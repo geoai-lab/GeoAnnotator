@@ -1,0 +1,77 @@
+.column {
+    float: left;
+    width: 50%;
+    margin: auto;
+
+  }
+
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  .column{
+      margin: auto;
+      
+  }
+  .highlight {
+    background-color: yellow;
+}
+.card {
+    border: 1px solid #cccccc;
+    width: 564px;
+    min-height: 68px;
+    padding: 10px;
+    display: flex;
+    font-family: "Helevetica", arial, sans-serif;
+    font-size: 14px;
+    line-height: 10px;
+    margin: auto;
+  }
+  .avatar {
+    width: 6%;
+    height: 70%;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  .name {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    margin-right: 0.3em;
+  }
+  .handle {
+    color: #8899a6;
+    font-size: 13px;
+  }
+  .time {
+    padding-left: 0.3em;
+    color: #8899a6;
+  }
+  .time::before {
+    content: '\00b7';
+    padding-right: 0.3em;
+  }
+  #loading {
+    background: url('spinner.gif') no-repeat center center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 9999999;
+}
+#highlight-button , #refresh-button {
+   
+    /* additional code */
+   
+    border-radius: 50%;
+    border: 1px solid black;
+    }
+#highlight-button {
+  background-color: yellow; 
+}
+#refresh-button {
+  background: url('spinner.gif') no-repeat center center;
+}
