@@ -5,7 +5,7 @@ import React from 'react';
 function App() {
   return (
     <div className="App">
-      <h1>Geo Annotator Tool</h1>
+      <h1 class="css-3d-text">GeoAnnotator for Disaster-related Location Descriptions</h1>
       <Submit_form/>
     </div>
   );

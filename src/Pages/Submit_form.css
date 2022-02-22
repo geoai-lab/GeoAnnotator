@@ -1,9 +1,16 @@
-.column {
+.column2, .column1 {
     float: left;
     width: 50%;
     margin: auto;
 
+
   }
+  .column2{
+    bottom: -80px;
+    position:relative;
+    width: 30%;
+  }
+
 
   /* Clear floats after the columns */
   .row:after {
@@ -12,7 +19,7 @@
     clear: both;
   }
 
-  .column{
+  .column1,.column2{
       margin: auto;
       
   }
@@ -84,4 +91,87 @@
   margin-bottom: 10px;
   overflow:scroll;
   -webkit-overflow-scrolling: touch;
+}
+.windows8 {
+	position: absolute;
+  left: 40%;
+	width: 182px;
+	height:182px;
+}
+.windows8 .wBall {
+	position: absolute;
+	width: 173px;
+	height: 173px;
+	opacity: 0;
+	transform: rotate(225deg);
+	animation: orbit 3.3s infinite;
+}
+.windows8 .wBall .wInnerBall{
+	position: absolute;
+	width: 23px;
+	height: 23px;
+	background: #000000;
+	left:0px;
+	top:0px;
+	border-radius: 23px;
+}
+.windows8 #wBall_1 {
+	animation-delay: 0.72s;
+}
+.windows8 #wBall_2 {
+	animation-delay: 0.14s;
+}
+.windows8 #wBall_3 {
+	animation-delay: 0.29s;
+}
+.windows8 #wBall_4 {
+	animation-delay: 0.43s;
+}
+.windows8 #wBall_5 {
+	animation-delay: 0.58s;
+}
+@keyframes orbit {
+	0% {
+		opacity: 1;
+		z-index:99;
+		transform: rotate(180deg);
+		animation-timing-function: ease-out;
+	}
+	7% {
+		opacity: 1;
+		transform: rotate(300deg);
+		animation-timing-function: linear;
+		origin:0%;
+	}
+	30% {
+		opacity: 1;
+		transform:rotate(410deg);
+		animation-timing-function: ease-in-out;
+		origin:7%;
+	}
+	39% {
+		opacity: 1;
+		transform: rotate(645deg);
+		animation-timing-function: linear;
+		origin:30%;
+	}
+	70%{
+		opacity: 1;
+		transform: rotate(770deg);
+		animation-timing-function: ease-out;
+		origin:39%;
+	}
+	75%{
+		opacity: 1;
+		transform: rotate(900deg);
+		animation-timing-function: ease-out;
+		origin:70%;
+	}
+	76% {
+		opacity: 0;
+		transform:rotate(900deg);
+	}100% {
+		opacity: 0;
+		transform: rotate(900deg);
+	}
 }

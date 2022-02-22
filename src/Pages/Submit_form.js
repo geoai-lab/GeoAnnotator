@@ -55,7 +55,23 @@ export const Submit_form = () => {
     }
     // Might need to implement to Rangy Soon
     if (isloading) {
-        return <div id="loading"></div>;
+        return<div class="windows8">
+        <div class="wBall" id="wBall_1">
+         <div class="wInnerBall"></div>
+        </div>
+        <div class="wBall" id="wBall_2">
+         <div class="wInnerBall"></div>
+        </div>
+        <div class="wBall" id="wBall_3">
+         <div class="wInnerBall"></div>
+        </div>
+        <div class="wBall" id="wBall_4">
+         <div class="wInnerBall"></div>
+       </div>
+       <div class="wBall" id="wBall_5">
+        <div class="wInnerBall"></div>
+       </div>
+      </div>;
     }
     const handleCategory = (e) => {
         setCategory(e.value)
@@ -129,11 +145,11 @@ export const Submit_form = () => {
             <Form>
                 {/*First Column*/}
                 <div className="row">
-                    <div className="column">
+                    <div className="column1">
                         <Leafletmap onChange={neuroHighlight}/>
                     </div>
                     {/*Second column*/}
-                    <div className="column" >
+                    <div className="column2" >
                         {/* Annotator might be removed soon*/}
                         <div className="row">
                             <label>
