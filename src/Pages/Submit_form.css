@@ -19,6 +19,10 @@
   .highlight {
     background-color: yellow;
 }
+.highlight-neuro {
+  background-color: red;
+}
+
 .card {
     border: 1px solid #cccccc;
     width: 564px;
@@ -74,4 +78,10 @@
 }
 #refresh-button {
   background: url('spinner.gif') no-repeat center center;
+}
+.list-group{
+  max-height: 300px;
+  margin-bottom: 10px;
+  overflow:scroll;
+  -webkit-overflow-scrolling: touch;
 }

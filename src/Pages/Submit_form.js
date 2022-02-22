@@ -15,8 +15,10 @@ export const Submit_form = () => {
     const [refresh, setRefresh] = useState(0)
     const [category, setCategory] = useState('')
     const [selection, setSelection] = useState([]);
+    const [neuroHighlight, setNeuroHighlight] = useState({})
+    // helpers
 
-    // helpers 
+
     const Required_comp = (value) => <input
         tabIndex={-1}
         autoComplete="off"
@@ -30,18 +32,20 @@ export const Submit_form = () => {
         { value: 'C5', label: 'Strawberry' },
         { value: 'vanilla', label: 'Vanilla' }
     ]
-    const chosenColors = [
-        ['#FC0', 'Highlight']]
+    
     useEffect(() => {
         fetch('/api').then(response => {
             if (response.ok) {
                 return response.json()
             }
         }).then(data => {
-            setTweet(data)
+            setTweet(data.content)
             setIsloading(false)
+            setNeuroHighlight(data.neuro_result)
+            console.log(data.id)
         }
         )
+        
 
     }, [])
     const handleClickRefresh = () => {
@@ -56,27 +60,69 @@ export const Submit_form = () => {
     const handleCategory = (e) => {
         setCategory(e.value)
     }
-    const handleSubmit = () => {
-
+    const handleSubmit = async () => {
+        if(!category){
+            return null;
+        }
+        try{
+            fetch('/api/submit',{
+                method:'POST', 
+                body: JSON.stringify({
+                    "Hi":"oh no"
+                })
+            })
+        }catch(e){
+            console.log(e)
+        }
     }
 
 
     const handleTextSelection = () => {
+
         const selection = Rangy.getSelection();
-        const beforeText = selection.toString();
         const highlighter = Rangy.createHighlighter();
         highlighter.addClassApplier(
             Rangy.createClassApplier("highlight", {
                 ignoreWhiteSpace: true,
                 elementTagName: "mark",
-                tagNames: ["mark"]
+                tagNames: ["mark"],
+                elementProperties: {
+                    href: "#",
+                    onclick: function () {
+                        var highlight = highlighter.getHighlightForElement(this);
+                        if (window.confirm("Delete this note (ID " + highlight.id + ")?")) {
+                            highlighter.removeHighlights([highlight]);
+                        }
+                        return false;
+                    }
+                }
             })
         );
         selection.expand("word", { containerElementId: "tweet" });
         highlighter.highlightSelection("highlight", { containerElementId: "tweet" });
+
+
         setSelection(allSelection => [...allSelection, selection.toString()])
     };
 
+    const handleAIToggle = () => {
+        // clicking again is not handled 
+        const range = Rangy.createRange()
+        var tweet_div = document.getElementById("tweet");
+        console.log(neuroHighlight)
+        ;
+        
+        for (var selection_tpr of neuroHighlight) {
+            var textNode = tweet_div.childNodes[0]
+            range.setStart(textNode, selection_tpr.start_idx);
+            range.setEnd(textNode, selection_tpr.end_idx);
+            
+            const mark = document.createElement('mark');
+            range.surroundContents(mark);
+            tweet_div.normalize()
+            
+        }   
+    }
     return (
         <>
 
@@ -84,7 +130,7 @@ export const Submit_form = () => {
                 {/*First Column*/}
                 <div className="row">
                     <div className="column">
-                        <Leafletmap />
+                        <Leafletmap onChange={neuroHighlight}/>
                     </div>
                     {/*Second column*/}
                     <div className="column" >
@@ -127,6 +173,11 @@ export const Submit_form = () => {
                                     type='button'
                                     title="Delete Highlights"
                                     onClick={handleClickRefresh}><i class="fa-solid fa-arrow-rotate-right"></i></Button>
+                                <Button
+                                    class="btn btn-secondary btn-floating"
+                                    type='button'
+                                    title="Show Ai Highlights"
+                                    onClick={handleAIToggle}><i class="fa-solid fa-brain"></i></Button>
                             </div>
                         </div>
                         <div className="row">
