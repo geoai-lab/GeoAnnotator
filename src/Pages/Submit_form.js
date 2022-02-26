@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Form, Button } from "react-bootstrap";
+import { Popup } from "./Popup"
 import Highlighter from "react-highlight-colors";
 import Creatable from 'react-select/creatable';
 import { Leafletmap } from "./leafletmap";
@@ -8,7 +9,8 @@ import 'rangy/lib/rangy-highlighter'
 import 'rangy/lib/rangy-classapplier'
 import Rangy from "rangy";
 import './Submit_form.css';
-import { ButtonHighlight } from "./ButtonHighlight"
+import { TwitterCard } from './TwitterCard';
+
 export const Submit_form = () => {
     const [tweet, setTweet] = useState('No Data... Please report to developer')
     const [isloading, setIsloading] = useState(true)
@@ -16,6 +18,9 @@ export const Submit_form = () => {
     const [category, setCategory] = useState('')
     const [selection, setSelection] = useState([]);
     const [neuroHighlight, setNeuroHighlight] = useState({})
+    const [highlighter, setHighlighter] = useState(null)
+   
+  
     // helpers
 
 
@@ -28,11 +33,18 @@ export const Submit_form = () => {
         required
     />
     const category_options = [
-        { value: 'C7', label: 'C7:Other human-made' },
-        { value: 'C5', label: 'Strawberry' },
-        { value: 'vanilla', label: 'Vanilla' }
+        { value: 'C1', label: 'C1:House number addresses' },
+        { value: 'C2', label: 'C2: Street names' },
+        { value: 'C3', label: 'C3: Highways' },
+        { value: 'C4', label: "C4: Exits of highways" },
+        { value: 'C5', label: "C5: Intersection of roads (rivers)" },
+        { value: 'C6', label: "C6: Natural features" },
+        { value: 'C7', label: "C7: Other human-made features" },
+        { value: 'C8', label: "C8: Local Organizations" },
+        { value: 'C9', label: "C9: Admin units" },
+        { value: 'C10', label: "C10: Multiple-areas" }
     ]
-    
+
     useEffect(() => {
         fetch('/api').then(response => {
             if (response.ok) {
@@ -45,7 +57,11 @@ export const Submit_form = () => {
             console.log(data.id)
         }
         )
+       
+        Rangy.init();
+        setHighlighter(Rangy.createHighlighter())
         
+
 
     }, [])
     const handleClickRefresh = () => {
@@ -55,48 +71,38 @@ export const Submit_form = () => {
     }
     // Might need to implement to Rangy Soon
     if (isloading) {
-        return<div class="windows8">
-        <div class="wBall" id="wBall_1">
-         <div class="wInnerBall"></div>
-        </div>
-        <div class="wBall" id="wBall_2">
-         <div class="wInnerBall"></div>
-        </div>
-        <div class="wBall" id="wBall_3">
-         <div class="wInnerBall"></div>
-        </div>
-        <div class="wBall" id="wBall_4">
-         <div class="wInnerBall"></div>
-       </div>
-       <div class="wBall" id="wBall_5">
-        <div class="wInnerBall"></div>
-       </div>
-      </div>;
+        return null;
     }
     const handleCategory = (e) => {
         setCategory(e.value)
     }
     const handleSubmit = async () => {
-        if(!category){
+        if (!category) {
             return null;
         }
-        try{
-            fetch('/api/submit',{
-                method:'POST', 
+        try {
+            fetch('/api/submit', {
+                method: 'POST',
                 body: JSON.stringify({
-                    "Hi":"oh no"
+                    "Hi": "oh no"
                 })
             })
-        }catch(e){
+        } catch (e) {
             console.log(e)
         }
     }
 
+    const deleteTextHighlight = () => {
+
+        highlighter.unhighlightSelection();
+
+    }
+    
 
     const handleTextSelection = () => {
 
         const selection = Rangy.getSelection();
-        const highlighter = Rangy.createHighlighter();
+
         highlighter.addClassApplier(
             Rangy.createClassApplier("highlight", {
                 ignoreWhiteSpace: true,
@@ -105,11 +111,12 @@ export const Submit_form = () => {
                 elementProperties: {
                     href: "#",
                     onclick: function () {
+                        
                         var highlight = highlighter.getHighlightForElement(this);
                         if (window.confirm("Delete this note (ID " + highlight.id + ")?")) {
                             highlighter.removeHighlights([highlight]);
                         }
-                        return false;
+                        return null;
                     }
                 }
             })
@@ -125,28 +132,50 @@ export const Submit_form = () => {
         // clicking again is not handled 
         const range = Rangy.createRange()
         var tweet_div = document.getElementById("tweet");
+        // need to make this a toggle on or off 
+        var new_index_side = 0
+        if (tweet_div.childNodes[1]) {
+            console.log(tweet_div.childNodes[1].tagName)
+        }
         console.log(neuroHighlight)
-        ;
-        
-        for (var selection_tpr of neuroHighlight) {
-            var textNode = tweet_div.childNodes[0]
-            range.setStart(textNode, selection_tpr.start_idx);
-            range.setEnd(textNode, selection_tpr.end_idx);
-            
-            const mark = document.createElement('mark');
-            range.surroundContents(mark);
-            tweet_div.normalize()
-            
-        }   
+
+
+        var keys = Object.keys(neuroHighlight)
+        var new_index_side = 0
+        for (var [nodeIndex, keyIndex] = [0, 0]; keyIndex < keys.length;) {
+            var Node = tweet_div.childNodes[nodeIndex]
+            if (!Node) {
+                break
+            }
+            else if (Node.tagName == 'MARK') {
+                nodeIndex++;
+                continue;
+            } else {
+                var objLocation = neuroHighlight[keys[keyIndex]]
+                console.log(objLocation.start_idx)
+                range.setStart(Node, objLocation.start_idx - new_index_side);
+                range.setEnd(Node, objLocation.end_idx - new_index_side);
+                new_index_side = objLocation.end_idx
+                const mark = document.createElement('mark');
+                range.surroundContents(mark);
+                keyIndex++;
+                nodeIndex++;
+            }
+
+
+        }
+
     }
     return (
         <>
 
+
             <Form>
+            
                 {/*First Column*/}
                 <div className="row">
                     <div className="column1">
-                        <Leafletmap onChange={neuroHighlight}/>
+                        <Leafletmap onChange={neuroHighlight} />
                     </div>
                     {/*Second column*/}
                     <div className="column2" >
@@ -157,27 +186,7 @@ export const Submit_form = () => {
                             </label>
                         </div>
                         <div className="row">
-                            <Card>
-                                <Card.Header>{"Please Highlight Tweet Location "}
-                                    <i class="fa-brands fa-twitter"></i>
-                                </Card.Header>
-                                <Card.Body>
-                                    {/* <Highlighter text={tweet}
-                                        colors={chosenColors}
-                                        export={(highlightedtext) => {
-                                            setHighlighttext(highlightedtext)
-                                        }}
-                                        key={refresh} /> */}
-
-                                    <span className="NameWithHandle">
-                                        <span className="name">Name</span>
-                                        <span className="handle">@HandleName</span>
-                                    </span>
-                                    <span className="time">3h ago</span>
-                                    <p key={refresh} id="tweet">{tweet}</p>
-
-                                </Card.Body>
-                            </Card>
+                            <TwitterCard key={refresh}>{tweet}</TwitterCard> 
                             <div>
                                 <Button
                                     class="btn btn-secondary btn-floating"
@@ -194,6 +203,12 @@ export const Submit_form = () => {
                                     type='button'
                                     title="Show Ai Highlights"
                                     onClick={handleAIToggle}><i class="fa-solid fa-brain"></i></Button>
+                                <Button
+                                    class="btn btn-secondary btn-floating"
+                                    type='button'
+                                    title="Show Ai Highlights"
+                                    onClick={deleteTextHighlight}><i class="fa-solid fa-arrow"></i></Button>
+
                             </div>
                         </div>
                         <div className="row">
@@ -203,6 +218,7 @@ export const Submit_form = () => {
                             </label>
                         </div>
                         <Button
+                            id="submit-button"
                             type='primary'
                             title="Submit Annotation"
                             onClick={handleSubmit}>Submit</Button>

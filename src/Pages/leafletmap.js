@@ -37,6 +37,7 @@ export const Leafletmap = ({ onChange }) => {
     const [mapLayers, setMapLayers] = useState({});
     const [isloading, setIsloading] = useState(true)
     const [locations, setLocations] = useState({})
+    const [locationTitle, setLocationTitle] = useState('')
     const [timeout, setTimeout] = useState(false)
     const [navbarOpen, setNavbarOpen] = useState(false)
     const [isinitial, setIsinitial] = useState(false)
@@ -47,18 +48,9 @@ export const Leafletmap = ({ onChange }) => {
 
     const ZOOM_LEVEL = 12;
     const mapRef = useRef();
-    const ChangeView = (center) => {
-        
-        // should only change when position changes 
-        const map = useMap();
-        if(!isinitial){
-            return null
-        }
-        map.setView(center.center, 12);
-        map.fitBounds(rectangleBoundary)
-        return null
-    }
+  
     useEffect(() => {
+        
         if (timeout == true) {
             console.log("already done waiting")
             return
@@ -94,7 +86,22 @@ export const Leafletmap = ({ onChange }) => {
 
     }, [timeout])
 
-
+    const ChangeView = (center) => {
+        //I could have it only run when positions change 
+        const map = useMap();
+        useEffect(() => {
+        // should only change when position changes 
+           
+            if(!isinitial){
+                return null
+            }
+            map.setView(center.center, 12);
+            map.fitBounds(rectangleBoundary)
+            setIsinitial(false)
+            return null
+        }, [position])
+        return null;
+    }
 
     if (isloading) {
         return <div class="windows8">
@@ -127,6 +134,8 @@ export const Leafletmap = ({ onChange }) => {
             json_value.bounds
         )
         setIsinitial(true)
+       
+        setLocationTitle(json_value.label)
 
     };
 
@@ -151,6 +160,7 @@ export const Leafletmap = ({ onChange }) => {
                 setRectangleBoundary(
                     data.location.bounds
                 )
+                setLocationTitle(data.location.label)
             });
             return () => map.removeControl(searchControl);
         }, []);
@@ -209,7 +219,22 @@ export const Leafletmap = ({ onChange }) => {
 
 
 
-    const purpleOptions = { color: 'purple' }
+    const purpleOptions = { color: 'red' }
+    var isSuggesion = (locations) =>{
+        if(locations){
+            if(Object.keys(locations).length > 0){
+                return(
+                    Object.keys(locations).map(function (key_o, index) {
+                        return (< Dropdown.Item
+                            as="button"
+                            onClick={(e) => { handleSuggestionRequest(e) }} key={key_o} id={key_o} value={JSON.stringify({ "latlng": [locations[key_o].y, locations[key_o].x], "bounds": locations[key_o].bounds, "label": locations[key_o].label})} >{locations[key_o].label}</Dropdown.Item >)
+                    })
+                )
+            }else{
+                return <Dropdown.Item>No Suggestion</Dropdown.Item>
+            }
+        }
+    }
     return (
         <>
 
@@ -219,8 +244,7 @@ export const Leafletmap = ({ onChange }) => {
 
                     <div className='form-group col-md-13'>
 
-                        <MapContainer center={position} zoom={ZOOM_LEVEL} ref={mapRef}
-
+                        <MapContainer id='leaflet-api' center={position} zoom={ZOOM_LEVEL} ref={mapRef}
                             attributionControl={false}>
                             <Rectangle
                                 bounds={rectangleBoundary}
@@ -239,8 +263,8 @@ export const Leafletmap = ({ onChange }) => {
                                             rectangle: true,
                                             circle: false,
                                             circlemarker: false,
-                                            marker: false,
-                                            polyline: false
+                                            marker: true,
+                                            polyline: true
                                         }
                                     }
                                 />
@@ -258,25 +282,23 @@ export const Leafletmap = ({ onChange }) => {
 
 
                     </div>
-
+                  
                 </div>
 
             </div>
+            
             <div class="suggestions" >
                 <DropdownButton id="dropdown-item-button" title="Suggestions" drop="up" 
                 variant="secondary" key="up" as={ButtonGroup}
                 align={{ lg: 'start' }}>
-                    { !isloading &&
-                    <Dropdown.Menu  >
-                        { Object.keys(locations).map(function (key_o, index) {
-                            return (< Dropdown.Item
-                                as="button"
-                                onClick={(e) => { handleSuggestionRequest(e) }} eventKey={key_o} id={key_o} value={JSON.stringify({ "latlng": [locations[key_o].y, locations[key_o].x], "bounds": locations[key_o].bounds })} >{locations[key_o].label}</Dropdown.Item >)
-                        })}
-                    </Dropdown.Menu>}
-                </DropdownButton>
-
+                        {isSuggesion(locations)}
+                </DropdownButton>   
+                   
             </div>
+            <div id="suggestion-title">
+                {locationTitle}
+            </div>
+         
         </>
     )
 }

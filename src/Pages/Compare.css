@@ -1,0 +1,21 @@
+#leaflet-compare {
+    height: 80%;
+    width: 100%;
+    top: 10px;
+    padding: 300px 100px;
+    position: relative;
+    border-radius: 0.1%;
+    padding-right: 200px;
+    z-index: 0;
+}
+.column {
+    float: left;
+    width: 50%;
+  }
+  
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }

@@ -1,5 +1,5 @@
 
-  .leaflet-container {
+  #leaflet-api {
     height: 90%;
     width: 62%;
     top: 8%;
@@ -13,9 +13,15 @@
     position: absolute;
     bottom: 30px;
     margin: auto;
-    
-   
-  
+}
+#suggestion-title{
+    position: absolute;
+    left: 300px;
+    bottom: 30px;
+    font-size: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 700px;
 }
 
     
@@ -39,12 +45,13 @@
 	animation: orbit 3.3s infinite;
 }
 .windows8 .wBall .wInnerBall{
-	position: absolute;
+	position: relative;
 	width: 6px;
 	height: 6px;
 	background: #000000;
-	left:0px;
-	top:0px;
+	left:100px;
+	
+    bottom: 1000px;
 	border-radius: 6px;
 }
 .windows8 #wBall_1 {
