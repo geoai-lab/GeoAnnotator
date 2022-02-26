@@ -8,7 +8,7 @@ import "rangy/lib/rangy-textrange";
 import 'rangy/lib/rangy-highlighter'
 import 'rangy/lib/rangy-classapplier'
 import Rangy from "rangy";
-import './Submit_form.css';
+import '../CSS-files/Submit_form.css';
 import { TwitterCard } from './TwitterCard';
 
 export const Submit_form = () => {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 import { Card } from 'react-bootstrap';
-import "./TwitterCard.css"
+import "../CSS-files/TwitterCard.css"
 export const TwitterCard = ({ children, key }) => {
   
     return (

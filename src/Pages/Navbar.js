@@ -1,16 +1,33 @@
 import React, {useState,useEffect} from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from './Button';
-import './Navbar.css'
+import '../CSS-files/Navbar.css'
+import axios from "axios";
+import Login from './Login';
 
-
-function Navbar(){
+export const Navbar = ({children}) => {
     const [click, setClick] = useState(false); 
     const [button, setButton] = useState(true); 
     const handleClick = () => {
         setClick(!click); 
     }
     const closeMobileMenu = () => {
+        setClick(false)
+    }
+    const handleLogout = () =>  {
+        axios({
+          method: "POST",
+          url:"/logout",
+        })
+        .then((response) => {
+           console.log("Successful logout")
+        }).catch((error) => {
+          if (error.response) {
+            console.log(error.response)
+            console.log(error.response.status)
+            console.log(error.response.headers)
+            }
+        })
         setClick(false)
     }
     const showButton = () => {
@@ -24,7 +41,9 @@ function Navbar(){
         showButton();
       }, []);
     window.addEventListener('resize', showButton)
-
+    const handleLoginPopup = () => {
+        document.getElementById("myDropdown").classList.toggle("show")
+      }
     return(
         <>
             <nav className="navbar">
@@ -51,9 +70,10 @@ function Navbar(){
                                 Compare Annotations 
                             </Link>
                         </li>
+                        
                         <li className='nav-item'>
-                            <Link to='/logout' className='nav-links' onClick={closeMobileMenu}>
-                                Logout 
+                            <Link to='/' className='nav-links' onClick={handleLoginPopup}>
+                             Login 
                             </Link>
                         </li>
                     </ul>
@@ -64,4 +84,3 @@ function Navbar(){
     )
 }
 
-export default Navbar 

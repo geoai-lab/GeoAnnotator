@@ -1,5 +1,5 @@
 import React from 'react'
-import "./Popup.css"
+import "../CSS-files/Popup.css"
 
 
 export const Popup = ({ children, trigger }) => {

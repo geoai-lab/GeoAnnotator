@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import { EditControl } from "react-leaflet-draw";
 import 'leaflet-geosearch/dist/geosearch.css';
 import "leaflet-draw/dist/leaflet.draw.css";
-import "./leafletmap.css"
+import "../CSS-files/leafletmap.css"
 
 import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup } from "react-bootstrap";
 import { slide as Menu } from 'react-burger-menu'

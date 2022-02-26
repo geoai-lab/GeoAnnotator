@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import "leaflet-draw/dist/leaflet.draw.css";
 import CreatableSelect from "react-select/creatable";
-import './Compare.css'
+import '../CSS-files/Compare.css'
 import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup } from "react-bootstrap";
 import { slide as Menu } from 'react-burger-menu'
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';

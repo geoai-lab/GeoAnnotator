@@ -1,40 +1,122 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 import json
+import bcrypt 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
+from sqlalchemy.exc import IntegrityError
 import os
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import current_user
 from flask_jwt_extended import jwt_required
-from flask_jwt_extended import JWTManager
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, get_jwt, get_jwt_identity, unset_jwt_cookies, jwt_required
 import json
+from flask_cors import CORS, cross_origin
+from flask_session import Session
+import redis
+from datetime import datetime, timedelta, timezone
+from models import db, tpr_database, User
+from dotenv import load_dotenv
+load_dotenv()
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///HarveyTwitter.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config["JWT_SECRET_KEY"] = os.environ.get('JWT_SECRET')
-jwt = JWTManager(app)
+app.config["SECRET_KEY"] = "6236413AA53537DE57D1F6931653B"
+app.config['SQLALCHEMY_ECHO'] = True
+app.config['SESSION_TYPE'] = "filesystem" # causes bugs right here this needs to be in redis soon need to download reddis and do some reddis cli stuff
+app.config['SESSION_USE_SIGNER'] = True
+#app.config['SESSION_COOKIE_NAME']
+#app.config['SESSION_COOKIE_DOMAIN]
+#app.config['SESSION_COOKies]
+#app.config['SESSION_COOKIE_SECURE'] = True # add this to make the cookies invisible or something 
+bcrypt = Bcrypt(app)
 
-db = SQLAlchemy(app)
+CORS(app, supports_credentials=True)
+server_session = Session(app)
+db.__init__(app)
+with app.app_context():
+    db.create_all()
 
-class tweet_database(db.Model):
-    __tablename__ = 'HarveyTwitterDataSet'
-    index = db.Column(db.Integer)
-    id = db.Column(db.Integer, primary_key = True)
-    text = db.Column(db.String, nullable = False)
-    created_at = db.Column(db.String)
-    def __str__(self):
-        return f'{self.id},{self.text},{self.created_at}'
-class tpr_database(db.Model):
-    __tablename__ = 'NeuroTPR-dataset'
-  
-    text = db.Column(db.String, nullable = False)
-    id = db.Column(db.Integer, primary_key = True)
-    created_at = db.Column(db.String)
-    neuro_data = db.Column(db.String, nullable = False)
-    correction_of_neuro = db.Column(db.String, nullable = False)
-    def __str__(self):
-        return f'{self.id},{self.text},{self.created_at},{self.neuro_data},{self.correction_of_neuro}'
+@app.route("/@me", methods = ["GET"])
+def get_current_user():
+    user_id = session.get("user_id")
 
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    user = User.query.filter_by(id=user_id).first()
+    print("ME SUCCESSFUL\n\n\n")
+    return jsonify({
+        "id": user.id,
+        "email": user.email
+    }) 
+
+@app.after_request
+def refresh_expiring_jwts(response):
+    try:
+        exp_timestamp = get_jwt()["exp"]
+        now = datetime.now(timezone.utc)
+        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+        if target_timestamp > exp_timestamp:
+            access_token = create_access_token(identity=get_jwt_identity())
+            data = response.get_json()
+            if type(data) is dict:
+                data["access_token"] = access_token 
+                response.data = json.dumps(data)
+        return response
+    except (RuntimeError, KeyError):
+        # Case where there is not a valid JWT. Just return the original respone
+        return response
+
+@app.route("/login", methods=["POST"])
+def login_user():
+    email = request.json["email"]
+    password = request.json["password"]
+
+    user = User.query.filter_by(email=email).first()
+
+    if user is None:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not bcrypt.check_password_hash(user.password, password):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    session["user_id"] = user.id
+
+    return jsonify({
+        "id": user.id,
+        "email": user.email
+    })
+
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.pop("user_id")
+    return "200"
+
+
+@app.route("/register", methods=["POST"])
+def register_user():
+    email = request.json["email"]
+    password = request.json["password"]
+
+    user_exists = User.query.filter_by(email=email).first() is not None
+
+    if user_exists:
+        return jsonify({"error": "User already exists"}), 409
+
+    hashed_password = bcrypt.generate_password_hash(password)
+    new_user = User(email=email, password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    
+    session["user_id"] = new_user.id
+
+    return jsonify({
+        "id": new_user.id,
+        "email": new_user.email
+    })
 
 @app.route('/api', methods=['GET'])
 def index():
@@ -53,18 +135,6 @@ def submission():
     print(request_data)
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
 
-@app.route("/login", methods=["POST"])
-def login():
-    username = request.json.get("username", None)
-    password = request.json.get("password", None)
-
-    user = User.query.filter_by(username=username).one_or_none()
-    if not user or not user.check_password(password):
-        return jsonify("Wrong username or password"), 401
-
-    # Notice that we are passing in the actual sqlalchemy user object here
-    access_token = create_access_token(identity=user)
-    return jsonify(access_token=access_token)
 
 if __name__ == '__main__':
     app.run(debug = True)
