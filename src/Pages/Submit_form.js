@@ -3,7 +3,7 @@ import { Card, Form, Button } from "react-bootstrap";
 import { Popup } from "./Popup"
 import Highlighter from "react-highlight-colors";
 import Creatable from 'react-select/creatable';
-import { Leafletmap } from "./leafletmap";
+import { Leafletmap } from "./Leafletmap";
 import "rangy/lib/rangy-textrange";
 import 'rangy/lib/rangy-highlighter'
 import 'rangy/lib/rangy-classapplier'
@@ -175,7 +175,7 @@ export const Submit_form = () => {
                 {/*First Column*/}
                 <div className="row">
                     <div className="column1">
-                        <Leafletmap onChange={neuroHighlight} />
+                        <Leafletmap id="annotate-map" onChange={neuroHighlight} />
                     </div>
                     {/*Second column*/}
                     <div className="column2" >

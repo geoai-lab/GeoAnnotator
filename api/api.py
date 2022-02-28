@@ -5,18 +5,17 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
 import os
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import current_user
-from flask_jwt_extended import jwt_required
+
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager, get_jwt, get_jwt_identity, unset_jwt_cookies, jwt_required
+
 import json
 from flask_cors import CORS, cross_origin
 from flask_session import Session
 import redis
 from datetime import datetime, timedelta, timezone
-from models import db, tpr_database, User
+from models import db, tpr_database, User, LoginForm
 from dotenv import load_dotenv
+from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 load_dotenv()
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///HarveyTwitter.db"
@@ -36,63 +35,56 @@ server_session = Session(app)
 db.__init__(app)
 with app.app_context():
     db.create_all()
+login_manager = LoginManager()
+login_manager.init_app(app)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.filter_by(id=user_id).first()
 
-@app.route("/@me", methods = ["GET"])
+@app.route("/@me", methods = ["POST"])
+@login_required
 def get_current_user():
-    user_id = session.get("user_id")
-
-    if not user_id:
+    
+    #print(current_user.is_authenticated)
+    if not current_user.is_authenticated:
         return jsonify({"error": "Unauthorized"}), 401
     
-    user = User.query.filter_by(id=user_id).first()
-    print("ME SUCCESSFUL\n\n\n")
     return jsonify({
-        "id": user.id,
-        "email": user.email
-    }) 
+        "id": current_user.id,
+        "email": current_user.email
+    }),200
 
-@app.after_request
-def refresh_expiring_jwts(response):
-    try:
-        exp_timestamp = get_jwt()["exp"]
-        now = datetime.now(timezone.utc)
-        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
-        if target_timestamp > exp_timestamp:
-            access_token = create_access_token(identity=get_jwt_identity())
-            data = response.get_json()
-            if type(data) is dict:
-                data["access_token"] = access_token 
-                response.data = json.dumps(data)
-        return response
-    except (RuntimeError, KeyError):
-        # Case where there is not a valid JWT. Just return the original respone
-        return response
+
 
 @app.route("/login", methods=["POST"])
-def login_user():
+def login():
+    loginform = LoginForm()
+
     email = request.json["email"]
     password = request.json["password"]
 
     user = User.query.filter_by(email=email).first()
-
+    print(loginform.password.data)
     if user is None:
         return jsonify({"error": "Unauthorized"}), 401
 
-    if not bcrypt.check_password_hash(user.password, password):
+    if not bcrypt.check_password_hash(user.password, loginform.password.data):
         return jsonify({"error": "Unauthorized"}), 401
     
-    session["user_id"] = user.id
+    login_user(user)
+   
 
     return jsonify({
         "id": user.id,
         "email": user.email
-    })
+    }),200
 
 
 
 @app.route("/logout", methods=["POST"])
+@login_required
 def logout():
-    session.pop("user_id")
+    logout_user()
     return "200"
 
 
@@ -100,7 +92,6 @@ def logout():
 def register_user():
     email = request.json["email"]
     password = request.json["password"]
-
     user_exists = User.query.filter_by(email=email).first() is not None
 
     if user_exists:
@@ -118,7 +109,13 @@ def register_user():
         "email": new_user.email
     })
 
+@app.route('/compare', methods =['GET'])
+@login_required
+def compare_data():
+    return 
+
 @app.route('/api', methods=['GET'])
+@login_required
 def index():
 
     tweets = tpr_database.query.order_by(func.random()).first()

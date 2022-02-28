@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
 import L, { geoJSON } from "leaflet"
-import { MapContainer, TileLayer, useMap, FeatureGroup, Polygon, Rectangle } from "react-leaflet";
+import { MapContainer, TileLayer, useMap, FeatureGroup, Polygon, Rectangle, GeoJSON } from "react-leaflet";
 import osm from "./osm-providers";
 import 'leaflet/dist/leaflet.css';
 import { EditControl } from "react-leaflet-draw";
@@ -23,15 +23,16 @@ L.Icon.Default.mergeOptions({
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png",
 });
 
-export const Leafletmap = ({ onChange }) => {
+export const Leafletmap = ({ children, id, onChange }) => {
     const provider = new OpenStreetMapProvider({
         params: {
             email: 'jv11699@gmail.com', // auth for large number of requests
-            countrycodes: 'us'
+            countrycodes: 'us',
+            polygon_geojson:"1"
         }
     }
     );
-
+    
     //Results must be cached on your side. Clients sending repeatedly the same query may be classified as faulty and blocked.
     const [position, setPosition] = useState({ lat: 43.5128472, lng: -76.2510408 }); // { lat: 42.8864, lng: -78.8784 }
     const [mapLayers, setMapLayers] = useState({});
@@ -63,7 +64,8 @@ export const Leafletmap = ({ onChange }) => {
         }
         const fetchData = async () => {
             try {
-                const data = await provider.search({ query: location_total, country: "us", credentials: "same-origin" })
+                const data = await provider.search({ query: location_total, country: "us", credentials: "same-origin", format:"geojson" })
+                console.log(data)
                 return data
             }
             catch (error) {
@@ -77,6 +79,7 @@ export const Leafletmap = ({ onChange }) => {
                 setLocations(data)
                 setTimeout(true)
                 setIsloading(false)
+              
             })
         }, 1500)
 
@@ -146,7 +149,8 @@ export const Leafletmap = ({ onChange }) => {
             style: 'button',
             position: 'topleft',
             keepResult: true,
-            updateMap: true
+            updateMap: true, 
+            polygon_geojson:"1"
         });
 
         const map = useMap();
@@ -161,6 +165,7 @@ export const Leafletmap = ({ onChange }) => {
                     data.location.bounds
                 )
                 setLocationTitle(data.location.label)
+                console.log(data)
             });
             return () => map.removeControl(searchControl);
         }, []);
@@ -235,6 +240,7 @@ export const Leafletmap = ({ onChange }) => {
             }
         }
     }
+    
     return (
         <>
 
@@ -244,12 +250,13 @@ export const Leafletmap = ({ onChange }) => {
 
                     <div className='form-group col-md-13'>
 
-                        <MapContainer id='leaflet-api' center={position} zoom={ZOOM_LEVEL} ref={mapRef}
+                        <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={mapRef}
                             attributionControl={false}>
                             <Rectangle
                                 bounds={rectangleBoundary}
                                 pathOptions={purpleOptions}
                             />
+                            {/* <GeoJSON data={locations[0].raw.geojson}/> */}
                             <ChangeView center={position} />
                             <SearchField />
                             <FeatureGroup>

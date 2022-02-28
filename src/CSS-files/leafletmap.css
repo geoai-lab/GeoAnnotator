@@ -1,5 +1,12 @@
 
-  #leaflet-api {
+  #create-map {
+    height: 90%;
+    width: 48%;
+    top: 8%;
+    position: absolute;
+    z-index: 0;
+}
+#annotate-map {
     height: 90%;
     width: 62%;
     top: 8%;
