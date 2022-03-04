@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from "axios";
 import Draggable from 'react-draggable';
 import "../CSS-files/Login.css"
 import CreatableSelect from "react-select/creatable";
-export const Login = ({ children, OnLogin }) => {
+export const Login = ({ children, OnLogin, projectNames }) => {
   const [isRegistering, setIsRegistering] = useState(false)
   const [loginForm, setloginForm] = useState({
     email: "",
@@ -16,35 +16,50 @@ export const Login = ({ children, OnLogin }) => {
     username: ""
   })
 
+  useEffect(() => {
+    console.log(projectNames)
+    document.getElementById("myDropdown").classList.toggle("show")
+    
+  }, [])
+
 
   const logMeIn = (event) => {
     event.preventDefault()
+    
     axios({
       method: "POST",
-      url: "/login",
+      url: isRegistering ? "/register" : "/login",
       withCredentials: true,
-      data: {
+      data: !isRegistering ? {
         email: loginForm.email,
         password: loginForm.password
+      } : {
+        email: registerForm.email,
+        password: registerForm.password,
+        retypepassword: registerForm.retypepassword,
+        username: registerForm.username
       }
     })
       .then((response) => {
         if (response.status == 200) {
-          console.log("login succesful")
-          alert("successfuly logged in")
+          console.log("login succesful");
+          isRegistering ? alert("successful on registering") : alert("successfuly logged in");
           var x = document.getElementById("myDropdown");
           x.classList.toggle("show");
           OnLogin(true);
-          setIsRegistering(false)
-
+          setIsRegistering(false);
         }
+
       }).catch((error) => {
         if (error.response.status == 401) {
           console.log(error.response)
           console.log(error.response.status)
           console.log(error.response.headers)
           alert("Invalid credentials")
-          OnLogin(false)
+          OnLogin(false);
+        }
+        else if (error.response.status == 409) {
+          alert(error.response.data)
         }
       })
 
@@ -56,11 +71,20 @@ export const Login = ({ children, OnLogin }) => {
 
   function handleChange(event) {
     const { value, name } = event.target
-    setloginForm(prevNote => ({
-      ...prevNote, [name]: value
-    })
-    )
+    if (!isRegistering) {
+      setloginForm(prevNote => ({
+        ...prevNote, [name]: value
+      })
+      )
+    } else {
+      setregisterForm(prevNote => ({
+        ...prevNote, [name]: value
+      })
+      )
+    }
+
   }
+
 
   const handleClick = () => {
     document.getElementById("myDropdown").classList.toggle("show")
@@ -110,15 +134,20 @@ export const Login = ({ children, OnLogin }) => {
                 value={registerForm.username}
                 required />
             </div>}
-          Project:<CreatableSelect
-            options={["default"]}
-            noOptionsMessage={() => null}
-            promptTextCreator={() => false}
-            formatCreateLabel={() => undefined} />
-          <button >Create New Project</button>
-          <button onClick={HandleRegister} >{isRegistering ? 'Back to log-in' : 'New User'}</button>
-          <button type="primary" onClick={logMeIn}>Submit</button>
+          <div>
+            Project:<CreatableSelect
+              options={projectNames.map(name => Object({"label": name}) ) }
+              noOptionsMessage={() => null}
+              promptTextCreator={() => false}
+              formatCreateLabel={() => undefined} />
+
+            <button type="secondary" onClick={HandleRegister} >{isRegistering ? 'Back to log-in' : 'New User'}</button>
+            <button type="secondary" onClick={logMeIn} >{ 'Create a Project' }</button>
+            <button type="primary" onClick={logMeIn}>Submit</button>
+            
+          </div>
         </form>
+
         {!isRegistering && <p>Forgot your password? <a href='/lostpassword'>Click Here!</a></p>}
       </div>
     </div>

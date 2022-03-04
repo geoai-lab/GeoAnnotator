@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, request, session
-import json
+from flask import Flask, jsonify, request, session,redirect
 import bcrypt 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
@@ -13,9 +12,11 @@ from flask_cors import CORS, cross_origin
 from flask_session import Session
 import redis
 from datetime import datetime, timedelta, timezone
-from models import db, tpr_database, User, LoginForm
+from models import db, tpr_database, User, LoginForm, Project
 from dotenv import load_dotenv
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
+
+
 load_dotenv()
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///HarveyTwitter.db"
@@ -37,9 +38,16 @@ with app.app_context():
     db.create_all()
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+with app.app_context():
+    optionsData = jsonify(json.load(open('../../createProjectOptions.json')))
+
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
+
 
 @app.route("/@me", methods = ["POST"])
 @login_required
@@ -51,20 +59,18 @@ def get_current_user():
     
     return jsonify({
         "id": current_user.id,
-        "email": current_user.email
+        "email": current_user.email,
+        "username": current_user.username
     }),200
-
 
 
 @app.route("/login", methods=["POST"])
 def login():
     loginform = LoginForm()
-
     email = request.json["email"]
     password = request.json["password"]
 
-    user = User.query.filter_by(email=email).first()
-    print(loginform.password.data)
+    user = User.query.filter_by(email=loginform.email.data).first()
     if user is None:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -85,29 +91,59 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return "200"
+    return redirect("/", code=200)
 
+@app.route("/createproject", methods=["GET"])
+@login_required
+def create():
+    return optionsData, 200
+
+@app.route("/project+descriptions", methods=["GET"])
+@login_required
+def project_descriptions():
+    projects = Project.query.all()
+    list_of_projects = []
+    for project in projects:
+        list_of_projects.append({"project-name": project.project_name, "geo_json": project.geo_json})
+    return jsonify(list_of_projects), 200
+
+@app.route("/createproject-submit", methods=["POST"])
+@login_required
+def createproject_submission():
+    projectName = request.json["Project Name"]
+    mapLayers = request.json["map-layers"]
+    project_exists = Project.query.filter_by(project_name = projectName).first() is not None
+
+    if(project_exists):
+        return jsonify({"error": "project already exists"}), 409
+    new_project = Project(project_name = projectName, geo_json = mapLayers )
+    db.session.add(new_project)
+    db.session.commit()
+    return redirect("/createproject", code=200)
 
 @app.route("/register", methods=["POST"])
 def register_user():
+    print(request.json)
     email = request.json["email"]
     password = request.json["password"]
+    retype = request.json["retypepassword"]
+    username = request.json["username"]
     user_exists = User.query.filter_by(email=email).first() is not None
 
     if user_exists:
         return jsonify({"error": "User already exists"}), 409
-
+    elif password != retype:
+        return jsonify({"error":"password do not match"}), 409
     hashed_password = bcrypt.generate_password_hash(password)
-    new_user = User(email=email, password=hashed_password)
+    new_user = User(email=email, username=username ,password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
     
-    session["user_id"] = new_user.id
-
+    login_user(new_user)
     return jsonify({
         "id": new_user.id,
         "email": new_user.email
-    })
+    }), 200
 
 @app.route('/compare', methods =['GET'])
 @login_required

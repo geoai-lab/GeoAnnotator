@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { Card, Form, Button } from "react-bootstrap";
 import { Popup } from "./Popup"
 import Highlighter from "react-highlight-colors";
@@ -19,8 +19,8 @@ export const Submit_form = () => {
     const [selection, setSelection] = useState([]);
     const [neuroHighlight, setNeuroHighlight] = useState({})
     const [highlighter, setHighlighter] = useState(null)
-   
-  
+    const [toggleSubmit, setToggleSubmit]= useState(false)
+    Rangy.init()
     // helpers
 
 
@@ -54,16 +54,53 @@ export const Submit_form = () => {
             setTweet(data.content)
             setIsloading(false)
             setNeuroHighlight(data.neuro_result)
-            console.log(data.id)
+          
         }
         )
        
-        Rangy.init();
+        console.log("went thru")
         setHighlighter(Rangy.createHighlighter())
         
+        
 
-
-    }, [])
+    }, [toggleSubmit])
+    const AIToggle = useMemo( () => {
+        
+      
+        var tweet_div = document.getElementById("tweet");
+        const range = Rangy.createRange()
+        if(!tweet_div){ // check if the div exists
+            return null; 
+        }
+       
+        var new_index_side = 0
+        if (tweet_div.childNodes[1]) {
+            console.log(tweet_div.childNodes[1].tagName)
+        }
+        console.log(neuroHighlight)
+        var keys = Object.keys(neuroHighlight)
+        var new_index_side = 0
+        for (var [nodeIndex, keyIndex] = [0, 0]; keyIndex < keys.length;) {
+            var Node = tweet_div.childNodes[nodeIndex]
+            if (!Node) {
+                break
+            }
+            else if (Node.tagName == 'MARK') {
+                nodeIndex++;
+                continue;
+            } else {
+                var objLocation = neuroHighlight[keys[keyIndex]]
+                console.log(objLocation.start_idx)
+                range.setStart(Node, objLocation.start_idx - new_index_side);
+                range.setEnd(Node, objLocation.end_idx - new_index_side);
+                new_index_side = objLocation.end_idx
+                const mark = document.createElement('mark');
+                range.surroundContents(mark);
+                keyIndex++;
+                nodeIndex++;
+            }
+        }
+    }, [neuroHighlight])
     const handleClickRefresh = () => {
         setRefresh(refresh + 1)
         setSelection([])
@@ -77,6 +114,7 @@ export const Submit_form = () => {
         setCategory(e.value)
     }
     const handleSubmit = async () => {
+     
         if (!category) {
             return null;
         }
@@ -90,6 +128,9 @@ export const Submit_form = () => {
         } catch (e) {
             console.log(e)
         }
+        setToggleSubmit(data => !data)
+
+        
     }
 
     const deleteTextHighlight = () => {
@@ -127,45 +168,8 @@ export const Submit_form = () => {
 
         setSelection(allSelection => [...allSelection, selection.toString()])
     };
-
-    const handleAIToggle = () => {
-        // clicking again is not handled 
-        const range = Rangy.createRange()
-        var tweet_div = document.getElementById("tweet");
-        // need to make this a toggle on or off 
-        var new_index_side = 0
-        if (tweet_div.childNodes[1]) {
-            console.log(tweet_div.childNodes[1].tagName)
-        }
-        console.log(neuroHighlight)
-
-
-        var keys = Object.keys(neuroHighlight)
-        var new_index_side = 0
-        for (var [nodeIndex, keyIndex] = [0, 0]; keyIndex < keys.length;) {
-            var Node = tweet_div.childNodes[nodeIndex]
-            if (!Node) {
-                break
-            }
-            else if (Node.tagName == 'MARK') {
-                nodeIndex++;
-                continue;
-            } else {
-                var objLocation = neuroHighlight[keys[keyIndex]]
-                console.log(objLocation.start_idx)
-                range.setStart(Node, objLocation.start_idx - new_index_side);
-                range.setEnd(Node, objLocation.end_idx - new_index_side);
-                new_index_side = objLocation.end_idx
-                const mark = document.createElement('mark');
-                range.surroundContents(mark);
-                keyIndex++;
-                nodeIndex++;
-            }
-
-
-        }
-
-    }
+   
+    
     return (
         <>
 
@@ -175,39 +179,32 @@ export const Submit_form = () => {
                 {/*First Column*/}
                 <div className="row">
                     <div className="column1">
-                        <Leafletmap id="annotate-map" onChange={neuroHighlight} />
+                        <Leafletmap id="annotate-map" onChange={neuroHighlight} searchBar={true} drawings={true}/>
                     </div>
+                    
                     {/*Second column*/}
                     <div className="column2" >
-                        {/* Annotator might be removed soon*/}
+                        
                         <div className="row">
-                            <label>
-                                Annotator: <input type="text" />
-                            </label>
-                        </div>
-                        <div className="row">
-                            <TwitterCard key={refresh}>{tweet}</TwitterCard> 
+                            <TwitterCard uniqueKey={refresh}>{tweet}</TwitterCard> 
+                            {AIToggle}
                             <div>
                                 <Button
-                                    class="btn btn-secondary btn-floating"
+                                    className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Highlight Text"
-                                    onClick={handleTextSelection}><i class="fa-solid fa-highlighter"></i></Button>
+                                    onClick={handleTextSelection}><i className="fa-solid fa-highlighter"></i></Button>
                                 <Button
-                                    class="btn btn-secondary btn-floating"
+                                    className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Delete Highlights"
-                                    onClick={handleClickRefresh}><i class="fa-solid fa-arrow-rotate-right"></i></Button>
+                                    onClick={handleClickRefresh}><i className="fa-solid fa-arrow-rotate-right"></i></Button>
+                                
                                 <Button
-                                    class="btn btn-secondary btn-floating"
+                                    className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Show Ai Highlights"
-                                    onClick={handleAIToggle}><i class="fa-solid fa-brain"></i></Button>
-                                <Button
-                                    class="btn btn-secondary btn-floating"
-                                    type='button'
-                                    title="Show Ai Highlights"
-                                    onClick={deleteTextHighlight}><i class="fa-solid fa-arrow"></i></Button>
+                                    onClick={deleteTextHighlight}><i className="fa-solid fa-arrow"></i></Button>
 
                             </div>
                         </div>
@@ -219,9 +216,10 @@ export const Submit_form = () => {
                         </div>
                         <Button
                             id="submit-button"
-                            type='primary'
+                            type='button'
                             title="Submit Annotation"
                             onClick={handleSubmit}>Submit</Button>
+                        
                     </div>
                 </div>
 

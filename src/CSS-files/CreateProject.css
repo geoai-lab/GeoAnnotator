@@ -1,24 +1,40 @@
+.createBox{
+   
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
 .form-create{
+ 
     background:white;
-    width:700px;
+    position: absolute;
+    left: 10%;
+    top: 25%;
     border-radius:6px;
     margin: 0 auto 0 auto;
     padding:0px 0px 70px 0px;
     height: 500px;
+    width: 600px;
     border: #2980b9 4px solid;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    
    
   }
+  
   .form-create input{
-    
+   
     background:#ecf0f1;
     border: #ccc 1px solid;
     border-bottom: #ccc 2px solid;
+    margin: 20px;
     padding: 8px;
-    width:250px;
+    width:550px;
     color:#AAAAAA;
     margin-top:10px;
     font-size:1em;
+    
     border-radius:4px;
     
   }
@@ -48,7 +64,7 @@
     }
 
   
-.form-create #createbtn{
+.form-create .createbtn{
     position:relative;
     top: 50px;
     

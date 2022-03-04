@@ -1,9 +1,6 @@
-
 import axios from "axios";
-
 import '../CSS-files/CreateProject.css'
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
-
 import L, { geoJSON } from "leaflet"
 import { MapContainer, TileLayer, useMap, FeatureGroup, Polygon, Rectangle } from "react-leaflet";
 import osm from "./osm-providers";
@@ -14,41 +11,84 @@ import CreatableSelect from "react-select/creatable";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { TwitterCard } from './TwitterCard'
 import { Leafletmap } from "./Leafletmap";
-export const CreateProject = ({ children, OnLogin }) => {
-    
-    const [location, setLocation] = useState([{
-        location_name:"Arkansas, United States"
-    }])
 
-    const state_options = [{'value': 'AK', 'label': 'Alaska'}, {'value': 'AL', 'label': 'Alabama'}, {'value': 'AR', 'label': 'Arkansas'}, 
-    {'value': 'AZ', 'label': 'Arizona'}, {'value': 'CA', 'label': 'California'}, {'value': 'CO', 'label': 'Colorado'}, {'value': 'CT', 'label': 'Connecticut'}, 
-    {'value': 'DC', 'label': 'District of Columbia'}, {'value': 'DE', 'label': 'Delaware'}, {'value': 'FL', 'label': 'Florida'}, {'value': 'GA', 'label': 'Georgia'}, 
-    {'value': 'HI', 'label': 'Hawaii'}, {'value': 'IA', 'label': 'Iowa'}, {'value': 'ID', 'label': 'Idaho'}, {'value': 'IL', 'label': 'Illinois'}, {'value': 'IN', 'label': 'Indiana'}, {'value': 'KS', 'label': 'Kansas'}, {'value': 'KY', 'label': 'Kentucky'}, {'value': 'LA', 'label': 'Louisiana'}, {'value': 'MA', 'label': 'Massachusetts'}, {'value': 'MD', 'label': 'Maryland'}, {'value': 'ME', 'label': 'Maine'}, {'value': 'MI', 'label': 'Michigan'}, {'value': 'MN', 'label': 'Minnesota'}, {'value': 'MO', 'label': 'Missouri'}, {'value': 'MS', 'label': 'Mississippi'}, {'value': 'MT', 'label': 'Montana'}, {'value': 'NC', 'label': 'North Carolina'}, {'value': 'ND', 'label': 'North Dakota'}, {'value': 'NE', 'label': 'Nebraska'}, {'value': 'NH', 'label': 'New Hampshire'}, {'value': 'NJ', 'label': 'New Jersey'}, {'value': 'NM', 'label': 'New Mexico'}, {'value': 'NV', 'label': 'Nevada'}, {'value': 'NY', 'label': 'New York'}, {'value': 'OH', 'label': 'Ohio'}, {'value': 'OK', 'label': 'Oklahoma'}, {'value': 'OR', 'label': 'Oregon'}, {'value': 'PA', 'label': 'Pennsylvania'}, {'value': 'RI', 'label': 'Rhode Island'}, {'value': 'SC', 'label': 'South Carolina'}, {'value': 'SD', 'label': 'South Dakota'}, {'value': 'TN', 'label': 'Tennessee'}, {'value': 'TX', 'label': 'Texas'}, {'value': 'UT', 'label': 'Utah'}, {'value': 'VA', 'label': 'Virginia'}, {'value': 'VT', 'label': 'Vermont'}, {'value': 'WA', 'label': 'Washington'}, {'value': 'WI', 'label': 'Wisconsin'}, {'value': 'WV', 'label': 'West Virginia'}, {'value': 'WY', 'label': 'Wyoming'}]
-    
+export const CreateProject = ({ children }) => {
+    const [jsondata, setJsondata] = useState(null)
+    const [location, setLocation] = useState([{
+        location_name: "Arkansas, United States"
+    }])
+    const [projectName, setProjectName] = useState(null)
+    const [selectionState, setSelectionState] = useState(true)
+    const [dataOptions, setDataOptions] = useState(null)
+    const [mapLayers, setMapLayers] = useState(null)
+    useEffect(() => {
+        fetch('/createproject').then(response => {
+            if (response.ok) {
+                return response.json()
+            }
+        }).then(data => {
+            setDataOptions(data)
+        }
+        )
+    }, [])
+
+    const handleStateClick = (event) => {
+
+        setJsondata(event.geojson)
+        console.log(event.geojson)
+    }
+    const handleSave = (event) => {
+        event.preventDefault();
+        console.log(mapLayers);
+        axios({
+            method: "POST",
+            url: "/createproject-submit",
+            withCredentials: true,
+            data: {
+                "Project Name":projectName, 
+                "map-layers":JSON.stringify(mapLayers) , 
+            }
+           })
+            .then((response) => {
+                if (response.status == 200) {
+                  
+                }
+
+            }).catch((error) => {
+                if (error.response.status == 401) {
+                 
+                }
+                else if (error.response.status == 409) {
+                    
+                }
+            })
+    }
 
     return (
 
 
-        <>
+        <div className="createBox">
             <div className="column">
                 <form className="form-create">
-                    Project Name: <input />
-                    <input id="selection1" type="radio" value="state" name="createProj" /> Select a State <CreatableSelect
-                        options={state_options}
+                    Project Name: <input onChange={(e) => setProjectName(e.target.value)} />
+                    <input id="selection1" type="radio" value="state" name="createProj" onClick={() => setSelectionState(true)} /> Select a State {selectionState && <CreatableSelect
+                        options={dataOptions}
                         id="selection1"
                         noOptionsMessage={() => null}
                         promptTextCreator={() => false}
-                        formatCreateLabel={() => undefined} />
-                    <input id="selection" type="radio" name="createProj" /> Draw the geographic score on map
-                    <button id="createbtn" style={{ "float": "left" }}>Save</button>
-                    <button id="createbtn" style={{ "float": "right" }}>Cancel</button>
+                        formatCreateLabel={() => undefined}
+                        onChange={handleStateClick} />}
+                    <input id="selection" type="radio" name="createProj" onClick={() => setSelectionState(false)} /> Draw the geographic score on map
+                    <button type="secondary" className="createbtn" style={{ "float": "left" }} onClick={handleSave} >Save</button>
+                    <button className="createbtn" style={{ "float": "right" }}>Cancel</button>
 
                 </form>
             </div>
             <div className="column">
-              <Leafletmap id="create-map" onChange={location}/>
+                {/* Below is map re renders after every switch of state or drawing */}
+                {selectionState ? <Leafletmap key="1" geojson={jsondata} id="create-map" drawings={false} setMaplayersFunction={setMapLayers} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={true} drawings={true} setMaplayersFunction={setMapLayers} />}
             </div>
-        </>
+        </div>
 
     );
 }

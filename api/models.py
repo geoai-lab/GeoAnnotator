@@ -5,6 +5,7 @@ from flask_login import UserMixin
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
+from flask import jsonify, json
 db = SQLAlchemy()
 def get_uuid():
     return uuid4().hex
@@ -50,3 +51,17 @@ class LoginForm(FlaskForm):
     email = StringField('email', validators=[DataRequired()])
     password = PasswordField('password', validators=[DataRequired()])
     submit= SubmitField('Sign-in')
+
+class Project(db.Model):
+    __tablename__ = 'projects'
+    project_id = db.Column(db.String(32), primary_key=True, unique=True, default=get_uuid)
+    project_name = db.Column(db.String, nullable = False)
+    geo_json = db.Column(db.String)
+  
+  
+
+
+
+
+
+  

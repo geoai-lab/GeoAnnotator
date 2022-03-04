@@ -15,15 +15,15 @@
     z-index: 0;
 }
 .suggestions{
-    color: red;
-    float: left;
-    position: absolute;
-    bottom: 30px;
-    margin: auto;
+	
+    position: fixed;
+    width: 30%;
+	top: -5%;
+    margin: 10%;
 }
 #suggestion-title{
     position: absolute;
-    left: 300px;
+    left: 55%;
     bottom: 30px;
     font-size: 1em;
     overflow: hidden;
@@ -33,31 +33,24 @@
 
     
 
-.loading-screen{
-   position: absolute;
-   float:left; 
-   left: 100%;
+
+.windows8,.wBall, .wInnerBall {
+	
+	height: 90%;
+    width: 50%;
+    top: 30%;
+    position: absolute;
+    left: 50%;
+    z-index: 0;
 }
-.windows8 {
-	position: relative;
-	width: 50px;
-	height:50px;
-}
-.windows8 .wBall {
-	position: absolute;
-	width: 48px;
-	height: 48px;
-	opacity: 0;
+ .wBall {
+	
 	transform: rotate(225deg);
 	animation: orbit 3.3s infinite;
 }
-.windows8 .wBall .wInnerBall{
-	position: relative;
-	width: 6px;
-	height: 6px;
+ .wBall .wInnerBall{
+
 	background: #000000;
-	left:100px;
-	
     bottom: 1000px;
 	border-radius: 6px;
 }

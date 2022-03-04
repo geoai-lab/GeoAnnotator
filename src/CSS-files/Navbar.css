@@ -46,10 +46,10 @@
     font-size: 1.8rem;
   }
   
-  .nav-menu {
+  .nav-menu{
     display: grid;
-    grid-template-columns: repeat(4, auto);
-    grid-gap: 10px;
+    grid-template-columns: repeat(5, auto);
+    grid-gap: 2px;
     list-style: none;
     text-align: center;
     width: 60vw;
@@ -58,9 +58,32 @@
   }
   
   .nav-item {
+    display: inline-block;
+    position: relative;
     height: 80px;
+  
+  }
+  .nav-item:hover .nav__submenu{
+    display: block;
+  }
+  .nav__submenu, .nav__submenu-item a {
+    font-weight: 300;
+    text-transform: none;
+    display: none;
+    position: absolute;
+    width: 180px;
+  }
+
+  .nav__submenu-item, .nav__submenu-item a{
+    display: grid;
+    box-sizing: border-box;
+    background: #4d4d44;
+    height: 35px;
+    color: white;
+    grid-gap: 10px;
   }
   
+ 
   .nav-links {
     color: #fff;
     display: flex;
@@ -69,10 +92,16 @@
     padding: 0.5rem 1rem;
     height: 100%;
   }
-  
-  .nav-links:hover {
+  .nav__submenu{
+    top: 100%;
+    left: -40px;
+    position: absolute;
+  }
+  .nav-links:hover, .nav__submenu-item:hover, .nav__submenu-item a:hover {
+    color:#242222;
     border-bottom: 4px solid #fff;
     transition: all 0.2s ease-out;
+    cursor: pointer;
   }
   
   .fa-bars {

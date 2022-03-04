@@ -8,8 +8,11 @@ import { EditControl } from "react-leaflet-draw";
 import 'leaflet-geosearch/dist/geosearch.css';
 import "leaflet-draw/dist/leaflet.draw.css";
 import "../CSS-files/leafletmap.css"
+import { MDBCol } from "mdbreact";
+import { useDebounce } from 'use-debounce';
+import AsyncSelect from 'react-select/async';
 
-import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup } from "react-bootstrap";
+import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup, InputGroup } from "react-bootstrap";
 import { slide as Menu } from 'react-burger-menu'
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 // Once checked double check with saved on database theres a bounds and a x y 
@@ -23,79 +26,169 @@ L.Icon.Default.mergeOptions({
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png",
 });
 
-export const Leafletmap = ({ children, id, onChange }) => {
+export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings, setMaplayersFunction }) => {
     const provider = new OpenStreetMapProvider({
         params: {
             email: 'jv11699@gmail.com', // auth for large number of requests
             countrycodes: 'us',
-            polygon_geojson:"1"
+            polygon_geojson: "1"
         }
     }
     );
-    
+
+    // need to fix caching mechanism
     //Results must be cached on your side. Clients sending repeatedly the same query may be classified as faulty and blocked.
-    const [position, setPosition] = useState({ lat: 43.5128472, lng: -76.2510408 }); // { lat: 42.8864, lng: -78.8784 }
-    const [mapLayers, setMapLayers] = useState({});
+    const [position, setPosition] = useState({ lat:39.7837304, lng: -100.445882 }); // { lat: 42.8864, lng: -78.8784 }
+    const [mapLayers, setMapLayers] = useState({}); // puts the data needed to get submitted 
     const [isloading, setIsloading] = useState(true)
     const [locations, setLocations] = useState({})
     const [locationTitle, setLocationTitle] = useState('')
-    const [timeout, setTimeout] = useState(false)
+    const [timeout, setTempTimeout] = useState(false)
     const [navbarOpen, setNavbarOpen] = useState(false)
     const [isinitial, setIsinitial] = useState(false)
-    const [rectangleBoundary, setRectangleBoundary] = useState([
-        [43.4928472, -76.2710408],
-        [43.5328472, -76.2310408]
-    ])
-
-    const ZOOM_LEVEL = 12;
+    const [SearchText, setSearchText] = useState("");
+    const [SearchBounceValue] = useDebounce(SearchText, 1500);
+    const [uniqueKey, setUniqueKey] = useState(0)
+    const [geojsonLayer, setGeojsonLayer] = useState(null)
+    const [rectangleBoundary, setRectangleBoundary] = useState()
+    const [map, setMap] = useState(null)
+    const [geojsonTag, setGeojsonTag] = useState(null)
+    const ZOOM_LEVEL = 4;
     const mapRef = useRef();
-  
+    var typingTimer;
+
     useEffect(() => {
+      
+        if (searchBar && onChange) { // only fires during the /api
+            var location_total = ""
+            if (Object.keys(onChange).length !== 0) {
+                for (var predicted of onChange) {
+                    location_total = location_total + predicted.location_name + " "
+                }
+            }
+            setSearchText(location_total)
+            var res_api = setTimeout(() => {
+                fetchData(location_total).then(data => {
+                    setLocations(data)
+                    setTempTimeout(true)
+                    setIsloading(false)
+                    if(data && map){
+                        setGeojsonTag(data[0].raw.geojson)
+                        map.fitBounds(data[0].bounds)
+                        setUniqueKey(data => data+1)
+                    }
+                })
+            }, 1500)
+            setUniqueKey(data => data + 1)
+
+            return () => clearTimeout(res_api)
         
-        if (timeout == true) {
-            console.log("already done waiting")
-            return
-        }
-        var location_total = ""
-        if (Object.keys(onChange).length !== 0) {
-            for (var predicted of onChange) {
-                location_total = location_total + predicted.location_name + " "
+        }else if(searchBar && !onChange){ // only occurs during when drawing on /createproject
+            setIsloading(false)
+            setTempTimeout(true)
+        }  
+        else { // only occurs when selecting states on /createproject 
+            setIsloading(false)
+            setTempTimeout(true)
+            if (geojson) {
+                setGeojsonLayer(L.geoJSON(geojson))
             }
+
         }
-        const fetchData = async () => {
-            try {
-                const data = await provider.search({ query: location_total, country: "us", credentials: "same-origin", format:"geojson" })
-                console.log(data)
-                return data
-            }
-            catch (error) {
-                console.log(error);
-            }
-        }
+        
 
 
-        var res_api = setTimeout(() => {
-            fetchData().then(data => {
-                setLocations(data)
-                setTimeout(true)
-                setIsloading(false)
+
+    }, [onChange])
+    const Addgeojson = useMemo(() => {
+        /* 
+        Function only used when user is creating project and the addistion of geojsons are already here
+        */
+        
+        if (geojson && map) {
+            var layer = L.geoJSON(geojson).addTo(map)
+            if (geojsonLayer) {
+                setGeojsonLayer(data => {    
+                    map.removeLayer(data)   
+                    map.fitBounds(layer.getBounds())
+                    return layer
+                })
+            } else {
+            
+                setGeojsonLayer(layer)
+                map.fitBounds(layer.getBounds())
+               
+            }
+        }
+        return null;
+    }, [geojson])
+    const Setlayers =  useMemo(()=>{
+        setMaplayersFunction(mapLayers)
+        return null;
+    },[mapLayers])
+    const handleloadOptions = (input) => {
+        if (input) {
+            const myPromise = new Promise((resolve, reject) => {
+                typingTimer = setTimeout(() => {
+                    resolve(fetchData(input).then(data => {
+                        var listData = []
+                        for (var pair of data) {
+                            listData.push({
+                                label: pair.label, value: pair.label, latlng: { y: pair.y, x: pair.x },
+                                bounds: pair.bounds, geojson: pair.raw.geojson
+                            })
+                        }
+
+                        return listData
+                    }));
+                }, 1500);
+            });
+            return myPromise;
+        }
+        else {
+            if (SearchText) {
               
-            })
-        }, 1500)
+                const altPromise = new Promise((resolve, reject) => {
+                    resolve(fetchData(SearchText).then(data => {
+                        var listData = []
+                        for (var pair of data) {
+                            listData.push({
+                                label: pair.label, value: pair.label, latlng: { y: pair.y, x: pair.x },
+                                bounds: pair.bounds, geojson: pair.raw.geojson
+                            })
+                        }
+                        return listData
+                    }));
+                }, 1000)
+                return altPromise;
+            }
+
+        }
 
 
-        return () => clearTimeout(res_api)
 
 
-    }, [timeout])
+
+    }
+
+    const fetchData = async (input_string) => {
+        try {
+            const data = await provider.search({ query: input_string, country: "us", credentials: "same-origin", format: "geojson" })
+            console.log(data)
+            return data
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
 
     const ChangeView = (center) => {
         //I could have it only run when positions change 
-        const map = useMap();
+        
         useEffect(() => {
-        // should only change when position changes 
-           
-            if(!isinitial){
+            // should only change when position changes 
+
+            if (!isinitial) {
                 return null
             }
             map.setView(center.center, 12);
@@ -107,71 +200,36 @@ export const Leafletmap = ({ children, id, onChange }) => {
     }
 
     if (isloading) {
-        return <div class="windows8">
-        <div class="wBall" id="wBall_1">
-         <div class="wInnerBall"></div>
-        </div>
-        <div class="wBall" id="wBall_2">
-         <div class="wInnerBall"></div>
-        </div>
-        <div class="wBall" id="wBall_3">
-         <div class="wInnerBall"></div>
-        </div>
-        <div class="wBall" id="wBall_4">
-         <div class="wInnerBall"></div>
-       </div>
-       <div class="wBall" id="wBall_5">
-        <div class="wInnerBall"></div>
-       </div>
-      </div>;
+        return (
+            <>
+                <div className="row">
+                    <div className="col text-center">
+                        <div className='form-group col-md-13'>
+                            <div className="windows8">
+                                <div className="wBall" id="wBall_1">
+                                    <div className="wInnerBall"></div>
+                                </div>
+                                <div className="wBall" id="wBall_2">
+                                    <div className="wInnerBall"></div>
+                                </div>
+                                <div className="wBall" id="wBall_3">
+                                    <div className="wInnerBall"></div>
+                                </div>
+                                <div className="wBall" id="wBall_4">
+                                    <div className="wInnerBall"></div>
+                                </div>
+                                <div className="wBall" id="wBall_5">
+                                    <div className="wInnerBall"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>);
     }
-    const handleSuggestionRequest = (e) => {
-        e.preventDefault();
-        const json_value = JSON.parse(e.target.value)
 
 
-        setPosition(
-            { lat: json_value.latlng[0], lng: json_value.latlng[1] }
-        )
-        setRectangleBoundary(
-            json_value.bounds
-        )
-        setIsinitial(true)
-       
-        setLocationTitle(json_value.label)
 
-    };
-
-    const SearchField = () => {
-        const searchControl = new GeoSearchControl({
-            provider: provider,
-            showMarker: false,
-            style: 'button',
-            position: 'topleft',
-            keepResult: true,
-            updateMap: true, 
-            polygon_geojson:"1"
-        });
-
-        const map = useMap();
-
-        useEffect(() => {
-            map.addControl(searchControl);
-            map.on('geosearch/showlocation', data => {
-                setPosition(
-                    { lat: data.location.x, lng: data.location.y }
-                )
-                setRectangleBoundary(
-                    data.location.bounds
-                )
-                setLocationTitle(data.location.label)
-                console.log(data)
-            });
-            return () => map.removeControl(searchControl);
-        }, []);
-
-        return null;
-    };
 
 
     const _onCreate = (e) => {
@@ -184,6 +242,8 @@ export const Leafletmap = ({ children, id, onChange }) => {
             ...prevLayers,
             [id]: geoJson
         }));
+        
+     
 
     };
 
@@ -225,22 +285,25 @@ export const Leafletmap = ({ children, id, onChange }) => {
 
 
     const purpleOptions = { color: 'red' }
-    var isSuggesion = (locations) =>{
-        if(locations){
-            if(Object.keys(locations).length > 0){
-                return(
-                    Object.keys(locations).map(function (key_o, index) {
-                        return (< Dropdown.Item
-                            as="button"
-                            onClick={(e) => { handleSuggestionRequest(e) }} key={key_o} id={key_o} value={JSON.stringify({ "latlng": [locations[key_o].y, locations[key_o].x], "bounds": locations[key_o].bounds, "label": locations[key_o].label})} >{locations[key_o].label}</Dropdown.Item >)
-                    })
-                )
-            }else{
-                return <Dropdown.Item>No Suggestion</Dropdown.Item>
-            }
-        }
+    var handleClickSearch = (json_value) => {
+
+
+        setPosition(
+            { lat: json_value.latlng.y, lng: json_value.latlng.x }
+        )
+        setRectangleBoundary(
+            json_value.bounds
+        )
+        setIsinitial(true)
+        setUniqueKey(data => data + 1)
+        setGeojsonTag(json_value.geojson)
+        setLocationTitle(json_value.label)
     }
-    
+
+
+
+   
+
     return (
         <>
 
@@ -249,23 +312,23 @@ export const Leafletmap = ({ children, id, onChange }) => {
                 <div className="col text-center">
 
                     <div className='form-group col-md-13'>
-
+                  
                         <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={mapRef}
-                            attributionControl={false}>
-                            <Rectangle
-                                bounds={rectangleBoundary}
-                                pathOptions={purpleOptions}
-                            />
-                            {/* <GeoJSON data={locations[0].raw.geojson}/> */}
+                            attributionControl={false} whenCreated={map => setMap(map)}>
+
+                            {geojsonTag ? <GeoJSON key={uniqueKey} data={geojsonTag} /> :
+                                rectangleBoundary ? <Rectangle
+                                    bounds={rectangleBoundary}
+                                    pathOptions={purpleOptions}
+                                /> : null }
                             <ChangeView center={position} />
-                            <SearchField />
                             <FeatureGroup>
                                 <EditControl
                                     position="topright"
                                     onCreated={_onCreate}
                                     onEdited={_onEdit}
                                     onDeleted={_onDeleted}
-                                    draw={
+                                    draw={ drawings ?
                                         {
                                             rectangle: true,
                                             circle: false,
@@ -273,39 +336,56 @@ export const Leafletmap = ({ children, id, onChange }) => {
                                             marker: true,
                                             polyline: true
                                         }
+                                        : 
+                                        {
+                                            rectangle: false,
+                                            circle: false,
+                                            circlemarker: false,
+                                            marker: false,
+                                            polyline: false,
+                                            polygon: false
+                                        }
                                     }
                                 />
+                           
                             </FeatureGroup>
                             <TileLayer
                                 url={osm.maptiler.url}
                                 attribution={osm.maptiler.attribution}
                             />
-
-
+                            {geojsonLayer && Addgeojson}
+                            { setMaplayersFunction && Setlayers}
                         </MapContainer>
 
+                    </div>
+                    <div className="suggestions" >
 
 
+                        {searchBar && <AsyncSelect
+                            cacheOptions
+                            key={uniqueKey}
+                            id="dropdown-item-button" title="Suggestions"
+                            variant="secondary"
+                            placeholder="Search"
+                            value={SearchText ? { label: SearchText, value: SearchText } : null}
+                            defaultOptions
+                            align={{ lg: 'start' }}
+                            onChange={handleClickSearch}
+                            loadOptions={handleloadOptions}
+                            filterOption={(options) => options}>
+                        </AsyncSelect>}
 
 
                     </div>
-                  
+                    <div id="suggestion-title">
+                        {locationTitle}
+                    </div>
                 </div>
 
             </div>
-            
-            <div class="suggestions" >
-                <DropdownButton id="dropdown-item-button" title="Suggestions" drop="up" 
-                variant="secondary" key="up" as={ButtonGroup}
-                align={{ lg: 'start' }}>
-                        {isSuggesion(locations)}
-                </DropdownButton>   
-                   
-            </div>
-            <div id="suggestion-title">
-                {locationTitle}
-            </div>
-         
+
+
+
         </>
     )
 }

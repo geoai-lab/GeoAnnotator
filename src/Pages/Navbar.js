@@ -5,34 +5,35 @@ import '../CSS-files/Navbar.css'
 import axios from "axios";
 import Login from './Login';
 
-export const Navbar = ({ children, isLogin ,OnLogin }) => {
+export const Navbar = ({ children, isLogin, OnLogin }) => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
-  
+    const [username, setUsername] = useState()
     useEffect(() => {
         showButton();
-        axios({
-            method: "POST",
-            url: "/@me",
-            withCredentials: true
-        })
-            .then((response) => {
-                if (response.status == 200) {
-                    console.log("login succesful")
-                    alert("successfuly logged in")
-                    OnLogin(true)
-
-                }
-            }).catch((error) => {
-                if (error.response.status == 401) {
-                    console.log(error.response)
-                    console.log(error.response.status)
-                    console.log(error.response.headers)
-                    alert("Invalid credentials")
-                    OnLogin(false)
-                }
+        if (isLogin) {
+            axios({
+                method: "POST",
+                url: "/@me",
+                withCredentials: true
             })
-    }, []);
+                .then((response) => {
+                    if (response.status == 200) {
+                        setUsername(response.data.username)
+                    
+
+                    }
+                }).catch((error) => {
+                    if (error.response.status == 401) {
+                        console.log(error.response)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                        alert("Invalid credentials")
+                        OnLogin(false)
+                    }
+                })
+        }
+    }, [isLogin]);
     const handleClick = () => {
         setClick(!click);
     }
@@ -63,10 +64,21 @@ export const Navbar = ({ children, isLogin ,OnLogin }) => {
             setButton(true);
         }
     };
- 
 
 
 
+    const SubMenu = ({ data }) => {
+
+        return (
+            <ul className="nav__submenu">
+                {data.map(iter =>
+                    <li className="nav__submenu-item ">
+                        <Link to={iter.link} className='nav-links' onClick={iter.function} >{iter.label}</Link>
+                    </li>
+                )}
+            </ul>
+        );
+    }
 
     window.addEventListener('resize', showButton)
     const handleLoginPopup = () => {
@@ -98,16 +110,28 @@ export const Navbar = ({ children, isLogin ,OnLogin }) => {
                                 Compare Annotations
                             </Link>}
                         </li>
-
                         <li className='nav-item'>
+                            {isLogin && <li className='nav-links' onClick={closeMobileMenu}>
+                                Project
+                                <SubMenu data={[{ label: "Create a Project", link: "/createproject", function:null  },
+                                { label: "Select Project", link: "/selectproject" , function: null }]} />
+                            </li>}
+
+                        </li>
+                        <ul className='nav-item'>
                             {isLogin ?
-                                <Link to='/' className='nav-links' onClick={handleLogout}> 
-                                    Logout
-                                </Link> : <Link to='/' className='nav-links' onClick={handleLoginPopup}>
+
+                                <li className='nav-links'>
+                                    {"Welcome, " + username}
+                                    <SubMenu data={[{ label: "logout", link: "/" , "function": handleLogout},
+                                    { label: "settings", link: "/settings" , "function": null }]} />
+                                </li>
+
+                                : <Link to='/' className='nav-links' onClick={handleLoginPopup}>
                                     Login
                                 </Link>
                             }
-                        </li>
+                        </ul>
                     </ul>
                 </div>
             </nav>
