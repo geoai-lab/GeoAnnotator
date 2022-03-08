@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
 import os
-
+from sqlalchemy.orm import load_only
 from flask_bcrypt import Bcrypt
 
 import json
@@ -99,7 +99,6 @@ def create():
     return optionsData, 200
 
 @app.route("/project+descriptions", methods=["GET"])
-@login_required
 def project_descriptions():
     projects = Project.query.all()
     list_of_projects = []
@@ -148,19 +147,29 @@ def register_user():
 @app.route('/compare', methods =['GET'])
 @login_required
 def compare_data():
-    return 
+    user_data = User.query.with_entities(User.username)
+    list_usernames =[]
+    for username in user_data:
+        list_usernames.append({"label":username[0]})
 
-@app.route('/api', methods=['GET'])
+    return jsonify({
+        "usernames":list_usernames
+    }), 200
+
+
+@app.route('/api/<string:project_name>', methods=['GET'])
 @login_required
-def index():
-
+def index(project_name):
+    print(project_name)
     tweets = tpr_database.query.order_by(func.random()).first()
     content = tweets.text
-  
+    if project_name:
+        project_json = Project.query.filter_by(project_name = project_name).first()
     neuro_results_json = json.loads(tweets.correction_of_neuro)
     toSend = {'id': tweets.id, 
      'content': content,
-     'neuro_result':neuro_results_json}
+     'neuro_result':neuro_results_json,
+     'project_description': {"label":project_json.project_name, "geo_json": json.loads(project_json.geo_json)}}
     return jsonify(toSend)
 @app.route('/api/submit', methods=['POST'])
 def submission():

@@ -1,12 +1,12 @@
 #tweet-card {
     border: 1px solid #cccccc;
     width: 564px;
-  
+    height: 300px;
     padding: 10px;
     display: flex;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
-    line-height: 20px;
+    line-height: 40px;
     margin: auto;
     
   }

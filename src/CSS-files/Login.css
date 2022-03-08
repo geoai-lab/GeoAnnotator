@@ -5,11 +5,11 @@
 }
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa&display=swap');
 
-  #myDropdown {
+  .myDropdown {
     position: absolute;
-    user-select: none;
-    width:0px;
-    transition: width 3s, height 3s;
+    display: block;
+    width:100%;
+    left: 40%;
  
   }
   
@@ -62,8 +62,10 @@
  
  
 #myDropdown.show{
-    display: block;
+    position: absolute;
+    display: inline-block;
     width:100%;
+    right: 0%;
 }
 
 
@@ -115,6 +117,7 @@
     font-size:12px;
     text-decoration: none;
     color:#ffffff;
+    
   }
   .myDropdown a{
     color:#f1c40f;

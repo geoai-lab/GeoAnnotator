@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { Card, Form, Button } from "react-bootstrap";
-import { Popup } from "./Popup"
+
 import Highlighter from "react-highlight-colors";
 import Creatable from 'react-select/creatable';
 import { Leafletmap } from "./Leafletmap";
@@ -10,16 +10,21 @@ import 'rangy/lib/rangy-classapplier'
 import Rangy from "rangy";
 import '../CSS-files/Submit_form.css';
 import { TwitterCard } from './TwitterCard';
+import { useParams } from "react-router-dom";
 
-export const Submit_form = () => {
-    const [tweet, setTweet] = useState('No Data... Please report to developer')
-    const [isloading, setIsloading] = useState(true)
-    const [refresh, setRefresh] = useState(0)
+export const Submit_form = ({ children }) => {
+    const [tweet, setTweet] = useState('No Data... Please report to developer');
+    let { projectName } = useParams();
+    const [isloading, setIsloading] = useState(true);
+    const [refresh, setRefresh] = useState(0);
     const [category, setCategory] = useState('')
     const [selection, setSelection] = useState([]);
-    const [neuroHighlight, setNeuroHighlight] = useState({})
-    const [highlighter, setHighlighter] = useState(null)
-    const [toggleSubmit, setToggleSubmit]= useState(false)
+    const [neuroHighlight, setNeuroHighlight] = useState({});
+    const [highlighter, setHighlighter] = useState(null);
+    const [toggleSubmit, setToggleSubmit] = useState(false);
+    const [MaplayersFunction, setMaplayersFunction] = useState();
+    const [projectDescription, setProjectDescription] = useState(null);
+    const [submitKey, setSubmitKey] = useState(0)
     Rangy.init()
     // helpers
 
@@ -46,38 +51,45 @@ export const Submit_form = () => {
     ]
 
     useEffect(() => {
-        fetch('/api').then(response => {
+
+        fetch('/api/' + projectName).then(response => {
             if (response.ok) {
                 return response.json()
             }
         }).then(data => {
+            console.log(data)
             setTweet(data.content)
             setIsloading(false)
             setNeuroHighlight(data.neuro_result)
-          
+
+            setProjectDescription({ "label": data.project_description.label, "geo_json": data.project_description.geo_json })
+
+
         }
         )
-       
-        console.log("went thru")
+
         setHighlighter(Rangy.createHighlighter())
-        
-        
+        console.log(selection)
+        setSelection([])
+
 
     }, [toggleSubmit])
-    const AIToggle = useMemo( () => {
-        
-      
+    useEffect(() => {
+
+
         var tweet_div = document.getElementById("tweet");
         const range = Rangy.createRange()
-        if(!tweet_div){ // check if the div exists
-            return null; 
+        if (!tweet_div) { // check if the div exists
+            return null;
         }
-       
+
         var new_index_side = 0
         if (tweet_div.childNodes[1]) {
             console.log(tweet_div.childNodes[1].tagName)
         }
-        console.log(neuroHighlight)
+        for (var highlightByAI of neuroHighlight) {
+            setSelection(allSelection => [...allSelection, highlightByAI])
+        }
         var keys = Object.keys(neuroHighlight)
         var new_index_side = 0
         for (var [nodeIndex, keyIndex] = [0, 0]; keyIndex < keys.length;) {
@@ -100,9 +112,12 @@ export const Submit_form = () => {
                 nodeIndex++;
             }
         }
+
     }, [neuroHighlight])
+
     const handleClickRefresh = () => {
         setRefresh(refresh + 1)
+        console.log(projectDescription.geo_json)
         setSelection([])
 
     }
@@ -114,7 +129,12 @@ export const Submit_form = () => {
         setCategory(e.value)
     }
     const handleSubmit = async () => {
-     
+        var popup = document.getElementById("myPopup2");
+        popup.classList.toggle("show");
+        setTimeout(function() {
+            //your code here
+            popup.classList.toggle("show");
+          }, 1000)
         if (!category) {
             return null;
         }
@@ -129,8 +149,8 @@ export const Submit_form = () => {
             console.log(e)
         }
         setToggleSubmit(data => !data)
+     
 
-        
     }
 
     const deleteTextHighlight = () => {
@@ -138,12 +158,14 @@ export const Submit_form = () => {
         highlighter.unhighlightSelection();
 
     }
-    
 
     const handleTextSelection = () => {
 
-        const selection = Rangy.getSelection();
 
+        var tweetdiv = document.getElementById('tweet')
+
+        const selection = Rangy.getSelection(tweetdiv);
+        // need to solve the indeces bug 
         highlighter.addClassApplier(
             Rangy.createClassApplier("highlight", {
                 ignoreWhiteSpace: true,
@@ -152,7 +174,7 @@ export const Submit_form = () => {
                 elementProperties: {
                     href: "#",
                     onclick: function () {
-                        
+
                         var highlight = highlighter.getHighlightForElement(this);
                         if (window.confirm("Delete this note (ID " + highlight.id + ")?")) {
                             highlighter.removeHighlights([highlight]);
@@ -165,29 +187,34 @@ export const Submit_form = () => {
         selection.expand("word", { containerElementId: "tweet" });
         highlighter.highlightSelection("highlight", { containerElementId: "tweet" });
 
-
         setSelection(allSelection => [...allSelection, selection.toString()])
     };
-   
-    
+
+    const handlePopup = () => {
+
+        var popup = document.getElementById("myPopup2");
+        popup.classList.toggle("show");
+
+    }
     return (
         <>
 
 
             <Form>
-            
+
                 {/*First Column*/}
                 <div className="row">
                     <div className="column1">
-                        <Leafletmap id="annotate-map" onChange={neuroHighlight} searchBar={true} drawings={true}/>
+                        {!isloading && projectDescription && <Leafletmap id="annotate-map" onChange={neuroHighlight} searchBar={true} drawings={true} setMaplayersFunction={setMaplayersFunction}
+                            geojson={projectDescription.geo_json} />}
                     </div>
-                    
+
                     {/*Second column*/}
                     <div className="column2" >
-                        
-                        <div className="row">
-                            <TwitterCard uniqueKey={refresh}>{tweet}</TwitterCard> 
-                            {AIToggle}
+
+                        <div className="row" id="tweetsection">
+                            <TwitterCard uniqueKey={refresh}>{tweet}</TwitterCard>
+
                             <div>
                                 <Button
                                     className="btn btn-secondary btn-floating"
@@ -199,12 +226,7 @@ export const Submit_form = () => {
                                     type='button'
                                     title="Delete Highlights"
                                     onClick={handleClickRefresh}><i className="fa-solid fa-arrow-rotate-right"></i></Button>
-                                
-                                <Button
-                                    className="btn btn-secondary btn-floating"
-                                    type='button'
-                                    title="Show Ai Highlights"
-                                    onClick={deleteTextHighlight}><i className="fa-solid fa-arrow"></i></Button>
+
 
                             </div>
                         </div>
@@ -214,18 +236,25 @@ export const Submit_form = () => {
                                 {Required_comp(category) /*Required to fill in category*/}
                             </label>
                         </div>
-                        <Button
-                            id="submit-button"
-                            type='button'
-                            title="Submit Annotation"
-                            onClick={handleSubmit}>Submit</Button>
-                        
+
+                        <div className="popup2" key={submitKey}>
+                            <span className="popuptext2" id="myPopup2">Submitted!</span>
+
+                            <Button
+                                id="submit-button"
+                                type='button'
+                                title="Submit Annotation"
+                                onClick={handleSubmit}>Submit</Button>
+                        </div>
+
                     </div>
                 </div>
+
 
 
             </Form>
 
         </>
+
     )
 }

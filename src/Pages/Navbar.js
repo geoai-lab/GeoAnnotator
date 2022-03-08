@@ -30,6 +30,7 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                         console.log(error.response.headers)
                         alert("Invalid credentials")
                         OnLogin(false)
+                        document.getElementById("myDropdown").classList.toggle("show")
                     }
                 })
         }
@@ -47,6 +48,7 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
         })
             .then((response) => {
                 alert("Successful logout")
+                
                 OnLogin(false)
             }).catch((error) => {
                 if (error.response) {
@@ -56,6 +58,7 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                 }
             })
         setClick(false)
+       
     }
     const showButton = () => {
         if (window.innerWidth <= 960) {
@@ -110,14 +113,14 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                                 Compare Annotations
                             </Link>}
                         </li>
-                        <li className='nav-item'>
+                        <ul className='nav-item'>
                             {isLogin && <li className='nav-links' onClick={closeMobileMenu}>
                                 Project
                                 <SubMenu data={[{ label: "Create a Project", link: "/createproject", function:null  },
                                 { label: "Select Project", link: "/selectproject" , function: null }]} />
                             </li>}
 
-                        </li>
+                        </ul>
                         <ul className='nav-item'>
                             {isLogin ?
 

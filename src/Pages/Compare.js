@@ -4,6 +4,7 @@ import L, { geoJSON } from "leaflet"
 import { MapContainer, TileLayer, useMap, FeatureGroup, Polygon, Rectangle } from "react-leaflet";
 import osm from "./osm-providers";
 import 'leaflet/dist/leaflet.css';
+import axios from "axios";
 import 'leaflet-geosearch/dist/geosearch.css';
 import "leaflet-draw/dist/leaflet.draw.css";
 import CreatableSelect from "react-select/creatable";
@@ -28,7 +29,27 @@ export const Compare = () => {
     const ZOOM_LEVEL = 12;
     const mapRef = useRef();
     const [isloading, setIsloading] = useState(true)
+    const [annotators, setAnnotators] = useState();
     //position ZOOM_LEVEL
+    useEffect(() => {
+        axios({
+            method: "GET",
+            url: "/compare",
+            withCredentials: true
+        })
+            .then((response) => {
+                if (response.status == 200) {
+                   
+                    setAnnotators(response.data.usernames);
+
+                }
+            }).catch((error) => {
+                if (error.response.status == 401) {
+                 
+                }
+            })
+    }
+        , [])
     const MapSection = (e) => {
         return (
             <MapContainer id='leaflet-compare' center={e.center} zoom={e.zoom} ref={mapRef}
@@ -40,29 +61,25 @@ export const Compare = () => {
             </MapContainer>
         )
     }
-    const annotators = [
-        { value: '1', label: 'John Smith' },
-        { value: '2', label: 'Jill Valentine' }
-    ]
+  
     return (
 
         <div className="row">
             <div className='column'>
-                Annotator: <CreatableSelect 
-                options={annotators} 
-                label="hi"
-                noOptionsMessage={() => null}
-                promptTextCreator={() => false}
-                formatCreateLabel={() => undefined} />
+                Annotator: <CreatableSelect
+                    options={annotators}
+                    noOptionsMessage={() => null}
+                    promptTextCreator={() => false}
+                    formatCreateLabel={() => undefined} />
                 <MapSection center={position} zoom={ZOOM_LEVEL} />
                 <TwitterCard>Tweets coming from annotator 1</TwitterCard>
             </div>
             <div className="column">
-                Annotator: <CreatableSelect 
-                options={annotators} 
-                noOptionsMessage={() => null}
-                promptTextCreator={() => false}
-                formatCreateLabel={() => undefined} />
+                Annotator: <CreatableSelect
+                    options={annotators}
+                    noOptionsMessage={() => null}
+                    promptTextCreator={() => false}
+                    formatCreateLabel={() => undefined} />
                 <MapSection center={position} zoom={ZOOM_LEVEL} />
                 <TwitterCard>Tweets coming from annotator 2</TwitterCard>
             </div>

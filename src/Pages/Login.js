@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Draggable from 'react-draggable';
+import { Link } from 'react-router-dom'
 import "../CSS-files/Login.css"
 import CreatableSelect from "react-select/creatable";
-export const Login = ({ children, OnLogin, projectNames }) => {
-  const [isRegistering, setIsRegistering] = useState(false)
+export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [createproject, setCreateproject] = useState(false);
+  const [currentProject, setCurrLoginProject]  = useState();
+  const navigate = useNavigate();
   const [loginForm, setloginForm] = useState({
     email: "",
     password: ""
@@ -15,10 +20,10 @@ export const Login = ({ children, OnLogin, projectNames }) => {
     retypepassword: "",
     username: ""
   })
-
+  
   useEffect(() => {
-    console.log(projectNames)
-    document.getElementById("myDropdown").classList.toggle("show")
+
+    //document.getElementById("myDropdown").classList.toggle("show")
     
   }, [])
 
@@ -46,8 +51,15 @@ export const Login = ({ children, OnLogin, projectNames }) => {
           isRegistering ? alert("successful on registering") : alert("successfuly logged in");
           var x = document.getElementById("myDropdown");
           x.classList.toggle("show");
+          setCreateproject(false);
           OnLogin(true);
           setIsRegistering(false);
+          if(createproject){
+            navigate("/createproject");
+          }
+          else{
+            navigate('/api/' + currentProject)
+          }
         }
 
       }).catch((error) => {
@@ -69,6 +81,12 @@ export const Login = ({ children, OnLogin, projectNames }) => {
     }))
   }
 
+  const handleCreateProject = () =>{
+    setCreateproject(true); 
+    logMeIn(); 
+    navigate("/createproject")
+
+  }
   function handleChange(event) {
     const { value, name } = event.target
     if (!isRegistering) {
@@ -96,6 +114,10 @@ export const Login = ({ children, OnLogin, projectNames }) => {
       return (!data);
     })
   }
+  const handleProjectSelection = (event) =>{
+    setCurrProject(event.label)
+    setCurrLoginProject(event.label)
+  }
   return (
 
 
@@ -120,7 +142,7 @@ export const Login = ({ children, OnLogin, projectNames }) => {
           {isRegistering &&
             <div>
               <input onChange={handleChange}
-                type="retypepassword"
+                type="password"
                 text={registerForm.retypepassword}
                 name="retypepassword"
                 placeholder="Confirm-Password"
@@ -136,13 +158,14 @@ export const Login = ({ children, OnLogin, projectNames }) => {
             </div>}
           <div>
             Project:<CreatableSelect
-              options={projectNames.map(name => Object({"label": name}) ) }
+              options={projectNames }
               noOptionsMessage={() => null}
               promptTextCreator={() => false}
-              formatCreateLabel={() => undefined} />
+              formatCreateLabel={() => undefined}
+              onChange={handleProjectSelection} />
 
             <button type="secondary" onClick={HandleRegister} >{isRegistering ? 'Back to log-in' : 'New User'}</button>
-            <button type="secondary" onClick={logMeIn} >{ 'Create a Project' }</button>
+            <button type="secondary" onClick={handleCreateProject}>Create a Project</button>
             <button type="primary" onClick={logMeIn}>Submit</button>
             
           </div>

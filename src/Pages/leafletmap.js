@@ -26,7 +26,7 @@ L.Icon.Default.mergeOptions({
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png",
 });
 
-export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings, setMaplayersFunction }) => {
+export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawings, setMaplayersFunction }) => {
     const provider = new OpenStreetMapProvider({
         params: {
             email: 'jv11699@gmail.com', // auth for large number of requests
@@ -38,7 +38,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
 
     // need to fix caching mechanism
     //Results must be cached on your side. Clients sending repeatedly the same query may be classified as faulty and blocked.
-    const [position, setPosition] = useState({ lat:39.7837304, lng: -100.445882 }); // { lat: 42.8864, lng: -78.8784 }
+    const [position, setPosition] = useState({ lat: 39.7837304, lng: -100.445882 }); // { lat: 42.8864, lng: -78.8784 }
     const [mapLayers, setMapLayers] = useState({}); // puts the data needed to get submitted 
     const [isloading, setIsloading] = useState(true)
     const [locations, setLocations] = useState({})
@@ -58,8 +58,9 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
     var typingTimer;
 
     useEffect(() => {
-      
+        
         if (searchBar && onChange) { // only fires during the /api
+
             var location_total = ""
             if (Object.keys(onChange).length !== 0) {
                 for (var predicted of onChange) {
@@ -72,21 +73,20 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
                     setLocations(data)
                     setTempTimeout(true)
                     setIsloading(false)
-                    if(data && map){
+                    if (data[0] && map) {
                         setGeojsonTag(data[0].raw.geojson)
-                        map.fitBounds(data[0].bounds)
-                        setUniqueKey(data => data+1)
+                        setUniqueKey(data => data + 1)
                     }
                 })
             }, 1500)
             setUniqueKey(data => data + 1)
 
             return () => clearTimeout(res_api)
-        
-        }else if(searchBar && !onChange){ // only occurs during when drawing on /createproject
+
+        } else if (searchBar && !onChange) { // only occurs during when drawing on /createproject
             setIsloading(false)
             setTempTimeout(true)
-        }  
+        }
         else { // only occurs when selecting states on /createproject 
             setIsloading(false)
             setTempTimeout(true)
@@ -95,37 +95,40 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
             }
 
         }
-        
-
 
 
     }, [onChange])
-    const Addgeojson = useMemo(() => {
+    useEffect(() => {
+        Addgeojson(map);
+    },[geojson])
+
+    const Addgeojson = (map) => {
         /* 
         Function only used when user is creating project and the addistion of geojsons are already here
         */
-        
+
         if (geojson && map) {
-            var layer = L.geoJSON(geojson).addTo(map)
+            var layer = L.geoJSON(geojson, { style: {  "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } }).addTo(map)
             if (geojsonLayer) {
-                setGeojsonLayer(data => {    
-                    map.removeLayer(data)   
+                setGeojsonLayer(data => {
+                    map.removeLayer(data)
                     map.fitBounds(layer.getBounds())
                     return layer
                 })
             } else {
-            
+
                 setGeojsonLayer(layer)
                 map.fitBounds(layer.getBounds())
-               
+
             }
         }
         return null;
-    }, [geojson])
-    const Setlayers =  useMemo(()=>{
+    }
+    const Setlayers = useMemo(() => {
         setMaplayersFunction(mapLayers)
         return null;
-    },[mapLayers])
+    }, [mapLayers])
+
     const handleloadOptions = (input) => {
         if (input) {
             const myPromise = new Promise((resolve, reject) => {
@@ -138,7 +141,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
                                 bounds: pair.bounds, geojson: pair.raw.geojson
                             })
                         }
-
+                     
                         return listData
                     }));
                 }, 1500);
@@ -147,7 +150,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
         }
         else {
             if (SearchText) {
-              
+
                 const altPromise = new Promise((resolve, reject) => {
                     resolve(fetchData(SearchText).then(data => {
                         var listData = []
@@ -184,7 +187,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
 
     const ChangeView = (center) => {
         //I could have it only run when positions change 
-        
+
         useEffect(() => {
             // should only change when position changes 
 
@@ -242,8 +245,8 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
             ...prevLayers,
             [id]: geoJson
         }));
-        
-     
+
+
 
     };
 
@@ -302,25 +305,27 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
 
 
 
-   
+
 
     return (
         <>
-
-
+            
             <div className="row">
                 <div className="col text-center">
 
                     <div className='form-group col-md-13'>
-                  
+
                         <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={mapRef}
-                            attributionControl={false} whenCreated={map => setMap(map)}>
+                            attributionControl={false} whenCreated={map => {
+                                setMap(map);
+                                Addgeojson(map);
+                            }}>
 
                             {geojsonTag ? <GeoJSON key={uniqueKey} data={geojsonTag} /> :
                                 rectangleBoundary ? <Rectangle
                                     bounds={rectangleBoundary}
                                     pathOptions={purpleOptions}
-                                /> : null }
+                                /> : null}
                             <ChangeView center={position} />
                             <FeatureGroup>
                                 <EditControl
@@ -328,7 +333,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
                                     onCreated={_onCreate}
                                     onEdited={_onEdit}
                                     onDeleted={_onDeleted}
-                                    draw={ drawings ?
+                                    draw={drawings ?
                                         {
                                             rectangle: true,
                                             circle: false,
@@ -336,7 +341,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
                                             marker: true,
                                             polyline: true
                                         }
-                                        : 
+                                        :
                                         {
                                             rectangle: false,
                                             circle: false,
@@ -347,16 +352,17 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
                                         }
                                     }
                                 />
-                           
+
                             </FeatureGroup>
                             <TileLayer
                                 url={osm.maptiler.url}
                                 attribution={osm.maptiler.attribution}
                             />
-                            {geojsonLayer && Addgeojson}
-                            { setMaplayersFunction && Setlayers}
-                        </MapContainer>
 
+                            {setMaplayersFunction && Setlayers}
+                            
+                        </MapContainer>
+                        
                     </div>
                     <div className="suggestions" >
 
@@ -374,7 +380,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar,drawings
                             loadOptions={handleloadOptions}
                             filterOption={(options) => options}>
                         </AsyncSelect>}
-
+                                
 
                     </div>
                     <div id="suggestion-title">

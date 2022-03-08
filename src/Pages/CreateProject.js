@@ -39,14 +39,13 @@ export const CreateProject = ({ children }) => {
     }
     const handleSave = (event) => {
         event.preventDefault();
-        console.log(mapLayers);
         axios({
             method: "POST",
             url: "/createproject-submit",
             withCredentials: true,
             data: {
                 "Project Name":projectName, 
-                "map-layers":JSON.stringify(mapLayers) , 
+                "map-layers": selectionState ? JSON.stringify(jsondata) : JSON.stringify(mapLayers[Object.keys(mapLayers)[0]]) , 
             }
            })
             .then((response) => {
