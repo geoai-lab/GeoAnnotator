@@ -46,6 +46,7 @@ export const Compare = () => {
                     setAnnotators(response.data.map((user) => {
                         return ({
                             "label": user.username,
+                            "value": user.username, 
                             "text": user.text,
                             "highlight": user.annotation.highlight,
                             "geojson": L.geoJSON(Object.values(user.annotation["spatial-footprint"])),
@@ -124,7 +125,7 @@ export const Compare = () => {
                 <button>
                     Submit! 
                 </button>
-                <button>
+                <button >
                     Create new annotation
                 </button>
             </div>}

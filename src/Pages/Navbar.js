@@ -48,7 +48,7 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
         })
             .then((response) => {
                 alert("Successful logout")
-                
+              
                 OnLogin(false)
             }).catch((error) => {
                 if (error.response) {
@@ -117,18 +117,15 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
 
                         </ul>
                         <ul className='nav-item'>
-                            {isLogin ?
+                            {isLogin &&
 
                                 <li className='nav-links'>
                                     {"Welcome, " + username}
                                     <SubMenu data={[{ label: "logout", link: "/" , "function": handleLogout},
                                     { label: "settings", link: "/settings" , "function": null }]} />
-                                </li>
+                                </li>}
 
-                                : <Link to='/' className='nav-links' onClick={handleLoginPopup}>
-                                    Login
-                                </Link>
-                            }
+                             
                         </ul>
                     </ul>
                 </div>

@@ -4,7 +4,7 @@ import axios from "axios";
 import Draggable from 'react-draggable';
 import { Link } from 'react-router-dom'
 import "../CSS-files/Login.css"
-import CreatableSelect from "react-select/creatable";
+import Select from 'react-select'
 export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [createproject, setCreateproject] = useState(false);
@@ -23,7 +23,7 @@ export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
   
   useEffect(() => {
 
-    //document.getElementById("myDropdown").classList.toggle("show")
+    document.getElementById("myDropdown").classList.toggle("show")
     
   }, [])
 
@@ -49,8 +49,7 @@ export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
         if (response.status == 200) {
           console.log("login succesful");
           isRegistering ? alert("successful on registering") : alert("successfuly logged in");
-          var x = document.getElementById("myDropdown");
-          x.classList.toggle("show");
+   
           setCreateproject(false);
           OnLogin(true);
           setIsRegistering(false);
@@ -157,11 +156,8 @@ export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
                 required />
             </div>}
           <div>
-            Project:<CreatableSelect
-              options={projectNames }
-              noOptionsMessage={() => null}
-              promptTextCreator={() => false}
-              formatCreateLabel={() => undefined}
+            Project:<Select
+              options={projectNames } 
               onChange={handleProjectSelection} />
 
             <button type="secondary" onClick={HandleRegister} >{isRegistering ? 'Back to log-in' : 'New User'}</button>

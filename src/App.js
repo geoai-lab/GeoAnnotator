@@ -24,7 +24,7 @@ function App() {
     }).then(data => {
       var projectList = []
       for (var project of data) {
-        projectList.push({ "label": project["project-name"] })
+        projectList.push({ "label": project["project-name"] , "value": project["project-name"]})
       }
       setProjects(projectList)
 
@@ -53,12 +53,13 @@ function App() {
       
       <Router>
         <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} />
-        {!loggedin && <Login isLogin={loggedin} OnLogin={setIsLoggedin} projectNames={projects} setCurrProject={setProject}/>}
+        
         <Routes>
-          <Route path='/' exact />
+          {!loggedin && <Route path='/' element={<Login isLogin={loggedin} OnLogin={setIsLoggedin} projectNames={projects} setCurrProject={setProject}/>} exact />}
           <Route path="/logout" />
           <Route path='/createproject' element={<CreateProject />} />
           <Route path={"/api/project_name=:projectName"} element={<Submit_form/>} />
+          <Route path={"/api/project_name=:projectName&tweetid=:id"} element={<Submit_form/>} />
           <Route path='/compare/project_name=:projectName' element={<Compare />} />
         </Routes>
       </Router>

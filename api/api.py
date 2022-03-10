@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, session,redirect
+from flask import Flask, jsonify, request, session,redirect, url_for
 import bcrypt 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
@@ -175,7 +175,6 @@ def compare_data(project_name):
 @app.route('/api/<string:project_name>', methods=['GET'])
 @login_required
 def index(project_name):
-    print(project_name)
     tweets = tpr_database.query.filter_by(id = "901774900481970176").first()#.order_by(func.random()).first() #func.random()
     content = tweets.text
     if project_name:
@@ -192,16 +191,17 @@ def index(project_name):
 @login_required
 def submission(project_name):
     json_object = request.json
-    print(json_object)
     tweetid =json_object["tweetid"]
     project = json_object["project"]
     highlight = json_object["highlight"]
     spatial_footprint = json_object["spatial-footprint"]
     timestamp = json_object["timestamp"]
+    category = json_object["category"]
 
     annotation = json.dumps({"annotation": {
         "highlight": highlight , 
-        "spatial-footprint": spatial_footprint
+        "spatial-footprint": spatial_footprint,
+        "category": category
     }})
     new_submission = Submission(userid = current_user.id, tweetid = tweetid, project_name = project,
                  timestamp = timestamp, annotation = annotation, username = current_user.username)
