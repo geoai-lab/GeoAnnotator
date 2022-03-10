@@ -53,12 +53,13 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     const [rectangleBoundary, setRectangleBoundary] = useState()
     const [map, setMap] = useState(null)
     const [geojsonTag, setGeojsonTag] = useState(null)
+    const [selectGeojson, setSelectGeojson] = useState(null)
     const ZOOM_LEVEL = 4;
     const mapRef = useRef();
     var typingTimer;
 
     useEffect(() => {
-        
+
         if (searchBar && onChange) { // only fires during the /api
 
             var location_total = ""
@@ -100,7 +101,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }, [onChange])
     useEffect(() => {
         Addgeojson(map);
-    },[geojson])
+    }, [geojson])
 
     const Addgeojson = (map) => {
         /* 
@@ -108,7 +109,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         */
 
         if (geojson && map) {
-            var layer = L.geoJSON(geojson, { style: {  "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } }).addTo(map)
+            var layer = L.geoJSON(geojson, { style: { "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } }).addTo(map)
             if (geojsonLayer) {
                 setGeojsonLayer(data => {
                     map.removeLayer(data)
@@ -130,6 +131,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }, [mapLayers])
 
     const handleloadOptions = (input) => {
+        console.log(input)
         if (input) {
             const myPromise = new Promise((resolve, reject) => {
                 typingTimer = setTimeout(() => {
@@ -141,7 +143,6 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                                 bounds: pair.bounds, geojson: pair.raw.geojson
                             })
                         }
-                     
                         return listData
                     }));
                 }, 1500);
@@ -285,7 +286,16 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
     }
 
-
+    const handleDeleteGeojson = () =>{
+        
+        if(selectGeojson){
+            var deletemessage = document.getElementById("deletemessage")
+            deletemessage.style.visibility = "hidden";
+            map.removeLayer(selectGeojson);
+            setSelectGeojson(null);
+        }
+       
+    }
 
     const purpleOptions = { color: 'red' }
     var handleClickSearch = (json_value) => {
@@ -309,7 +319,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
     return (
         <>
-            
+
             <div className="row">
                 <div className="col text-center">
 
@@ -321,12 +331,38 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                                 Addgeojson(map);
                             }}>
 
-                            {geojsonTag ? <GeoJSON key={uniqueKey} data={geojsonTag} /> :
-                                rectangleBoundary ? <Rectangle
-                                    bounds={rectangleBoundary}
-                                    pathOptions={purpleOptions}
-                                /> : null}
+                            {geojsonTag && <GeoJSON key={uniqueKey} data={geojsonTag} onEachFeature={(feature, layer) => {
+                                layer.on('click', function (e) {
+                                   
+                                    //map.removeLayer(layer);
+                                });
+                                layer.on('mouseover', function (e) {
+                                    var deletemessage = document.getElementById("deletemessage")
+                                    deletemessage.style.visibility = "visible";
+                                    setSelectGeojson(layer)
+                                    //map.removeLayer(layer);
+                                });
+                                layer.on('mouseout', function (e) {
+                                    if(e.originalEvent.relatedTarget.className === "deletemessage" || e.originalEvent.relatedTarget.className === "deletesection" )
+                                    {
+                                        var deletemessage = document.getElementById("deletemessage")
+                                        deletemessage.style.visibility = "visible";
+                                        setSelectGeojson(layer)
+                                    }else{
+                                        var deletemessage = document.getElementById("deletemessage")
+                                        deletemessage.style.visibility = "hidden";
+                                        setSelectGeojson(null)
+                                    }
+        
+                         
+                                    //map.removeLayer(layer);
+                                });
+                                
+
+                            }} />}
+
                             <ChangeView center={position} />
+
                             <FeatureGroup>
                                 <EditControl
                                     position="topright"
@@ -360,9 +396,9 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                             />
 
                             {setMaplayersFunction && Setlayers}
-                            
+
                         </MapContainer>
-                        
+
                     </div>
                     <div className="suggestions" >
 
@@ -380,12 +416,17 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                             loadOptions={handleloadOptions}
                             filterOption={(options) => options}>
                         </AsyncSelect>}
-                                
+
 
                     </div>
+                    <div className="deletesection" id="deletebox"> 
+                        <span className="deletemessage" id="deletemessage" onClick={handleDeleteGeojson}>Delete?</span>
+                    </div>
                     <div id="suggestion-title">
+                
                         {locationTitle}
                     </div>
+                    
                 </div>
 
             </div>

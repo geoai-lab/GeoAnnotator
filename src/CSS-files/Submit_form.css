@@ -77,10 +77,11 @@ mark{
 #tweetsection button{
   position: relative;
   border: 2px solid lightblue;
-  text-align: right;
+  text-align: center;
   left: 92%;
   bottom: 200%;
-  display: block
+  display: block;
+  width: 10%; 
   
 }
 #refresh-button {

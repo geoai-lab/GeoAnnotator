@@ -99,17 +99,12 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                     </div>
                     <ul className={click ? 'nav-menu active' : 'nav-menu'}>
                         <li className='nav-item'>
-                            <Link to='/' className='nav-links' onClick={closeMobileMenu}>
-                                Home
-                            </Link>
-                        </li>
-                        <li className='nav-item'>
-                            {isLogin && <Link to='/api' className='nav-links' onClick={closeMobileMenu}>
+                            {isLogin && <Link to={'/api/project_name=' + 'polygondraw'} className='nav-links' onClick={closeMobileMenu}>
                                 Annotate
                             </Link>}
                         </li>
                         <li className='nav-item'>
-                            {isLogin && <Link to='/compare' className='nav-links' onClick={closeMobileMenu}>
+                            {isLogin && <Link to={'/compare/project_name=' + 'polygondraw'}  className='nav-links' onClick={closeMobileMenu}>
                                 Compare Annotations
                             </Link>}
                         </li>

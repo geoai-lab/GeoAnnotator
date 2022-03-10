@@ -31,7 +31,30 @@
     max-width: 700px;
 }
 
-    
+.deletesection {
+	position: absolute;
+	display: inline-block;
+	
+	overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+ #deletemessage {
+	visibility: hidden;
+	border-width: thick;
+	background-color: red;
+	border-color: #000000;
+	color: white;
+	cursor: pointer;
+	border-width: 1.2rem;
+   
+	
+  }
+  
+#deletemessage:hover {
+	visibility: visible;
+	
+  } 
 
 
 .windows8,.wBall, .wInnerBall {
@@ -114,3 +137,4 @@
 		transform: rotate(900deg);
 	}
 }
+

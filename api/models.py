@@ -58,6 +58,16 @@ class Project(db.Model):
     project_name = db.Column(db.String, nullable = False)
     geo_json = db.Column(db.String)
   
+class Submission(db.Model):
+    __tablename__ = 'submission'
+    submission_id = db.Column(db.String(32), primary_key=True, unique=True, default=get_uuid)
+    userid = db.Column(db.String(32))
+    username = db.Column(db.String)
+    tweetid = db.Column(db.String)
+    project_name = db.Column(db.String, nullable = False)
+    timestamp = db.Column(db.String)
+    annotation = db.Column(db.String)
+   
   
 
 

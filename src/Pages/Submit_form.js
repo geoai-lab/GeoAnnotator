@@ -11,7 +11,7 @@ import Rangy from "rangy";
 import '../CSS-files/Submit_form.css';
 import { TwitterCard } from './TwitterCard';
 import { useParams } from "react-router-dom";
-
+import axios from "axios";
 export const Submit_form = ({ children }) => {
     const [tweet, setTweet] = useState('No Data... Please report to developer');
     let { projectName } = useParams();
@@ -56,15 +56,15 @@ export const Submit_form = ({ children }) => {
             if (response.ok) {
                 return response.json()
             }
+            else{
+                alert("failed to grab data")
+            }
         }).then(data => {
             console.log(data)
-            setTweet(data.content)
+            setTweet(data)
             setIsloading(false)
             setNeuroHighlight(data.neuro_result)
-
             setProjectDescription({ "label": data.project_description.label, "geo_json": data.project_description.geo_json })
-
-
         }
         )
 
@@ -131,25 +131,43 @@ export const Submit_form = ({ children }) => {
     const handleSubmit = async () => {
         var popup = document.getElementById("myPopup2");
         popup.classList.toggle("show");
-        setTimeout(function() {
+        setTimeout(function () {
             //your code here
             popup.classList.toggle("show");
-          }, 1000)
+        }, 1000)
         if (!category) {
             return null;
         }
-        try {
-            fetch('/api/submit', {
-                method: 'POST',
-                body: JSON.stringify({
-                    "Hi": "oh no"
-                })
-            })
-        } catch (e) {
-            console.log(e)
+        //
+
+        axios({
+            method: "POST",
+            url: '/api/' + projectName + '/submit',
+            withCredentials: true,
+            data: {
+                'tweetid': tweet.id ,
+                'project': projectName, // handle user ID in backend 
+                'highlight': selection,
+                'category': category, 
+                'spatial-footprint': MaplayersFunction,
+                'timestamp': new Date().toLocaleString()
+
         }
+        })
+            .then((response) => {
+                if (response.status == 200) {
+
+                }
+
+            }).catch((error) => {
+                if (error.response.status == 500) {
+                  
+                    alert("submission failed")
+                }
+
+            })
         setToggleSubmit(data => !data)
-     
+
 
     }
 
@@ -213,7 +231,7 @@ export const Submit_form = ({ children }) => {
                     <div className="column2" >
 
                         <div className="row" id="tweetsection">
-                            <TwitterCard uniqueKey={refresh}>{tweet}</TwitterCard>
+                            <TwitterCard uniqueKey={refresh}>{tweet.content}</TwitterCard>
 
                             <div>
                                 <Button

@@ -58,7 +58,7 @@ export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
             navigate("/createproject");
           }
           else{
-            navigate('/api/' + currentProject)
+            navigate('/api/project_name=' + currentProject)
           }
         }
 

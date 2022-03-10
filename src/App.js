@@ -58,8 +58,8 @@ function App() {
           <Route path='/' exact />
           <Route path="/logout" />
           <Route path='/createproject' element={<CreateProject />} />
-          <Route path={"/api/:projectName"} element={<Submit_form/>} />
-          <Route path='/compare' element={<Compare />} />
+          <Route path={"/api/project_name=:projectName"} element={<Submit_form/>} />
+          <Route path='/compare/project_name=:projectName' element={<Compare />} />
         </Routes>
       </Router>
     </div>

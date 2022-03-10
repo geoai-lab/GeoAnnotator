@@ -1,6 +1,6 @@
 #leaflet-compare {
-    height: 80%;
-    width: 100%;
+    height: 30%;
+    width: 80%;
     top: 10px;
     padding: 300px 100px;
     position: relative;
@@ -18,4 +18,32 @@
     content: "";
     display: table;
     clear: both;
+  }
+  #resolve1, #resolve2{
+    
+    position: relative;
+    
+    bottom: 8%;
+    right: 55%;
+    
+    -webkit-transform: scale(2.5); /* Chrome, Safari, Opera */
+    transform: scale(2.5);
+ 
+    
+ 
+  }
+  #comparebuttons{
+    display: inline-block;
+  }
+  #resolvesection1, #resolvesection2{
+    position: relative;
+    width: -moz-fit-content;
+    display: inline-block;
+    width: 50%;
+   
+  }
+  #usercard2, #usercard1{
+    overflow: auto;
+    display: inline-block;
+    width: 100%;
   }
