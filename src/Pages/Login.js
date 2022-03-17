@@ -4,11 +4,13 @@ import axios from "axios";
 import Draggable from 'react-draggable';
 import { Link } from 'react-router-dom'
 import "../CSS-files/Login.css"
+import ReactCardFlip from 'react-card-flip';
 import Select from 'react-select'
-export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
+import { Card } from 'react-bootstrap';
+export const Login = ({ children, OnLogin, projectNames, setCurrProject }) => {
   const [isRegistering, setIsRegistering] = useState(false);
-  const [createproject, setCreateproject] = useState(false);
-  const [currentProject, setCurrLoginProject]  = useState();
+  const [currentProject, setCurrLoginProject] = useState();
+  const [isFlipped, setIsFlipped] = useState(false)
   const navigate = useNavigate();
   const [loginForm, setloginForm] = useState({
     email: "",
@@ -20,17 +22,26 @@ export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
     retypepassword: "",
     username: ""
   })
-  
+
   useEffect(() => {
 
-    document.getElementById("myDropdown").classList.toggle("show")
-    
+    document.getElementById("myDropdown").classList.toggle("show");
+
+    var loginbutton = document.getElementById("loginbutton");
+    loginbutton.style.borderBottom = "rgb(106, 73, 0) 3px solid";
+    loginbutton.style.transition = "all .2s ease-in-out";
+    loginbutton.style.transform = "scale(1.1)";
+    loginbutton.style.cursor = "default";
+    var loginbutton = document.getElementById("registerbutton2");
+    loginbutton.style.borderBottom = "rgb(106, 73, 0) 3px solid";
+    loginbutton.style.transition = "all .2s ease-in-out";
+    loginbutton.style.transform = "scale(1.1)";
+    loginbutton.style.cursor = "default";
   }, [])
 
 
-  const logMeIn = (event) => {
-    event.preventDefault()
-    
+  const logMeIn = (onSubmit) => {
+
     axios({
       method: "POST",
       url: isRegistering ? "/register" : "/login",
@@ -49,14 +60,12 @@ export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
         if (response.status == 200) {
           console.log("login succesful");
           isRegistering ? alert("successful on registering") : alert("successfuly logged in");
-   
-          setCreateproject(false);
           OnLogin(true);
-          setIsRegistering(false);
-          if(createproject){
+
+          if (!onSubmit) {
             navigate("/createproject");
           }
-          else{
+          else {
             navigate('/api/project_name=' + currentProject)
           }
         }
@@ -80,10 +89,9 @@ export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
     }))
   }
 
-  const handleCreateProject = () =>{
-    setCreateproject(true); 
-    logMeIn(); 
-    navigate("/createproject")
+  const handleCreateProject = () => {
+    logMeIn(false);
+
 
   }
   function handleChange(event) {
@@ -109,68 +117,147 @@ export const Login = ({ children, OnLogin, projectNames,setCurrProject }) => {
 
   const HandleRegister = (event) => {
     event.preventDefault()
+
     setIsRegistering((data) => {
       return (!data);
     })
+
+
+
   }
-  const handleProjectSelection = (event) =>{
+  const handleProjectSelection = (event) => {
     setCurrProject(event.label)
     setCurrLoginProject(event.label)
   }
+
   return (
 
+    <>
+      <div id="myDropdown" className="dropdown-content">
+        <div className='login-box'>
+          <ReactCardFlip isFlipped={isRegistering} flipDirection="horizontal">
+            <form key="front" className="login-form">
+              <div id="choosing_title">
+                <span id="loginbutton" >
+                  Login
+                </span>
+                <span id="registerbutton" onClick={HandleRegister}>
+                  Register
+                </span>
+              </div>
+              <div style={{ display: "inline-block" }}>
+                <i class="fa-solid fa-envelope"></i>
+                <input onChange={handleChange}
+                  id="forminput"
+                  type="email"
+                  text={loginForm.email}
+                  name="email"
+                  placeholder="Email"
+                  value={loginForm.email}
+                  required />
+              </div>
+              <div style={{ display: "inline-block" }}>
+                <i class="fa-solid fa-lock"></i>
+                <input onChange={handleChange}
+                  id="forminput"
+                  type="password"
+                  text={loginForm.password}
+                  name="password"
+                  placeholder="Password"
+                  value={loginForm.password}
+                  required />
+              </div>
 
-    <div id="myDropdown" className="dropdown-content">
-      <div className='login-box'>
-        <form className="login-form" onSubmit={logMeIn}>
-          <h3>{isRegistering ? 'Register' : 'Login'}</h3>
-          <input onChange={handleChange}
-            type="email"
-            text={isRegistering ? registerForm.email : loginForm.email}
-            name="email"
-            placeholder="Email"
-            value={isRegistering ? registerForm.email : loginForm.email}
-            required />
-          <input onChange={handleChange}
-            type="password"
-            text={isRegistering ? registerForm.password : loginForm.password}
-            name="password"
-            placeholder="Password"
-            value={isRegistering ? registerForm.password : loginForm.password}
-            required />
-          {isRegistering &&
-            <div>
-              <input onChange={handleChange}
-                type="password"
-                text={registerForm.retypepassword}
-                name="retypepassword"
-                placeholder="Confirm-Password"
-                value={registerForm.retypepassword}
-                required />
-              <input onChange={handleChange}
-                type="username"
-                text={registerForm.username}
-                name="username"
-                placeholder="Username"
-                value={registerForm.username}
-                required />
-            </div>}
-          <div>
-            Project:<Select
-              options={projectNames } 
-              onChange={handleProjectSelection} />
+              <div id="projectbuttonsection">
+                <Select
+                  id="selectBar"
+                  options={projectNames}
+                  onChange={handleProjectSelection}
+                  placeholder="Select a project" />
+              </div>
 
-            <button type="secondary" onClick={HandleRegister} >{isRegistering ? 'Back to log-in' : 'New User'}</button>
-            <button type="secondary" onClick={handleCreateProject}>Create a Project</button>
-            <button type="primary" onClick={logMeIn}>Submit</button>
-            
+            </form>
+            <form key="back" className="login-form" >
+              <div id="choosing_title">
+                <span id="loginbutton2" onClick={HandleRegister}>
+                  Login
+                </span>
+                <span id="registerbutton2" >
+                  Register
+                </span>
+              </div>
+              <div style={{ display: "inline-block" }}>
+                <i class="fa-solid fa-envelope"></i>
+                <input onChange={handleChange}
+                  id="forminput"
+                  type="email"
+                  text={registerForm.email}
+                  name="email"
+                  placeholder="Email"
+                  value={registerForm.email}
+                  required />
+              </div>
+              <div style={{ display: "inline-block" }}>
+                <i class="fa-solid fa-lock"></i>
+                <input onChange={handleChange}
+                  id="forminput"
+                  type="password"
+                  text={registerForm.password}
+                  name="password"
+                  placeholder="Password"
+                  value={registerForm.password}
+                  required />
+              </div>
+
+              <div style={{ display: "inline-block" }}>
+                <i class="fa-solid fa-lock"></i>
+                <input id="forminput" onChange={handleChange}
+                  type="password"
+                  text={registerForm.retypepassword}
+                  name="retypepassword"
+                  placeholder="Confirm-Password"
+                  value={registerForm.retypepassword}
+                  required />
+              </div>
+              <div style={{ display: "inline-block" }}>
+                <i class="fa-solid fa-user"></i>
+                <input id="forminput" onChange={handleChange}
+                  type="username"
+                  text={registerForm.username}
+                  name="username"
+                  placeholder="Username"
+                  value={registerForm.username}
+                  required />
+              </div>
+
+              <div id="projectbuttonsection">
+                <Select
+                  id="selectBar"
+                  options={projectNames}
+                  onChange={handleProjectSelection}
+                  placeholder="Select a project" />
+              </div>
+            </form>
+
+          </ReactCardFlip>
+          <div id="wrapper">
+            <div class="button-css-3" id="button-3"
+              onClick={ ()=> handleCreateProject()}>
+              <div id="circle"></div>
+              <a >Create Project</a>
+            </div>
+            <div class="button-css-3" id="button-3"
+              onClick={ () => logMeIn(true)}>
+              <div id="circle"></div>
+              <a>Login</a>
+            </div>
+          
           </div>
-        </form>
-
-        {!isRegistering && <p>Forgot your password? <a href='/lostpassword'>Click Here!</a></p>}
+        </div>
       </div>
-    </div>
 
+
+    </>
 
   );
 }

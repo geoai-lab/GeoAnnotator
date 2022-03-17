@@ -4,12 +4,17 @@ import { Button } from './Button';
 import '../CSS-files/Navbar.css'
 import axios from "axios";
 import Login from './Login';
-
+import { useParams } from "react-router-dom";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 export const Navbar = ({ children, isLogin, OnLogin }) => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
     const [username, setUsername] = useState()
+    let { projectName } = useParams();
+
     useEffect(() => {
+        console.log(projectName);
         showButton();
         if (isLogin) {
             axios({
@@ -20,7 +25,7 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                 .then((response) => {
                     if (response.status == 200) {
                         setUsername(response.data.username)
-                    
+
 
                     }
                 }).catch((error) => {
@@ -48,7 +53,7 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
         })
             .then((response) => {
                 alert("Successful logout")
-              
+
                 OnLogin(false)
             }).catch((error) => {
                 if (error.response) {
@@ -58,7 +63,7 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                 }
             })
         setClick(false)
-       
+
     }
     const showButton = () => {
         if (window.innerWidth <= 960) {
@@ -70,10 +75,10 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
 
 
 
-    const SubMenu = ({ data }) => {
+    const SubMenu = ({ data, id }) => {
 
         return (
-            <ul className="nav__submenu">
+            <ul id={id} className="nav__submenu">
                 {data.map(iter =>
                     <li className="nav__submenu-item ">
                         <Link to={iter.link} className='nav-links' onClick={iter.function} >{iter.label}</Link>
@@ -87,11 +92,13 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
     const handleLoginPopup = () => {
         document.getElementById("myDropdown").classList.toggle("show")
     }
+
+
     return (
         <>
             <nav className="navbar">
                 <div className="navbar-container">
-                    <Link to="/" className='navbar-logo'>
+                    <Link to={"/" + projectName} className='navbar-logo'>
                         GeoAnnotator for Disaster-related Location Descriptions&nbsp; <i className="fa-solid fa-earth-americas" />
                     </Link>
                     <div className='menu-icon' onClick={handleClick}>
@@ -99,20 +106,20 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                     </div>
                     <ul className={click ? 'nav-menu active' : 'nav-menu'}>
                         <li className='nav-item'>
-                            {isLogin && <Link to={'/api/project_name=' + 'polygondraw'} className='nav-links' onClick={closeMobileMenu}>
+                            {isLogin && <Link to={'/api/project_name=' + projectName} className='nav-links' onClick={closeMobileMenu}>
                                 Annotate
                             </Link>}
                         </li>
                         <li className='nav-item'>
-                            {isLogin && <Link to={'/compare/project_name=' + 'polygondraw'}  className='nav-links' onClick={closeMobileMenu}>
+                            {isLogin && <Link to={'/compare/project_name=' + projectName} className='nav-links' onClick={closeMobileMenu}>
                                 Compare Annotations
                             </Link>}
                         </li>
                         <ul className='nav-item'>
                             {isLogin && <li className='nav-links' onClick={closeMobileMenu}>
                                 Project
-                                <SubMenu data={[{ label: "Create a Project", link: "/createproject", function:null  },
-                                { label: "Select Project", link: "/selectproject" , function: null }]} />
+                                <SubMenu id="submenu1" data={[{ label: "Create a Project", link: "/createproject" + projectName, function: null },
+                                { label: "Select Project", link: "/selectproject", function: null }]} />
                             </li>}
 
                         </ul>
@@ -121,11 +128,11 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
 
                                 <li className='nav-links'>
                                     {"Welcome, " + username}
-                                    <SubMenu data={[{ label: "logout", link: "/" , "function": handleLogout},
-                                    { label: "settings", link: "/settings" , "function": null }]} />
+                                    <SubMenu id="submenu2" data={[{ label: "logout", link: "/", "function": handleLogout },
+                                    { label: "settings", link: "/settings", "function": null }]} />
                                 </li>}
 
-                             
+
                         </ul>
                     </ul>
                 </div>

@@ -8,5 +8,24 @@
     font-size: 14px;
     line-height: 55px;
     margin: auto;
+    box-shadow: 3px 10px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    border: 0;
     
   }
+  #tweet{
+    flex-direction: column;
+    letter-spacing: 1px;
+    font-style: normal;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  #card-header-twitter{
+    position: relative;
+    width: 60%;
+    height: 10%;
+    bottom: -15px;
+    right: -20%;
+    color: #4490bf;
+
+  }
+ 

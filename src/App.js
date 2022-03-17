@@ -52,15 +52,15 @@ function App() {
     <div className="App">
       
       <Router>
-        <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} />
-        
+
         <Routes>
-          {!loggedin && <Route path='/' element={<Login isLogin={loggedin} OnLogin={setIsLoggedin} projectNames={projects} setCurrProject={setProject}/>} exact />}
+          {!loggedin && <Route path='/' element={<> <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} /><Login isLogin={loggedin} OnLogin={setIsLoggedin} projectNames={projects} setCurrProject={setProject}/></>} exact />}
+          {loggedin && <Route path='/:projectName' element={<> <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} /></>} exact />}
           <Route path="/logout" />
-          <Route path='/createproject' element={<CreateProject />} />
-          <Route path={"/api/project_name=:projectName"} element={<Submit_form/>} />
-          <Route path={"/api/project_name=:projectName&tweetid=:id"} element={<Submit_form/>} />
-          <Route path='/compare/project_name=:projectName' element={<Compare />} />
+          <Route path='/createproject/project_name:projectName' element={<> <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} /><CreateProject /></>} />
+          <Route path={"/api/project_name=:projectName"} element={<> <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} /><Submit_form/></>} />
+          <Route path={"/api/project_name=:projectName&tweetid=:id"} element={<> <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} /><Submit_form/></>} />
+          <Route path='/compare/project_name=:projectName' element={<> <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} /><Compare /></>} />
         </Routes>
       </Router>
     </div>

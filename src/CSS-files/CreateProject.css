@@ -1,71 +1,106 @@
-.createBox{
-   
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
 
 .form-create{
- 
-    background:white;
-    position: absolute;
-    left: 10%;
-    top: 25%;
-    border-radius:6px;
-    margin: 0 auto 0 auto;
-    padding:0px 0px 70px 0px;
-    height: 500px;
-    width: 600px;
-    border: #2980b9 4px solid;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    
-   
+  position: relative;
+  border: 1px solid #cccccc;
+  width: 564px;
+  height: 100%;
+  padding: 20px;
+  top: 100px;
+  display: flex;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 55px;
+  margin: auto;
+  box-shadow: 3px 10px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;   
   }
   
   .form-create input{
-   
+    font-family: Arial, Helvetica, sans-serif;
     background:#ecf0f1;
     border: #ccc 1px solid;
     border-bottom: #ccc 2px solid;
-    margin: 20px;
-    padding: 8px;
-    width:550px;
-    color:#AAAAAA;
-    margin-top:10px;
+    width:100%;
     font-size:1em;
-    
     border-radius:4px;
-    
+  }
+  input#projectnameinput{
+    height: 30px;
+    width: 70%;
+    align-self: center;
   }
   .form-create #selection{
-      display: block;
+    display: block;
   }
-  .form-create #selection1{
+  .form-create .radiobutton{
+    top: 110px;
+  }
+  .form-create #createable_createproject{
     display: block;
+  
 }
+input[type="file"] {
+  display: none;
+}
+.custom-file-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
   .form-create button{
-   
-    background:#3498db;
-    width:125px;  padding-top:5px;
-    padding-bottom:5px;
+    
+    background:#c57723cd;
+    width:100px; 
+    
+  
     color:white;
-    border-radius:4px;
-    border: #2980b9 1px solid;
-    display: block;
+    border-radius:20px;
+    border: #80551d 2.5px solid;
+ 
     margin-top:20px;
-    margin-bottom:20px;
-    margin-left:10px;
+    height:10px;
+  
+   
+    text-align: center;
+    padding-bottom: 60px;
+
     font-weight:800;
     font-size:0.8em;
   }
   .form-create button:hover{ 
-    background:#3594D2; 
+    background:#e2ab15; 
     }
-
+    
+  .createSelect{
+    position: absolute;
+    display: inline-block;
+    margin-top: -13px;
+    width: 100%;
   
+  }
 .form-create .createbtn{
     position:relative;
-    top: 50px;
-    
+    top: 166px;
+    left: 40%;
+}
+
+
+
+.radio_buttonsection{
+  position:relative;
+  display: table;         
+  width: auto;   
+}
+.div-table-row{
+  display: table-row;
+
+}
+.div-table-col {
+  position: relative;
+  top: 20px;
+  width:50%; 
+  display: table-cell;         
+   
 }

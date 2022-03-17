@@ -9,6 +9,7 @@
   
 .navbar {
     background: #4d4d44;
+    font-family: Arial, Helvetica, sans-serif;
     height: 80px;
     width: 100%;
     display: flex;
@@ -40,6 +41,14 @@
     position: relative;
     align-items: center;
   }
+  .navbar-logo:hover {
+    color: aliceblue;
+    
+    transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -ms-transform: scale(1.1);
+    -webkit-transform: scale(1.1);
+  }
   
   .fa-typo3 {
     margin-left: 0.5rem;
@@ -65,13 +74,18 @@
   }
   .nav-item:hover .nav__submenu{
     display: block;
+   
   }
   .nav__submenu, .nav__submenu-item a {
     font-weight: 300;
     text-transform: none;
     display: none;
-    position: absolute;
+    position: relative;
     width: 180px;
+    transition: all 3s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    
+    
   }
 
   .nav__submenu-item, .nav__submenu-item a{
@@ -80,7 +94,12 @@
     background: #4d4d44;
     height: 35px;
     color: white;
+    position: relative;
     grid-gap: 10px;
+    box-shadow: 2px 8px 16px 2px rgba(0,0,0,0.2);
+    border: #242222;
+    border-radius: 10px;
+    
   }
   
  
@@ -92,18 +111,27 @@
     padding: 0.5rem 1rem;
     height: 100%;
   }
-  .nav__submenu{
-    top: 100%;
-    left: -40px;
-    position: absolute;
+  .nav-item .nav__submenu{
+    bottom: -90%;
+    position:absolute;
   }
+  
+  #submenu1{
+    right: -13%;
+   
+  }
+  #submenu2{
+    right: 13%;
+   
+  }
+
   .nav-links:hover, .nav__submenu-item:hover, .nav__submenu-item a:hover {
     color:#242222;
     border-bottom: 4px solid #fff;
-    transition: all 0.2s ease-out;
+    transition: all .4s ease-out;
     cursor: pointer;
   }
-  
+
   .fa-bars {
     color: #fff;
   }

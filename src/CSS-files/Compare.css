@@ -12,6 +12,9 @@
     float: left;
     width: 50%;
   }
+  #resolvesection1:{
+
+  }
   
   /* Clear floats after the columns */
   .row:after {
@@ -32,6 +35,9 @@
     
  
   }
+  .resolvesection mark{
+    background-color: #e2ab15;
+  }
   #comparebuttons{
     display: inline-block;
   }
@@ -40,10 +46,29 @@
     width: -moz-fit-content;
     display: inline-block;
     width: 50%;
+    transition: all .3s ease-in;
    
   }
   #usercard2, #usercard1{
     overflow: auto;
     display: inline-block;
     width: 100%;
+  }
+  .CompareBtn{
+    background:#c57723cd;
+    width:100px; 
+    color:white;
+    border-radius:20px;
+    border: #80551d 2.5px solid;
+    margin-top:20px;
+    height:10px;
+    margin: 30px;
+    text-align: center;
+    padding-bottom: 60px;
+
+    font-weight:800;
+    font-size:0.8em;
+  }
+  .CompareBtn:hover{
+    background:#e2ab15; 
   }

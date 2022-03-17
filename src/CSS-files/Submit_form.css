@@ -13,22 +13,27 @@
 
 
 
+
   /* Clear floats after the columns */
   .row:after {
     content: "";
     display: table;
     clear: both;
   }
-
   .column1,.column2{
-      margin: auto;
-      
+      margin: auto;    
   }
   .highlight {
-    background-color: yellow;
+    background-color: rgb(255, 247, 0);
+    cursor: pointer;
+    content: "Delete?";
+    
+}
+.highlight:hover{
+  background-color: rgba(248, 41, 41, 0.721);
 }
 .highlight-neuro {
-  background-color: red;
+  background-color: rgba(255, 0, 0, 0.666);
 }
 
 
@@ -65,24 +70,53 @@
     z-index: 9999999;
 }
 #highlight-button , #refresh-button {
-   
-    /* additional code */
-   
     border-radius: 50%;
     border: 1px solid black;
     }
-mark{
-  background-color: yellow; 
+
+#submitbuttonsection{
+  position: relative;
+  top:60px;
+  
+}
+#submitbuttonsection i{
+  position: relative;
+  right: 7px; 
+}
+.submit-section{
+  top: 30px;
+}
+#submitbuttonsection button:hover{
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  transition: all .2s ease-in-out;
+  -moz-transition: all .2s ease-in-out;
+  -ms-transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+}
+#creatable-submit{
+  width: 50%;
+  left: 20%; 
+}
+#submitbutton-annotate{
+  position:absolute;
+  left: 200px;
+  bottom: 40px; 
+}
+#submitbuttonsection button:active{
+  background-color: rgba(140, 79, 38, 0.884);
+  transition: all .1s ease-in-out;
 }
 #tweetsection button{
   position: relative;
-  border: 2px solid lightblue;
-  text-align: center;
-  left: 92%;
-  bottom: 200%;
+  border: 2px solid rgba(25, 22, 19, 0.524);
+  color: #000;
+  background-color: rgba(187, 122, 78, 0.748);
+  left: 95%;
+  bottom: 140%;
   display: block;
-  width: 10%; 
-  
+  width: 6%; 
+  border-radius: 100%;
+  margin: 5% 0;
 }
 #refresh-button {
   background: url('spinner.gif') no-repeat center center;
@@ -176,11 +210,7 @@ mark{
 		transform: rotate(900deg);
 	}
 }
-#submit-button{  
-  width: fit-content;
-  border: 0;
 
-}
 
 /* Popup container - can be anything you want */
 .popup2 {
@@ -191,7 +221,10 @@ mark{
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  background-origin: padding-box;
+ 
 }
+
 
 /* The actual popup */
 .popup2 .popuptext2 {
@@ -204,17 +237,17 @@ mark{
   padding: 8px 0;
   position: absolute;
   z-index: 1;
-  bottom: 125%;
-  left: 50%;
   margin-left: -80px;
+  left: 45px;
+  top: 90px;
 }
 
 /* Popup arrow */
 .popup2 .popuptext2::after {
   content: "";
   position: absolute;
-  top: 100%;
-  left: 50%;
+ 
+  left: 40%;
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;

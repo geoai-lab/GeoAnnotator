@@ -276,25 +276,26 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
             return
         }
         for (const [key, value] of Object.entries(layers)) {
-            setMapLayers((prevLayers) => ({
-                ...prevLayers,
-                [key]: undefined
-            }));
+            setMapLayers((prevLayers) => {
+                delete prevLayers[key];
+                return prevLayers; 
+            }
+            )
         }
 
 
 
     }
 
-    const handleDeleteGeojson = () =>{
-        
-        if(selectGeojson){
+    const handleDeleteGeojson = () => {
+
+        if (selectGeojson) {
             var deletemessage = document.getElementById("deletemessage")
             deletemessage.style.visibility = "hidden";
             map.removeLayer(selectGeojson);
             setSelectGeojson(null);
         }
-       
+
     }
 
     const purpleOptions = { color: 'red' }
@@ -333,7 +334,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
                             {geojsonTag && <GeoJSON key={uniqueKey} data={geojsonTag} onEachFeature={(feature, layer) => {
                                 layer.on('click', function (e) {
-                                   
+
                                     //map.removeLayer(layer);
                                 });
                                 layer.on('mouseover', function (e) {
@@ -343,21 +344,20 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                                     //map.removeLayer(layer);
                                 });
                                 layer.on('mouseout', function (e) {
-                                    if(e.originalEvent.relatedTarget.className === "deletemessage" || e.originalEvent.relatedTarget.className === "deletesection" )
-                                    {
+                                    if (e.originalEvent.relatedTarget.className === "deletemessage" || e.originalEvent.relatedTarget.className === "deletesection") {
                                         var deletemessage = document.getElementById("deletemessage")
                                         deletemessage.style.visibility = "visible";
                                         setSelectGeojson(layer)
-                                    }else{
+                                    } else {
                                         var deletemessage = document.getElementById("deletemessage")
                                         deletemessage.style.visibility = "hidden";
                                         setSelectGeojson(null)
                                     }
-        
-                         
+
+
                                     //map.removeLayer(layer);
                                 });
-                                
+
 
                             }} />}
 
@@ -419,14 +419,14 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
 
                     </div>
-                    <div className="deletesection" id="deletebox"> 
+                    <div className="deletesection" id="deletebox">
                         <span className="deletemessage" id="deletemessage" onClick={handleDeleteGeojson}>Delete?</span>
                     </div>
                     <div id="suggestion-title">
-                
+
                         {locationTitle}
                     </div>
-                    
+
                 </div>
 
             </div>

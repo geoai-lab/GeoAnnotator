@@ -7,20 +7,23 @@ import osm from "./osm-providers";
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import "leaflet-draw/dist/leaflet.draw.css";
-import CreatableSelect from "react-select/creatable";
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import Select from "react-select";
 import { TwitterCard } from './TwitterCard'
 import { Leafletmap } from "./Leafletmap";
-
+import { Card } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 export const CreateProject = ({ children }) => {
     const [jsondata, setJsondata] = useState(null)
     const [location, setLocation] = useState([{
         location_name: "Arkansas, United States"
     }])
     const [projectName, setProjectName] = useState(null)
-    const [selectionState, setSelectionState] = useState(true)
+    const [selectionState, setSelectionState] = useState(false)
     const [dataOptions, setDataOptions] = useState(null)
+    const navigate = useNavigate();
     const [mapLayers, setMapLayers] = useState(null)
+    const [stateLabel, setStateLabel] = useState(null)
+    const [file, setFile] = useState()
     useEffect(() => {
         fetch('/createproject').then(response => {
             if (response.ok) {
@@ -33,7 +36,9 @@ export const CreateProject = ({ children }) => {
     }, [])
 
     const handleStateClick = (event) => {
-
+        setSelectionState(true);
+        document.getElementById('drawradio').checked = false;
+        setStateLabel({ "label": event.label })
         setJsondata(event.geojson)
         console.log(event.geojson)
     }
@@ -44,23 +49,27 @@ export const CreateProject = ({ children }) => {
             url: "/createproject-submit",
             withCredentials: true,
             data: {
-                "Project Name":projectName, 
-                "map-layers": selectionState ? JSON.stringify(jsondata) : JSON.stringify(mapLayers[Object.keys(mapLayers)[0]]) , 
+                "Project Name": projectName,
+                "map-layers": selectionState ? JSON.stringify(jsondata) : JSON.stringify(mapLayers[Object.keys(mapLayers)[0]]),
             }
-           })
+        })
             .then((response) => {
                 if (response.status == 200) {
-                  
-                }
+                    navigate('/api/project_name=' + projectName)
+                }   
 
             }).catch((error) => {
                 if (error.response.status == 401) {
-                 
+
                 }
                 else if (error.response.status == 409) {
-                    
+
                 }
             })
+    }
+    const handletwitterDataInput = (event) => {
+        setFile(event.target.files[0])
+        
     }
 
     return (
@@ -68,21 +77,39 @@ export const CreateProject = ({ children }) => {
 
         <div className="createBox">
             <div className="column">
-                <form className="form-create">
-                    Project Name: <input onChange={(e) => setProjectName(e.target.value)} />
-                    <input id="selection1" type="radio" value="state" name="createProj" onClick={() => setSelectionState(true)} /> Select a State {selectionState && <CreatableSelect
-                        options={dataOptions}
-                        id="selection1"
-                        noOptionsMessage={() => null}
-                        promptTextCreator={() => false}
-                        formatCreateLabel={() => undefined}
-                        onChange={handleStateClick} />}
-                    <input id="selection" type="radio" name="createProj" onClick={() => setSelectionState(false)} /> Draw the geographic score on map
-                    <button type="secondary" className="createbtn" style={{ "float": "left" }} onClick={handleSave} >Save</button>
-                    <button className="createbtn" style={{ "float": "right" }}>Cancel</button>
+                <Card className="form-create">
+                    Project Name: <input id="projectnameinput" onChange={(e) => setProjectName(e.target.value)} />
+                    <div className="radio_buttonsection">
+                        <div className="div-table-row">
+                            <div className="div-table-col">
+                                Select a State  <Select
+                                    options={dataOptions}
+                                    className="createSelect"
+                                    placeholder="Select a State"
+                                    value={stateLabel}
+                                    onChange={handleStateClick} />
+                            </div>
+                            <div className="div-table-col">
+                                <input className="radiobutton" id="drawradio" type="radio" name="createProj"
+                                    onClick={() => {
+                                        setSelectionState(false);
+                                        setStateLabel(null);
+                                    }} /> Draw the geographic score on map
+                            </div>
+                        </div>
+                    </div>
 
-                </form>
+
+                    <button type="secondary" className="createbtn" style={{ "float": "left" }} onClick={handleSave} >Save</button>
+
+                    <label class="custom-file-upload">
+                        <input type="file" onChange={handletwitterDataInput}/>
+                                {file ? "Uploaded: " + file.name: "Upload Twitter Data"}
+                    </label>
+                </Card>
+
             </div>
+
             <div className="column">
                 {/* Below is map re renders after every switch of state or drawing */}
                 {selectionState ? <Leafletmap key="1" geojson={jsondata} id="create-map" drawings={false} setMaplayersFunction={setMapLayers} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={true} drawings={true} setMaplayersFunction={setMapLayers} />}

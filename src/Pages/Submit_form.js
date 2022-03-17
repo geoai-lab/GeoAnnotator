@@ -18,13 +18,14 @@ export const Submit_form = ({ children }) => {
     const [isloading, setIsloading] = useState(true);
     const [refresh, setRefresh] = useState(0);
     const [category, setCategory] = useState('')
-    const [selection, setSelection] = useState([]);
+    const [highlightSelection, setSelection] = useState([]);
     const [neuroHighlight, setNeuroHighlight] = useState({});
     const [highlighter, setHighlighter] = useState(null);
     const [toggleSubmit, setToggleSubmit] = useState(false);
     const [MaplayersFunction, setMaplayersFunction] = useState();
     const [projectDescription, setProjectDescription] = useState(null);
     const [submitKey, setSubmitKey] = useState(0)
+    const [isDeleting, setIsDeleting] = useState(false);
     Rangy.init()
     // helpers
 
@@ -49,15 +50,13 @@ export const Submit_form = ({ children }) => {
         { value: 'C9', label: "C9: Admin units" },
         { value: 'C10', label: "C10: Multiple-areas" }
     ]
-
     useEffect(() => {
-
         fetch('/api/' + projectName).then(response => {
             if (response.ok) {
                 return response.json()
             }
-            else{
-                alert("failed to grab data")
+            else {
+                alert("failed to grab data");
             }
         }).then(data => {
             console.log(data)
@@ -69,20 +68,16 @@ export const Submit_form = ({ children }) => {
         )
 
         setHighlighter(Rangy.createHighlighter())
-        console.log(selection)
         setSelection([])
 
 
     }, [toggleSubmit])
     useEffect(() => {
-
-
         var tweet_div = document.getElementById("tweet");
         const range = Rangy.createRange()
-        if (!tweet_div) { // check if the div exists
+        if (!tweet_div) {
             return null;
         }
-
         var new_index_side = 0
         if (tweet_div.childNodes[1]) {
             console.log(tweet_div.childNodes[1].tagName)
@@ -121,38 +116,35 @@ export const Submit_form = ({ children }) => {
         setSelection([])
 
     }
-    // Might need to implement to Rangy Soon
     if (isloading) {
         return null;
     }
     const handleCategory = (e) => {
-        setCategory(e.value)
+        setCategory(e.label)
     }
     const handleSubmit = async () => {
         var popup = document.getElementById("myPopup2");
         popup.classList.toggle("show");
         setTimeout(function () {
-            //your code here
             popup.classList.toggle("show");
         }, 1000)
         if (!category) {
             return null;
         }
-        //
 
         axios({
             method: "POST",
             url: '/api/' + projectName + '/submit',
             withCredentials: true,
             data: {
-                'tweetid': tweet.id ,
+                'tweetid': tweet.id,
                 'project': projectName, // handle user ID in backend 
-                'highlight': selection,
-                'category': category, 
+                'highlight': highlightSelection,
+                'category': category,
                 'spatial-footprint': MaplayersFunction,
                 'timestamp': new Date().toLocaleString()
 
-        }
+            }
         })
             .then((response) => {
                 if (response.status == 200) {
@@ -161,27 +153,21 @@ export const Submit_form = ({ children }) => {
 
             }).catch((error) => {
                 if (error.response.status == 500) {
-                  
+
                     alert("submission failed")
                 }
 
             })
         setToggleSubmit(data => !data)
 
-
     }
 
     const deleteTextHighlight = () => {
-
         highlighter.unhighlightSelection();
-
     }
 
     const handleTextSelection = () => {
-
-
-        var tweetdiv = document.getElementById('tweet')
-
+        var tweetdiv = document.getElementById('tweet');
         const selection = Rangy.getSelection(tweetdiv);
         // need to solve the indeces bug 
         highlighter.addClassApplier(
@@ -190,34 +176,47 @@ export const Submit_form = ({ children }) => {
                 elementTagName: "mark",
                 tagNames: ["mark"],
                 elementProperties: {
-                    href: "#",
+                    p: "#tweet",
                     onclick: function () {
 
                         var highlight = highlighter.getHighlightForElement(this);
+                        console.log(highlight)
                         if (window.confirm("Delete this note (ID " + highlight.id + ")?")) {
                             highlighter.removeHighlights([highlight]);
                         }
-                        return null;
+                        
+                        setSelection(highlights => {
+                            delete highlights[highlight.id];
+                            return highlights;
+                        })
+                        return highlight.id;
                     }
                 }
             })
         );
-        selection.expand("word", { containerElementId: "tweet" });
-        highlighter.highlightSelection("highlight", { containerElementId: "tweet" });
+        var selection_scnd = window.getSelection();
+        console.log(selection_scnd.focusNode.data[selection_scnd.focusOffset]);
+        alert(selection_scnd.focusOffset);
 
-        setSelection(allSelection => [...allSelection, selection.toString()])
+        var highlight_object = highlighter.highlightSelection("highlight", { containerElementId: "tweet" })[0];
+        var start_idx = highlight_object.characterRange.start
+        var end_idx = highlight_object.characterRange.end
+        console.log(highlight_object)
+        setSelection(allSelection => {
+            return ({
+                ...allSelection,
+                [highlight_object.id]: {"location_name":selection.toString(),"start_idx":start_idx, "end_idx":end_idx}
+            })
+        })
+        console.log(highlightSelection);
     };
-
     const handlePopup = () => {
-
         var popup = document.getElementById("myPopup2");
         popup.classList.toggle("show");
 
     }
     return (
         <>
-
-
             <Form>
 
                 {/*First Column*/}
@@ -233,36 +232,39 @@ export const Submit_form = ({ children }) => {
                         <div className="row" id="tweetsection">
                             <TwitterCard uniqueKey={refresh}>{tweet.content}</TwitterCard>
 
-                            <div>
+                            <div id="submitbuttonsection">
                                 <Button
+                                    class="learn-more2"
                                     className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Highlight Text"
                                     onClick={handleTextSelection}><i className="fa-solid fa-highlighter"></i></Button>
                                 <Button
+                                    class="learn-more2"
                                     className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Delete Highlights"
                                     onClick={handleClickRefresh}><i className="fa-solid fa-arrow-rotate-right"></i></Button>
-
-
                             </div>
                         </div>
                         <div className="row">
-                            <label>
-                                Category: <Creatable options={category_options} onChange={handleCategory} />
+
+                            <label className="submit-section">
+                                <Creatable options={category_options} onChange={handleCategory} placeholder="Select Category"
+                                    id="creatable-submit" />
                                 {Required_comp(category) /*Required to fill in category*/}
                             </label>
+
                         </div>
 
                         <div className="popup2" key={submitKey}>
                             <span className="popuptext2" id="myPopup2">Submitted!</span>
-
-                            <Button
-                                id="submit-button"
+                            <button
+                                class="learn-more"
                                 type='button'
+                                id="submitbutton-annotate"
                                 title="Submit Annotation"
-                                onClick={handleSubmit}>Submit</Button>
+                                onClick={handleSubmit}>Submit</button>
                         </div>
 
                     </div>
