@@ -20,7 +20,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 load_dotenv()
-app = Flask(__name__)
+app = Flask(__name__,static_folder="../build", static_url_path='/')
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///HarveyTwitter.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config["SECRET_KEY"] = "6236413AA53537DE57D1F6931653B"
@@ -29,7 +29,7 @@ app.config['SESSION_TYPE'] = "filesystem" # causes bugs right here this needs to
 app.config['SESSION_USE_SIGNER'] = True
 #app.config['SESSION_COOKIE_NAME']
 #app.config['SESSION_COOKIE_DOMAIN]
-#app.config['SESSION_COOKies]
+#app.config['SESSIO N_COOKies]
 #app.config['SESSION_COOKIE_SECURE'] = True # add this to make the cookies invisible or something 
 bcrypt = Bcrypt(app)
 
@@ -43,7 +43,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 with app.app_context():
-    optionsData = jsonify(json.load(open('../../createProjectOptions.json')))
+    optionsData = jsonify(json.load(open('createProjectOptions.json'))) # '../../createProjectOptions.json'
 
 
 
@@ -51,6 +51,10 @@ with app.app_context():
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
 
+
+@app.route('/')
+def index():
+    return app.send_static_file("index.html")
 
 @app.route("/@me", methods = ["POST"])
 @login_required
@@ -174,7 +178,7 @@ def compare_data(project_name):
 
 @app.route('/api/<string:project_name>', methods=['GET'])
 @login_required
-def index(project_name):
+def app_data(project_name):
     tweets = tpr_database.query.filter_by(id = "901774900481970176").first()#.order_by(func.random()).first() #func.random()
     content = tweets.text
     if project_name:
