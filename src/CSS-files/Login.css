@@ -49,7 +49,7 @@
     display: none;
     position: absolute;
     bottom: 300px;
-    min-width: 160px;
+    min-width: 100px;
     width: 0px;
     z-index: 1;
     transition: width 2s, height 4s;
@@ -103,10 +103,10 @@
   
 }
   .login-form{
-    
+    position: relative;
     background-color: rgba(209, 208, 205, 0.734);
-    bottom: 10px;
-    width:500px;
+    top: 400px;
+    width:400px;
     
     margin: 0 auto 0 auto;
     
@@ -166,7 +166,7 @@
 
   position: absolute;
   left: 50%;
-  bottom:12%;
+  bottom:-60%;
   
  }
  button.learn-more{
@@ -179,7 +179,7 @@
     text-decoration: none;
     font-size: inherit;
     font-family: inherit;
-    bottom: 10%;
+    bottom: 30%;
 
 }
 .button-css-3 a{
@@ -254,11 +254,11 @@ button#createproject{
 
 button.learn-more {
     font-weight: 200;
-    color: #382b22;
+    color: #2f4a54;
     text-transform: uppercase;
     padding: 1.25em 1em;
-    background: #ab7849;
-    border: 1px solid #5d370e;
+    background: #4996ab;
+    border: 1px solid #0e2f5d;
     border-radius: 2em;
     transform-style: preserve-3d;
     transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1);
@@ -273,7 +273,7 @@ button.learn-more::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: #8c5b2c;
+    background: #2c778c;
     border-radius: inherit;
     box-shadow: 0 0 0 2px, 0 0.625em 0 0;
     transform: translate3d(0, 0.75em, -1em);
@@ -281,7 +281,7 @@ button.learn-more::before {
     
 }
 button.learn-more:hover {
-    background: #d6a954;
+    background: #54c5d6;
     transform: translate(0, 0.25em);
 }
 button.learn-more:hover::before {
@@ -290,12 +290,12 @@ button.learn-more:hover::before {
   
 }
 button.learn-more:active {
-    background: #ffe9e9;
+    background: #e9fffe;
     transform: translate(0em, 0.75em);
   
 }
 button.learn-more:active::before {
-    box-shadow: 0 0 0 2px #b1a985, 0 0 #fff8e2;
+    box-shadow: 0 0 0 2px #85b1b0, 0 0 #e2ffff;
     transform: translate3d(0, 0, -1em);
 
 }

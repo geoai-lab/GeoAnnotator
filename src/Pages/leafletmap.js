@@ -278,7 +278,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         for (const [key, value] of Object.entries(layers)) {
             setMapLayers((prevLayers) => {
                 delete prevLayers[key];
-                return prevLayers; 
+                return prevLayers;
             }
             )
         }
@@ -325,108 +325,107 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                 <div className="col text-center">
 
                     <div className='form-group col-md-13'>
+                        <div>
+                            <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={mapRef}
+                                attributionControl={false} whenCreated={map => {
+                                    setMap(map);
+                                    Addgeojson(map);
+                                }}>
 
-                        <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={mapRef}
-                            attributionControl={false} whenCreated={map => {
-                                setMap(map);
-                                Addgeojson(map);
-                            }}>
+                                {geojsonTag && <GeoJSON key={uniqueKey} data={geojsonTag} onEachFeature={(feature, layer) => {
+                                    layer.on('click', function (e) {
 
-                            {geojsonTag && <GeoJSON key={uniqueKey} data={geojsonTag} onEachFeature={(feature, layer) => {
-                                layer.on('click', function (e) {
-
-                                    //map.removeLayer(layer);
-                                });
-                                layer.on('mouseover', function (e) {
-                                    var deletemessage = document.getElementById("deletemessage")
-                                    deletemessage.style.visibility = "visible";
-                                    setSelectGeojson(layer)
-                                    //map.removeLayer(layer);
-                                });
-                                layer.on('mouseout', function (e) {
-                                    if (e.originalEvent.relatedTarget.className === "deletemessage" || e.originalEvent.relatedTarget.className === "deletesection") {
+                                        //map.removeLayer(layer);
+                                    });
+                                    layer.on('mouseover', function (e) {
                                         var deletemessage = document.getElementById("deletemessage")
                                         deletemessage.style.visibility = "visible";
                                         setSelectGeojson(layer)
-                                    } else {
-                                        var deletemessage = document.getElementById("deletemessage")
-                                        deletemessage.style.visibility = "hidden";
-                                        setSelectGeojson(null)
-                                    }
-
-
-                                    //map.removeLayer(layer);
-                                });
-
-
-                            }} />}
-
-                            <ChangeView center={position} />
-
-                            <FeatureGroup>
-                                <EditControl
-                                    position="topright"
-                                    onCreated={_onCreate}
-                                    onEdited={_onEdit}
-                                    onDeleted={_onDeleted}
-                                    draw={drawings ?
-                                        {
-                                            rectangle: true,
-                                            circle: false,
-                                            circlemarker: false,
-                                            marker: true,
-                                            polyline: true
+                                        //map.removeLayer(layer);
+                                    });
+                                    layer.on('mouseout', function (e) {
+                                        if (e.originalEvent.relatedTarget.className === "deletemessage" || e.originalEvent.relatedTarget.className === "deletesection") {
+                                            var deletemessage = document.getElementById("deletemessage")
+                                            deletemessage.style.visibility = "visible";
+                                            setSelectGeojson(layer)
+                                        } else {
+                                            var deletemessage = document.getElementById("deletemessage")
+                                            deletemessage.style.visibility = "hidden";
+                                            setSelectGeojson(null)
                                         }
-                                        :
-                                        {
-                                            rectangle: false,
-                                            circle: false,
-                                            circlemarker: false,
-                                            marker: false,
-                                            polyline: false,
-                                            polygon: false
+
+
+                                        //map.removeLayer(layer);
+                                    });
+
+
+                                }} />}
+
+                                <ChangeView center={position} />
+
+                                <FeatureGroup>
+                                    <EditControl
+                                        position="topright"
+                                        onCreated={_onCreate}
+                                        onEdited={_onEdit}
+                                        onDeleted={_onDeleted}
+                                        draw={drawings ?
+                                            {
+                                                rectangle: true,
+                                                circle: false,
+                                                circlemarker: false,
+                                                marker: true,
+                                                polyline: true
+                                            }
+                                            :
+                                            {
+                                                rectangle: false,
+                                                circle: false,
+                                                circlemarker: false,
+                                                marker: false,
+                                                polyline: false,
+                                                polygon: false
+                                            }
                                         }
-                                    }
+                                    />
+
+                                </FeatureGroup>
+                                <TileLayer
+                                    url={osm.maptiler.url}
+                                    attribution={osm.maptiler.attribution}
                                 />
 
-                            </FeatureGroup>
-                            <TileLayer
-                                url={osm.maptiler.url}
-                                attribution={osm.maptiler.attribution}
-                            />
+                                {setMaplayersFunction && Setlayers}
 
-                            {setMaplayersFunction && Setlayers}
+                            </MapContainer>
 
-                        </MapContainer>
+                        </div>
+                        <div className="suggestions" >
 
+
+                            {searchBar && <AsyncSelect
+                                cacheOptions
+                                key={uniqueKey}
+                                id="dropdown-item-button" title="Suggestions"
+                                variant="secondary"
+                                placeholder="Search"
+                                value={SearchText ? { label: SearchText, value: SearchText } : null}
+                                defaultOptions
+                                align={{ lg: 'start' }}
+                                onChange={handleClickSearch}
+                                loadOptions={handleloadOptions}
+                                filterOption={(options) => options}>
+                            </AsyncSelect>}
+
+
+                        </div>
+                        <div className="deletesection" id="deletebox">
+                            <span className="deletemessage" id="deletemessage" onClick={handleDeleteGeojson}>Delete?</span>
+                        </div>
+                        <div id="suggestion-title">
+                            {locationTitle}
+                        </div>
                     </div>
-                    <div className="suggestions" >
-
-
-                        {searchBar && <AsyncSelect
-                            cacheOptions
-                            key={uniqueKey}
-                            id="dropdown-item-button" title="Suggestions"
-                            variant="secondary"
-                            placeholder="Search"
-                            value={SearchText ? { label: SearchText, value: SearchText } : null}
-                            defaultOptions
-                            align={{ lg: 'start' }}
-                            onChange={handleClickSearch}
-                            loadOptions={handleloadOptions}
-                            filterOption={(options) => options}>
-                        </AsyncSelect>}
-
-
-                    </div>
-                    <div className="deletesection" id="deletebox">
-                        <span className="deletemessage" id="deletemessage" onClick={handleDeleteGeojson}>Delete?</span>
-                    </div>
-                    <div id="suggestion-title">
-
-                        {locationTitle}
-                    </div>
-
                 </div>
 
             </div>

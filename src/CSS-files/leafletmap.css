@@ -1,15 +1,15 @@
 
   #create-map {
     height: 90%;
-    width: 48%;
+    width: 8%;
     top: 8%;
     position: absolute;
     z-index: 0;
 }
 #annotate-map {
-    height: 90%;
-    width: 62%;
-    top: 8%;
+    height: 87%;
+    width: 60%;
+    top: 10%;
     position: absolute;
     left: 2%;
     z-index: 0;
@@ -23,8 +23,8 @@
 }
 #suggestion-title{
     position: absolute;
-    left: 20%;
-    bottom: 30px;
+    top: 660px;
+	width: 50%;
     font-size: 1em;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -40,19 +40,19 @@
   }
   
  #deletemessage {
-	visibility: hidden;
+	display: block;
 	border-width: thick;
 	background-color: red;
 	border-color: #000000;
 	color: white;
 	cursor: pointer;
 	border-width: 1.2rem;
-   
-	
+	border: #000000 1px solid;
+	transition: all .3 ease-in-out;
   }
   
 #deletemessage:hover {
-	visibility: visible;
+	display: block;
 	
   } 
 

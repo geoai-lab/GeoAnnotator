@@ -74,14 +74,21 @@
     border: 1px solid black;
     }
 
-#submitbuttonsection{
+#submitbuttonsection button{
   position: relative;
-  top:60px;
-  
+  border: 2px solid rgba(25, 22, 19, 0.524);
+  color: #000;
+  background-color: rgba(78, 163, 187, 0.748);
+  left: 150px;
+  width: 8%; 
+  top: 20px;
+  border-radius: 10%;
+  margin: 5% 0;
 }
 #submitbuttonsection i{
   position: relative;
-  right: 7px; 
+  right: 8px; 
+  top: -1px;
 }
 .submit-section{
   top: 30px;
@@ -94,29 +101,21 @@
   -webkit-transform: scale(1.1);
 }
 #creatable-submit{
-  width: 50%;
-  left: 20%; 
+  width: 70%;
+  
 }
 #submitbutton-annotate{
   position:absolute;
-  left: 200px;
-  bottom: 40px; 
+  left: 100px;
+  bottom: 50px; 
 }
 #submitbuttonsection button:active{
   background-color: rgba(140, 79, 38, 0.884);
   transition: all .1s ease-in-out;
 }
-#tweetsection button{
+#tweetsection{
   position: relative;
-  border: 2px solid rgba(25, 22, 19, 0.524);
-  color: #000;
-  background-color: rgba(187, 122, 78, 0.748);
-  left: 95%;
-  bottom: 140%;
-  display: block;
-  width: 6%; 
-  border-radius: 100%;
-  margin: 5% 0;
+  bottom: 100px;
 }
 #refresh-button {
   background: url('spinner.gif') no-repeat center center;
@@ -238,8 +237,8 @@
   position: absolute;
   z-index: 1;
   margin-left: -80px;
-  left: 45px;
-  top: 90px;
+  left: 145px;
+  top: -160px;
 }
 
 /* Popup arrow */

@@ -1,9 +1,9 @@
 #leaflet-compare {
-    height: 30%;
-    width: 80%;
-    top: 10px;
-    padding: 300px 100px;
-    position: relative;
+    height: -1%;
+    width: 49%;
+    top: 16%;
+    padding: 200px 70px;
+    position: absolute;
     border-radius: 0.1%;
     padding-right: 200px;
     z-index: 0;
@@ -12,10 +12,6 @@
     float: left;
     width: 50%;
   }
-  #resolvesection1:{
-
-  }
-  
   /* Clear floats after the columns */
   .row:after {
     content: "";
@@ -26,14 +22,19 @@
     
     position: relative;
     
-    bottom: 8%;
-    right: 55%;
+    top: 230%;
+    right: 85%;
     
     -webkit-transform: scale(2.5); /* Chrome, Safari, Opera */
     transform: scale(2.5);
  
     
  
+  }
+  .selectCompare{
+    position: relative;
+    top: 10px;
+    font-size: .8em;
   }
   .resolvesection mark{
     background-color: #e2ab15;
@@ -45,14 +46,16 @@
     position: relative;
     width: -moz-fit-content;
     display: inline-block;
-    width: 50%;
+    width: 80%;
+    right: 0px;
+    top: 430px;
     transition: all .3s ease-in;
    
   }
   #usercard2, #usercard1{
-    overflow: auto;
+    font-size: .8em;
     display: inline-block;
-    width: 100%;
+    
   }
   .CompareBtn{
     background:#c57723cd;
@@ -62,10 +65,10 @@
     border: #80551d 2.5px solid;
     margin-top:20px;
     height:10px;
-    margin: 30px;
+  
     text-align: center;
-    padding-bottom: 60px;
-
+   
+  
     font-weight:800;
     font-size:0.8em;
   }

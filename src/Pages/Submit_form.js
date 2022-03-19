@@ -51,7 +51,7 @@ export const Submit_form = ({ children }) => {
         { value: 'C10', label: "C10: Multiple-areas" }
     ]
     useEffect(() => {
-        fetch('/api/' + projectName).then(response => {
+        fetch('/api').then(response => {
             if (response.ok) {
                 return response.json()
             }
@@ -134,7 +134,7 @@ export const Submit_form = ({ children }) => {
 
         axios({
             method: "POST",
-            url: '/api/' + projectName + '/submit',
+            url: '/api/submit',
             withCredentials: true,
             data: {
                 'tweetid': tweet.id,
@@ -184,7 +184,7 @@ export const Submit_form = ({ children }) => {
                         if (window.confirm("Delete this note (ID " + highlight.id + ")?")) {
                             highlighter.removeHighlights([highlight]);
                         }
-                        
+
                         setSelection(highlights => {
                             delete highlights[highlight.id];
                             return highlights;
@@ -196,7 +196,6 @@ export const Submit_form = ({ children }) => {
         );
         var selection_scnd = window.getSelection();
         console.log(selection_scnd.focusNode.data[selection_scnd.focusOffset]);
-        alert(selection_scnd.focusOffset);
 
         var highlight_object = highlighter.highlightSelection("highlight", { containerElementId: "tweet" })[0];
         var start_idx = highlight_object.characterRange.start
@@ -205,7 +204,7 @@ export const Submit_form = ({ children }) => {
         setSelection(allSelection => {
             return ({
                 ...allSelection,
-                [highlight_object.id]: {"location_name":selection.toString(),"start_idx":start_idx, "end_idx":end_idx}
+                [highlight_object.id]: { "location_name": selection.toString(), "start_idx": start_idx, "end_idx": end_idx }
             })
         })
         console.log(highlightSelection);
@@ -230,41 +229,43 @@ export const Submit_form = ({ children }) => {
                     <div className="column2" >
 
                         <div className="row" id="tweetsection">
-                            <TwitterCard uniqueKey={refresh}>{tweet.content}</TwitterCard>
-
                             <div id="submitbuttonsection">
                                 <Button
-                                    class="learn-more2"
                                     className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Highlight Text"
                                     onClick={handleTextSelection}><i className="fa-solid fa-highlighter"></i></Button>
                                 <Button
-                                    class="learn-more2"
                                     className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Delete Highlights"
                                     onClick={handleClickRefresh}><i className="fa-solid fa-arrow-rotate-right"></i></Button>
                             </div>
-                        </div>
-                        <div className="row">
+                            <TwitterCard uniqueKey={refresh}>{tweet.content}</TwitterCard>
 
-                            <label className="submit-section">
-                                <Creatable options={category_options} onChange={handleCategory} placeholder="Select Category"
-                                    id="creatable-submit" />
-                                {Required_comp(category) /*Required to fill in category*/}
-                            </label>
 
                         </div>
+                        <div>
+                            <div className="row">
 
-                        <div className="popup2" key={submitKey}>
-                            <span className="popuptext2" id="myPopup2">Submitted!</span>
-                            <button
-                                class="learn-more"
-                                type='button'
-                                id="submitbutton-annotate"
-                                title="Submit Annotation"
-                                onClick={handleSubmit}>Submit</button>
+                                <label className="submit-section">
+                                    <Creatable options={category_options} onChange={handleCategory} placeholder="Select Category"
+                                        id="creatable-submit" 
+                                        maxMenuHeight={200}/>
+                                    {Required_comp(category) /*Required to fill in category*/}
+                                </label>
+
+                            </div>
+
+                            <div className="popup2" key={submitKey}>
+                                <span className="popuptext2" id="myPopup2">Submitted!</span>
+                                <button
+                                    class="learn-more"
+                                    type='button'
+                                    id="submitbutton-annotate"
+                                    title="Submit Annotation"
+                                    onClick={handleSubmit}>Submit</button>
+                            </div>
                         </div>
 
                     </div>

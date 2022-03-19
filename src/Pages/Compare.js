@@ -7,14 +7,15 @@ import 'leaflet/dist/leaflet.css';
 import axios from "axios";
 import 'leaflet-geosearch/dist/geosearch.css';
 import "leaflet-draw/dist/leaflet.draw.css";
+import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import '../CSS-files/Compare.css'
 import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup } from "react-bootstrap";
-import { slide as Menu } from 'react-burger-menu'
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { TwitterCard } from './TwitterCard'
 import Rangy from "rangy";
 import { useParams } from "react-router-dom";
+
 // Once checked double check with saved on database theres a bounds and a x y 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -39,7 +40,7 @@ export const Compare = () => {
     useEffect(() => {
         axios({
             method: "GET",
-            url: "/compare/" + projectName,
+            url: "/compare",
             withCredentials: true
         })
             .then((response) => {
@@ -133,14 +134,14 @@ export const Compare = () => {
 
         <div className="row">
             <div className='column'>
-                Annotator: <CreatableSelect
+                <Select
                     options={annotators}
-                    noOptionsMessage={() => null}
-                    promptTextCreator={() => false}
-                    formatCreateLabel={() => undefined}
+                    className="selectCompare"
+                    placeholder="Select Annotator"
                     onChange={(e) => {
                         setUserData1(e);
-                    }} />
+                    }} 
+                    maxMenuHeight={200}/>
                 {userData1 && <MapSection center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
                 <div className="resolvesection" id="resolvesection1">
                     {userData1 && <TwitterCard id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
@@ -151,7 +152,7 @@ export const Compare = () => {
                     var id2 = document.getElementById("resolvesection2");
                     id2.style.boxShadow = "none";
                 }} />}
-                { userData1 && 
+                {userData1 &&
                     <div>
                         <input
                             type="text"
@@ -161,12 +162,14 @@ export const Compare = () => {
 
             </div>
             <div className="column">
-                Annotator: <CreatableSelect
+                <Select
+                    className="selectCompare"
                     options={annotators}
-                    noOptionsMessage={() => null}
-                    promptTextCreator={() => false}
-                    formatCreateLabel={() => undefined}
-                    onChange={(e) => setUserData2(e)} />
+                    placeholder="Select Annotator"
+                    onChange={(e) => {
+                        setUserData2(e);}} 
+                    onClick={(e) => e.preventDefault()} 
+                    maxMenuHeight={200}/>
                 {userData2 && <MapSection center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
                 <div className="resolvesection" id="resolvesection2">
                     {userData2 && <TwitterCard id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
@@ -178,12 +181,12 @@ export const Compare = () => {
                     id1.style.boxShadow = "none";
                 }} />}
                 {userData2 &&
-                <div>
-                    <input
-                        type="text"
-                        value={userData2.category}
-                    />
-                </div>}
+                    <div>
+                        <input
+                            type="text"
+                            value={userData2.category}
+                        />
+                    </div>}
             </div>
             {userData2 && userData1 && <div id="comparebuttons">
                 <button className="CompareBtn">

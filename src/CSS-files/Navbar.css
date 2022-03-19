@@ -8,15 +8,15 @@
   }
   
 .navbar {
-    background: #4d4d44;
+    background: #5d7d85;
     font-family: Arial, Helvetica, sans-serif;
-    height: 80px;
+    height: 60px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    font-size: 1rem;
+    font-size: .8rem;
     top: 0;
     z-index: 999;
   }
@@ -25,7 +25,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80px;
+    height: 60px;
     max-width: 4100px;
   }
   
@@ -35,7 +35,7 @@
     margin-left: 0px;
     cursor: pointer;
     text-decoration: none;
-    width: 100%;
+  
     font-size: 1.2em;
     display: flex;
     position: relative;
@@ -69,7 +69,7 @@
   .nav-item {
     display: inline-block;
     position: relative;
-    height: 80px;
+    height: 60px;
   
   }
   .nav-item:hover .nav__submenu{
@@ -91,14 +91,15 @@
   .nav__submenu-item, .nav__submenu-item a{
     display: grid;
     box-sizing: border-box;
-    background: #4d4d44;
-    height: 35px;
+    background: #44494d;
+    height: 28px;
     color: white;
     position: relative;
-    grid-gap: 10px;
+    grid-gap: 1000px;
     box-shadow: 2px 8px 16px 2px rgba(0,0,0,0.2);
     border: #242222;
-    border-radius: 10px;
+    transition: all .3s ease-in;
+    border-radius: 5px;
     
   }
   
@@ -114,14 +115,17 @@
   .nav-item .nav__submenu{
     bottom: -90%;
     position:absolute;
+    transition: all .3s ease-in;
   }
   
   #submenu1{
-    right: -13%;
+
+    right: -25%;
    
   }
   #submenu2{
-    right: 13%;
+    
+    right: 5%;
    
   }
 

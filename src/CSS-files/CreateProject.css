@@ -104,3 +104,7 @@ input[type="file"] {
   display: table-cell;         
    
 }
+#create-map{
+  width: 48%;
+  top: 65px;
+}

@@ -43,7 +43,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 with app.app_context():
-    optionsData = jsonify(json.load(open('createProjectOptions.json'))) # '../../createProjectOptions.json'
+    optionsData = jsonify(json.load(open('../../createProjectOptions.json'))) # '../../createProjectOptions.json'
 
 
 
@@ -60,6 +60,8 @@ def index():
 @login_required
 def get_current_user():
     
+    if not session["project_name"]:
+        return jsonify({"error": "did not select project"}), 401
     #print(current_user.is_authenticated)
     if not current_user.is_authenticated:
         return jsonify({"error": "Unauthorized"}), 401
@@ -67,7 +69,8 @@ def get_current_user():
     return jsonify({
         "id": current_user.id,
         "email": current_user.email,
-        "username": current_user.username
+        "username": current_user.username, 
+        "project_name": session["project_name"]
     }),200
 
 
@@ -76,7 +79,8 @@ def login():
     loginform = LoginForm()
     email = request.json["email"]
     password = request.json["password"]
-
+    project_name = request.json["project"]
+    session["project_name"] = project_name
     user = User.query.filter_by(email=loginform.email.data).first()
     if user is None:
         return jsonify({"error": "Unauthorized"}), 401
@@ -150,9 +154,10 @@ def register_user():
         "email": new_user.email
     }), 200
 
-@app.route('/compare/<string:project_name>', methods =['GET'])
+@app.route('/compare', methods =['GET'])
 @login_required
-def compare_data(project_name):
+def compare_data():
+    project_name = session["project_name"]
     user_data = User.query.with_entities(User.username)
     list_usernames =[]
 
@@ -176,13 +181,16 @@ def compare_data(project_name):
     return jsonify(to_send_data), 200
 
 
-@app.route('/api/<string:project_name>', methods=['GET'])
+@app.route('/api', methods=['GET'])
 @login_required
-def app_data(project_name):
+def app_data():
     tweets = tpr_database.query.filter_by(id = "901774900481970176").first()#.order_by(func.random()).first() #func.random()
     content = tweets.text
+    project_name = session["project_name"]
     if project_name:
         project_json = Project.query.filter_by(project_name = project_name).first()
+    else:
+        return jsonify({"error": "No Project on session"}), 409
     neuro_results_json = json.loads(tweets.correction_of_neuro)
     toSend = {'id': str(tweets.id), 
      'content': content,
@@ -191,12 +199,12 @@ def app_data(project_name):
     return jsonify(toSend)
 
 # NEED TO TRY ON MULTIPLE USERS DOING IT AT THE SAME TIME! 
-@app.route('/api/<string:project_name>/submit', methods=['POST'])
+@app.route('/api/submit', methods=['POST'])
 @login_required
 def submission(project_name):
     json_object = request.json
     tweetid =json_object["tweetid"]
-    project = json_object["project"]
+    project = session["project_name"]
     highlight = json_object["highlight"]
     spatial_footprint = json_object["spatial-footprint"]
     timestamp = json_object["timestamp"]

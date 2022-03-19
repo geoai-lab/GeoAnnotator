@@ -7,39 +7,12 @@ import Login from './Login';
 import { useParams } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
-export const Navbar = ({ children, isLogin, OnLogin }) => {
+export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
-    const [username, setUsername] = useState()
+ 
     let { projectName } = useParams();
 
-    useEffect(() => {
-        console.log(projectName);
-        showButton();
-        if (isLogin) {
-            axios({
-                method: "POST",
-                url: "/@me",
-                withCredentials: true
-            })
-                .then((response) => {
-                    if (response.status == 200) {
-                        setUsername(response.data.username)
-
-
-                    }
-                }).catch((error) => {
-                    if (error.response.status == 401) {
-                        console.log(error.response)
-                        console.log(error.response.status)
-                        console.log(error.response.headers)
-                        alert("Invalid credentials")
-                        OnLogin(false)
-                        document.getElementById("myDropdown").classList.toggle("show")
-                    }
-                })
-        }
-    }, [isLogin]);
     const handleClick = () => {
         setClick(!click);
     }
@@ -88,17 +61,14 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
         );
     }
 
-    window.addEventListener('resize', showButton)
-    const handleLoginPopup = () => {
-        document.getElementById("myDropdown").classList.toggle("show")
-    }
+ 
 
 
     return (
         <>
             <nav className="navbar">
                 <div className="navbar-container">
-                    <Link to={"/" + projectName} className='navbar-logo'>
+                    <Link to={"/"} className='navbar-logo'>
                         GeoAnnotator for Disaster-related Location Descriptions&nbsp; <i className="fa-solid fa-earth-americas" />
                     </Link>
                     <div className='menu-icon' onClick={handleClick}>
@@ -106,19 +76,19 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                     </div>
                     <ul className={click ? 'nav-menu active' : 'nav-menu'}>
                         <li className='nav-item'>
-                            {isLogin && <Link to={'/api/project_name=' + projectName} className='nav-links' onClick={closeMobileMenu}>
+                            {isLogin && <Link to={'/api'} className='nav-links' onClick={closeMobileMenu}>
                                 Annotate
                             </Link>}
                         </li>
                         <li className='nav-item'>
-                            {isLogin && <Link to={'/compare/project_name=' + projectName} className='nav-links' onClick={closeMobileMenu}>
+                            {isLogin && <Link to={'/compare'} className='nav-links' onClick={closeMobileMenu}>
                                 Compare Annotations
                             </Link>}
                         </li>
                         <ul className='nav-item'>
                             {isLogin && <li className='nav-links' onClick={closeMobileMenu}>
                                 Project
-                                <SubMenu id="submenu1" data={[{ label: "Create a Project", link: "/createproject" + projectName, function: null },
+                                <SubMenu id="submenu1" data={[{ label: "Create a Project", link: "/createproject", function: null },
                                 { label: "Select Project", link: "/selectproject", function: null }]} />
                             </li>}
 
@@ -127,7 +97,7 @@ export const Navbar = ({ children, isLogin, OnLogin }) => {
                             {isLogin &&
 
                                 <li className='nav-links'>
-                                    {"Welcome, " + username}
+                                    {"Welcome, " + _username}
                                     <SubMenu id="submenu2" data={[{ label: "logout", link: "/", "function": handleLogout },
                                     { label: "settings", link: "/settings", "function": null }]} />
                                 </li>}

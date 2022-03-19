@@ -71,6 +71,7 @@ export const CreateProject = ({ children }) => {
         setFile(event.target.files[0])
         
     }
+   
 
     return (
 
@@ -112,7 +113,7 @@ export const CreateProject = ({ children }) => {
 
             <div className="column">
                 {/* Below is map re renders after every switch of state or drawing */}
-                {selectionState ? <Leafletmap key="1" geojson={jsondata} id="create-map" drawings={false} setMaplayersFunction={setMapLayers} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={true} drawings={true} setMaplayersFunction={setMapLayers} />}
+                {selectionState ? <Leafletmap key="1" id="create-map" geojson={jsondata} id="create-map" drawings={false} setMaplayersFunction={setMapLayers} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={true} drawings={true} setMaplayersFunction={setMapLayers} />}
             </div>
         </div>
 

@@ -25,8 +25,6 @@ export const Login = ({ children, OnLogin, projectNames, setCurrProject }) => {
 
   useEffect(() => {
 
-    document.getElementById("myDropdown").classList.toggle("show");
-
     var loginbutton = document.getElementById("loginbutton");
     loginbutton.style.borderBottom = "rgb(106, 73, 0) 3px solid";
     loginbutton.style.transition = "all .2s ease-in-out";
@@ -48,12 +46,14 @@ export const Login = ({ children, OnLogin, projectNames, setCurrProject }) => {
       withCredentials: true,
       data: !isRegistering ? {
         email: loginForm.email,
-        password: loginForm.password
+        password: loginForm.password,
+        project: currentProject
       } : {
         email: registerForm.email,
         password: registerForm.password,
         retypepassword: registerForm.retypepassword,
-        username: registerForm.username
+        username: registerForm.username,
+        project: currentProject
       }
     })
       .then((response) => {
@@ -66,7 +66,7 @@ export const Login = ({ children, OnLogin, projectNames, setCurrProject }) => {
             navigate("/createproject");
           }
           else {
-            navigate('/api/project_name=' + currentProject)
+            navigate('/api')
           }
         }
 
@@ -108,11 +108,6 @@ export const Login = ({ children, OnLogin, projectNames, setCurrProject }) => {
       )
     }
 
-  }
-
-
-  const handleClick = () => {
-    document.getElementById("myDropdown").classList.toggle("show")
   }
 
   const HandleRegister = (event) => {
