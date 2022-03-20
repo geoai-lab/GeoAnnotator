@@ -54,7 +54,7 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
             <ul id={id} className="nav__submenu">
                 {data.map(iter =>
                     <li className="nav__submenu-item ">
-                        <Link to={iter.link} className='nav-links' onClick={iter.function} >{iter.label}</Link>
+                       <Link to={iter.link} className='nav-links' onClick={iter.function} >{iter.label}</Link>                       
                     </li>
                 )}
             </ul>
@@ -89,7 +89,7 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
                             {isLogin && <li className='nav-links' onClick={closeMobileMenu}>
                                 Project
                                 <SubMenu id="submenu1" data={[{ label: "Create a Project", link: "/createproject", function: null },
-                                { label: "Select Project", link: "/selectproject", function: null }]} />
+                                { label: "Select Project", link: "/api", function: null }]} />
                             </li>}
 
                         </ul>
@@ -99,7 +99,7 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
                                 <li className='nav-links'>
                                     {"Welcome, " + _username}
                                     <SubMenu id="submenu2" data={[{ label: "logout", link: "/", "function": handleLogout },
-                                    { label: "settings", link: "/settings", "function": null }]} />
+                                    { label: "settings", link: "/", "function": null }]} />
                                 </li>}
 
 

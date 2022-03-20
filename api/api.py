@@ -56,7 +56,7 @@ def load_user(user_id):
 def index():
     return app.send_static_file("index.html")
 
-@app.route("/@me", methods = ["POST"])
+@app.route("/@me", methods = ["POST"]) # might need to change 
 @login_required
 def get_current_user():
     
@@ -69,8 +69,7 @@ def get_current_user():
     return jsonify({
         "id": current_user.id,
         "email": current_user.email,
-        "username": current_user.username, 
-        "project_name": session["project_name"]
+        "username": current_user.username
     }),200
 
 

@@ -6,6 +6,7 @@ import Home from './Pages/Home';
 import { Compare } from './Pages/Compare';
 import Login from './Pages/Login';
 import CreateProject from './Pages/CreateProject';
+import { LoginRegistration } from './Pages/LoginRegistration';
 import axios from "axios";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -15,23 +16,10 @@ function App() {
 
   const [loggedin, setIsLoggedin] = useState(false)
   const [projects, setProjects] = useState([])
-  const [project, setProject] = useState()
+  
   const [projectName, setProjectName] = useState("")
   const [_username, set_UserName] = useState("")
   useEffect(() => {
-    fetch('/project+descriptions').then(response => {
-      if (response.ok) {
-        return response.json()
-      }
-    }).then(data => {
-      var projectList = []
-      for (var project of data) {
-        projectList.push({ "label": project["project-name"], "value": project["project-name"] })
-      }
-      setProjects(projectList)
-
-    }
-    )
     axios({
       method: "POST",
       url: "/@me",
@@ -45,22 +33,22 @@ function App() {
           setProjectName(response.data.project_name)
 
         }
-      }).catch((error) => {
-        if (error.response.status == 401) {
-          setIsLoggedin(false);
+        if(response.status == 401){
+          alert("login error");
         }
       })
-
-  }, [loggedin])
+  }, [])
 
   return (
     <div className="App">
 
       <Router>
         <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} _username={_username} />
+       
         <Routes>
-
-          {!loggedin && <Route path='/' element={<Login isLogin={loggedin} OnLogin={setIsLoggedin} projectNames={projects} setCurrProject={setProject} />} exact />}
+          
+          {!loggedin && <Route path='/' element={<LoginRegistration setLogin={setIsLoggedin}/>} exact />}
+          <Route path="/" element={<Home/>}/>
           <Route path="/logout" />
           <Route path='/createproject' element={<CreateProject />} />
           <Route path={"/api"} element={<Submit_form />} />
