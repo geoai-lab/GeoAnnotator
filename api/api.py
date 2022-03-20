@@ -136,6 +136,8 @@ def register_user():
     password = request.json["password"]
     retype = request.json["retypepassword"]
     username = request.json["username"]
+    project_name = request.json["project"]
+    session["project_name"] = project_name        
     user_exists = User.query.filter_by(email=email).first() is not None
 
     if user_exists:

@@ -42,6 +42,7 @@ export const LoginRegistration = ({ onLogin, setLogin }) => {
         }
     }
     const handleSubmit = (isCreating) =>{
+        console.log(isRegistering);
         axios({
             method: "POST",
             url: isRegistering ? "/register" : "/login",
@@ -76,7 +77,6 @@ export const LoginRegistration = ({ onLogin, setLogin }) => {
                 console.log(error.response)
                 console.log(error.response.status)
                 console.log(error.response.headers)
-                alert("Invalid credentials")
               }
               else if (error.response.status == 409) {
                 alert(error.response.data)
