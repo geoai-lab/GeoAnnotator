@@ -8,6 +8,7 @@ import Login from './Pages/Login';
 import CreateProject from './Pages/CreateProject';
 import { LoginRegistration } from './Pages/LoginRegistration';
 import axios from "axios";
+import Loading from './Pages/Loading';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import React, { useEffect, useState } from 'react';
@@ -18,7 +19,8 @@ function App() {
   const [projects, setProjects] = useState([])
   
   const [projectName, setProjectName] = useState("")
-  const [_username, set_UserName] = useState("")
+  const [_username, set_UserName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     axios({
       method: "POST",
@@ -31,14 +33,16 @@ function App() {
           setIsLoggedin(true);
           set_UserName(response.data.username)
           setProjectName(response.data.project_name)
-
         }
         if(response.status == 401){
           alert("login error");
         }
       })
+      setIsLoading(false);
   }, [])
-
+  if(isLoading){
+    return(<Loading/>);
+  }
   return (
     <div className="App">
 

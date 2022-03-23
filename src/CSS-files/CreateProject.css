@@ -14,7 +14,9 @@
   box-shadow: 3px 10px 20px rgba(0, 0, 0, 0.2);
   border-radius: 3px;   
   }
-  
+  .div-table-col{
+    padding-bottom: 45px;
+  }
   .form-create input{
     font-family: Arial, Helvetica, sans-serif;
     background:#ecf0f1;
@@ -49,29 +51,32 @@ input[type="file"] {
   cursor: pointer;
 }
 
-  .form-create button{
-    
-    background:#c57723cd;
-    width:100px; 
-    
+#createbtn {
+  display: inline-block;
+  position:relative;
+  left:45%;
+  top:120px;
+  outline: 0;
+  cursor: pointer;
+  width: 10%;
   
-    color:white;
-    border-radius:20px;
-    border: #80551d 2.5px solid;
- 
-    margin-top:20px;
-    height:10px;
-  
-   
-    text-align: center;
-    padding-bottom: 60px;
+  border: none;
 
-    font-weight:800;
-    font-size:0.8em;
-  }
-  .form-create button:hover{ 
-    background:#e2ab15; 
-    }
+  height: 25px;
+ 
+  border-radius: 7px;
+  background-color: #0096f3;
+  color: white;
+  font-weight: 100;
+  font-size: 10px;
+  box-shadow: 0 4px 14px 0 #000;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+#createbtn:hover {
+  background: rgba(0, 157, 255, 0.9);
+  box-shadow: 0 6px 20px #000;
+}
+  
     
   .createSelect{
     position: absolute;
@@ -80,11 +85,7 @@ input[type="file"] {
     width: 100%;
   
   }
-.form-create .createbtn{
-    position:relative;
-    top: 166px;
-    left: 40%;
-}
+
 
 
 

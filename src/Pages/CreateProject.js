@@ -56,7 +56,7 @@ export const CreateProject = ({ children }) => {
             .then((response) => {
                 if (response.status == 200) {
                     navigate('/api/project_name=' + projectName)
-                }   
+                }
 
             }).catch((error) => {
                 if (error.response.status == 401) {
@@ -69,51 +69,56 @@ export const CreateProject = ({ children }) => {
     }
     const handletwitterDataInput = (event) => {
         setFile(event.target.files[0])
-        
+
     }
-   
+
 
     return (
 
+        <div class="row">
+            <div className="createBox">
+                <div className="column">
+                    <div class="col">
+                        <Card className="form-create">
+                            Project Name: <input id="projectnameinput" onChange={(e) => setProjectName(e.target.value)} />
+                            <div className="radio_buttonsection">
+                                <div className="div-table-row">
+                                    <div className="div-table-col">
+                                        Select a State  <Select
+                                            options={dataOptions}
+                                            className="createSelect"
+                                            placeholder="Select a State"
+                                            value={stateLabel}
+                                            onChange={handleStateClick} />
+                                    </div>
+                                    <div className="div-table-col">
+                                        <input className="radiobutton" id="drawradio" type="radio" name="createProj"
+                                            onClick={() => {
+                                                setSelectionState(false);
+                                                setStateLabel(null);
+                                            }} /> Draw the geographic score on map
+                                    </div>
+                                </div>
+                            </div>
 
-        <div className="createBox">
-            <div className="column">
-                <Card className="form-create">
-                    Project Name: <input id="projectnameinput" onChange={(e) => setProjectName(e.target.value)} />
-                    <div className="radio_buttonsection">
-                        <div className="div-table-row">
-                            <div className="div-table-col">
-                                Select a State  <Select
-                                    options={dataOptions}
-                                    className="createSelect"
-                                    placeholder="Select a State"
-                                    value={stateLabel}
-                                    onChange={handleStateClick} />
-                            </div>
-                            <div className="div-table-col">
-                                <input className="radiobutton" id="drawradio" type="radio" name="createProj"
-                                    onClick={() => {
-                                        setSelectionState(false);
-                                        setStateLabel(null);
-                                    }} /> Draw the geographic score on map
-                            </div>
-                        </div>
+
+
+
+                            <label class="custom-file-upload">
+                                <input type="file" onChange={handletwitterDataInput} />
+                                {file ? "Uploaded: " + file.name : "Upload Twitter Data"}
+                            </label>
+                        </Card>
                     </div>
+                    <div class="col">
+                        <button type="secondary" class="button" id="createbtn" style={{ "float": "left" }} onClick={handleSave} >Save</button>
+                    </div>
+                </div>
 
-
-                    <button type="secondary" className="createbtn" style={{ "float": "left" }} onClick={handleSave} >Save</button>
-
-                    <label class="custom-file-upload">
-                        <input type="file" onChange={handletwitterDataInput}/>
-                                {file ? "Uploaded: " + file.name: "Upload Twitter Data"}
-                    </label>
-                </Card>
-
-            </div>
-
-            <div className="column">
-                {/* Below is map re renders after every switch of state or drawing */}
-                {selectionState ? <Leafletmap key="1" id="create-map" geojson={jsondata} id="create-map" drawings={false} setMaplayersFunction={setMapLayers} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={true} drawings={true} setMaplayersFunction={setMapLayers} />}
+                <div className="column">
+                    {/* Below is map re renders after every switch of state or drawing */}
+                    {selectionState ? <Leafletmap key="1" id="create-map" geojson={jsondata} id="create-map" drawings={false} setMaplayersFunction={setMapLayers} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={true} drawings={true} setMaplayersFunction={setMapLayers} />}
+                </div>
             </div>
         </div>
 

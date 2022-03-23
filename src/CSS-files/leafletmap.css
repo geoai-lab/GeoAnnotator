@@ -40,19 +40,30 @@
   }
   
  #deletemessage {
-	display: block;
-	border-width: thick;
-	background-color: red;
-	border-color: #000000;
-	color: white;
-	cursor: pointer;
-	border-width: 1.2rem;
-	border: #000000 1px solid;
-	transition: all .3 ease-in-out;
+display: inline-block;
+  position:relative;
+  margin: 1px;
+  outline: 0;
+  width:100px;
+  cursor: pointer;
+  z-index: 999999999999;
+
+  border: none;
+
+ 
+  border: #000000 solid;
+  border-radius: 7px;
+  background-color: #d04c4c;
+  color: white;
+  font-weight: 100;
+  font-size: 20px;
+
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s
   }
   
 #deletemessage:hover {
-	display: block;
+background: rgba(255, 0, 0, 0.9);
+  
 	
   } 
 

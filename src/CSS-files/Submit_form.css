@@ -9,7 +9,9 @@
     bottom: -80px;
     position:relative;
     width: 30%;
+    
   }
+  
 
 
 
@@ -21,6 +23,7 @@
     clear: both;
   }
   .column1,.column2{
+    
       margin: auto;    
   }
   .highlight {
@@ -75,19 +78,44 @@
     }
 
 #submitbuttonsection button{
-  position: relative;
-  border: 2px solid rgba(25, 22, 19, 0.524);
-  color: #000;
-  background-color: rgba(78, 163, 187, 0.748);
-  left: 150px;
-  width: 8%; 
-  top: 20px;
-  border-radius: 10%;
-  margin: 5% 0;
+    padding-top: 100px;
+    background-color: #e0fbf2;
+    border: 2px solid #00423e;
+    border-radius: 30px;
+    box-shadow: #422800 4px 4px 0 0;
+    color: #422800;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 100;
+    font-size: 15px;
+    z-index: 99999999999;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    
+  }
+  
+  #submitbuttonsection button:hover {
+    background-color: #fff;
+  }
+  
+  #submitbuttonsection button:active {
+    box-shadow: #422800 2px 2px 0 0;
+    transform: translate(2px, 2px);
+  }
+  
+  @media (min-width: 768px) {
+    #submitbuttonsection button {
+      min-width: 120px;
+      padding: 0 25px;
+    }
+  
 }
 #submitbuttonsection i{
   position: relative;
-  right: 8px; 
+  right: 0px; 
   top: -1px;
 }
 
@@ -111,11 +139,12 @@
   bottom: 50px; 
 }
 #submitbuttonsection button:active{
-  background-color: rgba(140, 79, 38, 0.884);
+  background-color: rgba(183, 240, 225, 0.884);
   transition: all .1s ease-in-out;
 }
 #tweetsection{
   position: relative;
+  padding-top: 50px;
   bottom: 100px;
 }
 #refresh-button {

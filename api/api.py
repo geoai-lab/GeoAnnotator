@@ -20,7 +20,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 load_dotenv()
-app = Flask(__name__,static_folder="../build", static_url_path='/')
+app = Flask(__name__)#static_folder="../build", static_url_path='/'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///HarveyTwitter.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config["SECRET_KEY"] = "6236413AA53537DE57D1F6931653B"
@@ -185,7 +185,12 @@ def compare_data():
 @app.route('/api', methods=['GET'])
 @login_required
 def app_data():
-    tweets = tpr_database.query.filter_by(id = "901774900481970176").first()#.order_by(func.random()).first() #func.random()
+    submissions_exists = Submission.query.filter_by(userid = current_user.id) is not None 
+    if(submissions_exists):
+       
+        tweets = Submission.query.filter_by(userid = current_user.id).outerjoin(tpr_database, Submission.tweetid != tpr_database.id).add_columns(tpr_database.text, tpr_database.id, tpr_database.correction_of_neuro ).first()
+    else:
+        tweets = tpr_database.query.filter_by(id = "901774900481970176").first() #"901774900481970176" #.order_by(func.random()).first() #func.random()
     content = tweets.text
     project_name = session["project_name"]
     if project_name:
@@ -202,7 +207,7 @@ def app_data():
 # NEED TO TRY ON MULTIPLE USERS DOING IT AT THE SAME TIME! 
 @app.route('/api/submit', methods=['POST'])
 @login_required
-def submission(project_name):
+def submission():
     json_object = request.json
     tweetid =json_object["tweetid"]
     project = session["project_name"]

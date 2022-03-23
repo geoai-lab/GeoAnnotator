@@ -15,6 +15,7 @@ import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { TwitterCard } from './TwitterCard'
 import Rangy from "rangy";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Once checked double check with saved on database theres a bounds and a x y 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -34,8 +35,10 @@ export const Compare = () => {
     const [isloading, setIsloading] = useState(true)
     const [annotators, setAnnotators] = useState("");
     let { projectName } = useParams();
-    const [userData1, setUserData1] = useState()
-    const [userData2, setUserData2] = useState()
+    const navigate = useNavigate();
+    const [userData1, setUserData1] = useState();
+    const [userData2, setUserData2] = useState();
+    const [choosenUser, setChoosenUser] = useState(null);
     //position ZOOM_LEVEL
     useEffect(() => {
         axios({
@@ -129,73 +132,87 @@ export const Compare = () => {
         }
 
     }
+    const handleCreateAnnotation = () => {
+        navigate("/api")
+    }
 
     return (
+        <div class="col-md-12">
+            <div className="row">
+                <div className='column'>
+                    <Select
+                        options={annotators}
+                        className="selectCompare"
+                        placeholder="Select Annotator"
+                        onChange={(e) => {
+                            setUserData1(e);
+                        }}
+                        maxMenuHeight={200} />
+                    {userData1 && <MapSection center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
+                    <div className="resolvesection" id="resolvesection1">
+                        {userData1 && <TwitterCard id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
+                    </div>
+                    {userData1 && <input id="resolve1" type="radio" value="state" name="resolve" onClick={(e) => {
+                    
+                        var id1 = document.getElementById("resolvesection1");
+                        id1.style.boxShadow = "20px 20px 50px 15px green";
+                        var id2 = document.getElementById("resolvesection2");
+                        id2.style.boxShadow = "none";
+                        setChoosenUser(1);
 
-        <div className="row">
-            <div className='column'>
-                <Select
-                    options={annotators}
-                    className="selectCompare"
-                    placeholder="Select Annotator"
-                    onChange={(e) => {
-                        setUserData1(e);
-                    }} 
-                    maxMenuHeight={200}/>
-                {userData1 && <MapSection center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
-                <div className="resolvesection" id="resolvesection1">
-                    {userData1 && <TwitterCard id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
+                    }} />}
+                    {userData1 &&
+                        <div>
+                            <input
+                                type="text"
+                                value={userData1.category}
+                            />
+                        </div>}
+
                 </div>
-                {userData1 && <input id="resolve1" type="radio" value="state" name="resolve" onClick={(e) => {
-                    var id1 = document.getElementById("resolvesection1");
-                    id1.style.boxShadow = "20px 20px 50px 15px green";
-                    var id2 = document.getElementById("resolvesection2");
-                    id2.style.boxShadow = "none";
-                }} />}
-                {userData1 &&
-                    <div>
-                        <input
-                            type="text"
-                            value={userData1.category}
-                        />
-                    </div>}
+                <div className="column">
+                    <Select
+                        className="selectCompare"
+                        options={annotators}
+                        placeholder="Select Annotator"
+                        onChange={(e) => {
+                            setUserData2(e);
+                        }}
+                        onClick={(e) => e.preventDefault()}
+                        maxMenuHeight={200} />
+                    {userData2 && <MapSection center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
+                    <div className="resolvesection" id="resolvesection2">
+                        {userData2 && <TwitterCard id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
+                    </div>
+                    {userData2 && <input id="resolve2" type="radio" value="state" name="resolve" onClick={(e) => {
+               
+                        var id2 = document.getElementById("resolvesection2");
+                        id2.style.boxShadow = "20px 20px 50px 15px green";
+                        var id1 = document.getElementById("resolvesection1");
+                        id1.style.boxShadow = "none";
+                        setChoosenUser(2);
+                    }} />}
+                    {userData2 &&
+                        <div>
+                            <input
+                                type="text"
+                                value={userData2.category}
+                            />
+                        </div>}
+                </div>
 
             </div>
-            <div className="column">
-                <Select
-                    className="selectCompare"
-                    options={annotators}
-                    placeholder="Select Annotator"
-                    onChange={(e) => {
-                        setUserData2(e);}} 
-                    onClick={(e) => e.preventDefault()} 
-                    maxMenuHeight={200}/>
-                {userData2 && <MapSection center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
-                <div className="resolvesection" id="resolvesection2">
-                    {userData2 && <TwitterCard id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
-                </div>
-                {userData2 && <input id="resolve2" type="radio" value="state" name="resolve" onClick={(e) => {
-                    var id2 = document.getElementById("resolvesection2");
-                    id2.style.boxShadow = "20px 20px 50px 15px green";
-                    var id1 = document.getElementById("resolvesection1");
-                    id1.style.boxShadow = "none";
-                }} />}
-                {userData2 &&
-                    <div>
-                        <input
-                            type="text"
-                            value={userData2.category}
-                        />
-                    </div>}
+            <div class="row">
+
+                {choosenUser && userData2 && userData1 && <div id="comparebuttons">
+                    <button className="CompareBtn">
+                        Submit!
+                    </button>
+                    <button onClick={handleCreateAnnotation} className="CompareBtn">
+                        Create new annotation
+                    </button>
+                </div>}
             </div>
-            {userData2 && userData1 && <div id="comparebuttons">
-                <button className="CompareBtn">
-                    Submit!
-                </button>
-                <button className="CompareBtn">
-                    Create new annotation
-                </button>
-            </div>}
         </div>
 
     )

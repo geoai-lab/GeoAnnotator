@@ -58,20 +58,28 @@
     
   }
   .CompareBtn{
-    background:#c57723cd;
-    width:100px; 
-    color:white;
-    border-radius:20px;
-    border: #80551d 2.5px solid;
-    margin-top:20px;
-    height:10px;
-  
-    text-align: center;
-   
-  
-    font-weight:800;
-    font-size:0.8em;
+  display: inline-block;
+  position:relative;
+  margin: 10px;
+  outline: 0;
+  top: 420px;
+  cursor: pointer;
+  z-index: 999999999999;
+
+  border: none;
+
+  height: 25px;
+ 
+  border-radius: 7px;
+  background-color: #4cb3d0;
+  color: white;
+  font-weight: 100;
+  font-size: 10px;
+  box-shadow: 0 4px 14px 0 #000;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   }
   .CompareBtn:hover{
-    background:#e2ab15; 
+    background: rgba(45, 203, 206, 0.9);
+    box-shadow: 0 6px 20px #000;
   }
+ 

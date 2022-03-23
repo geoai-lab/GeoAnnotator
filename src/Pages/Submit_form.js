@@ -14,7 +14,6 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 export const Submit_form = ({ children }) => {
     const [tweet, setTweet] = useState('No Data... Please report to developer');
-    let { projectName } = useParams();
     const [isloading, setIsloading] = useState(true);
     const [refresh, setRefresh] = useState(0);
     const [category, setCategory] = useState('')
@@ -26,7 +25,7 @@ export const Submit_form = ({ children }) => {
     const [projectDescription, setProjectDescription] = useState(null);
     const [submitKey, setSubmitKey] = useState(0)
     const [isDeleting, setIsDeleting] = useState(false);
-    Rangy.init()
+    
     // helpers
 
 
@@ -73,6 +72,10 @@ export const Submit_form = ({ children }) => {
 
     }, [toggleSubmit])
     useEffect(() => {
+        Rangy.init()
+        if(!neuroHighlight){
+            return;
+        }
         var tweet_div = document.getElementById("tweet");
         const range = Rangy.createRange()
         if (!tweet_div) {
@@ -137,8 +140,7 @@ export const Submit_form = ({ children }) => {
             url: '/api/submit',
             withCredentials: true,
             data: {
-                'tweetid': tweet.id,
-                'project': projectName, // handle user ID in backend 
+                'tweetid': tweet.id, // handle user ID in backend 
                 'highlight': highlightSelection,
                 'category': category,
                 'spatial-footprint': MaplayersFunction,
@@ -227,8 +229,8 @@ export const Submit_form = ({ children }) => {
 
                     {/*Second column*/}
                     <div className="column2" >
-
                         <div className="row" id="tweetsection">
+                            <TwitterCard uniqueKey={refresh}>{tweet.content}</TwitterCard>
                             <div id="submitbuttonsection">
                                 <Button
                                     className="btn btn-secondary btn-floating"
@@ -241,7 +243,7 @@ export const Submit_form = ({ children }) => {
                                     title="Delete Highlights"
                                     onClick={handleClickRefresh}><i className="fa-solid fa-arrow-rotate-right"></i></Button>
                             </div>
-                            <TwitterCard uniqueKey={refresh}>{tweet.content}</TwitterCard>
+
 
 
                         </div>
@@ -250,8 +252,8 @@ export const Submit_form = ({ children }) => {
 
                                 <label className="submit-section">
                                     <Creatable options={category_options} onChange={handleCategory} placeholder="Select Category"
-                                        id="creatable-submit" 
-                                        maxMenuHeight={200}/>
+                                        id="creatable-submit"
+                                        maxMenuHeight={180} />
                                     {Required_comp(category) /*Required to fill in category*/}
                                 </label>
 

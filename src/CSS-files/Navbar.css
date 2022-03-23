@@ -32,18 +32,19 @@
   .navbar-logo {
     color: #fff;
     justify-self: start;
-    margin-left: 0px;
+    top: -6px;
+    position: relative;
     cursor: pointer;
     text-decoration: none;
-  
+    
     font-size: 1.2em;
     display: flex;
-    position: relative;
+   
     align-items: center;
+   
   }
   .navbar-logo:hover {
     color: aliceblue;
-    
     transition: all .2s ease-in-out;
     -moz-transition: all .2s ease-in-out;
     -ms-transform: scale(1.1);
@@ -186,12 +187,7 @@
       border-radius: 0;
     }
   
-    .navbar-logo {
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform: translate(25%, 50%);
-    }
+   
   
     .menu-icon {
       display: block;
