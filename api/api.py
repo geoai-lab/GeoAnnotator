@@ -57,7 +57,6 @@ def index():
     return app.send_static_file("index.html")
 
 @app.route("/@me", methods = ["POST"]) # might need to change 
-@login_required
 def get_current_user():
     
     if not session["project_name"]:

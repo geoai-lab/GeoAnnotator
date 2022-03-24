@@ -19,7 +19,7 @@ function App() {
   
   const [projectName, setProjectName] = useState("")
   const [_username, set_UserName] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     axios({
       method: "POST",
@@ -27,7 +27,7 @@ function App() {
       withCredentials: true
     })
       .then((response) => {
-        console.log(response)
+        setIsLoading(false);
         if (response.status == 200) {
           setIsLoggedin(true);
           set_UserName(response.data.username)
@@ -36,7 +36,7 @@ function App() {
         }
         if(response.status == 401){
           alert("login error");
-          setIsLoading(false);
+          
         }
       })
      
