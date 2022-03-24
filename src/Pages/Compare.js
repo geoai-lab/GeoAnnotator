@@ -10,7 +10,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import '../CSS-files/Compare.css'
-import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup } from "react-bootstrap";
+import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup, Card } from "react-bootstrap";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { TwitterCard } from './TwitterCard'
 import Rangy from "rangy";
@@ -38,6 +38,7 @@ export const Compare = () => {
     const navigate = useNavigate();
     const [userData1, setUserData1] = useState();
     const [userData2, setUserData2] = useState();
+    const [curTweetId, setCurTweetId] = useState("");
     const [choosenUser, setChoosenUser] = useState(null);
     //position ZOOM_LEVEL
     useEffect(() => {
@@ -50,15 +51,18 @@ export const Compare = () => {
                 if (response.status == 200) {
                     console.log(response.data)
                     setAnnotators(response.data.map((user) => {
+                        setCurTweetId(user.tweetid);
                         return ({
                             "label": user.username,
                             "value": user.username,
+                            "submissionid": user.submission_id, 
                             "text": user.text,
                             "highlight": user.annotation.highlight,
+                            "userid":user.userid,
                             "category": user.annotation.category,
                             "geojson": L.geoJSON(Object.values(user.annotation["spatial-footprint"])),
                             "projectGeojson": L.geoJSON(user.projectGeojson,
-                                { style: { "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } })
+                                { style: { "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } })    
 
                         });
                     }));
@@ -133,9 +137,33 @@ export const Compare = () => {
 
     }
     const handleCreateAnnotation = () => {
-        navigate("/api")
+        navigate("/api/" + curTweetId);
     }
+    const handleSubmit = () =>{
+        axios({
+            method: "POST",
+            url: '/compare/submit',
+            withCredentials: true,
+            data: {
+                'submission-userid-1': userData1.userid, // handle user ID in backend 
+                'submission-userid-2': userData2.userid,
+                'submissionid-1':userData1.submissionid,
+                'submissionid-2':userData2.submissionid, 
+                'choosing-correct-submission': choosenUser
+            }
+        })
+            .then((response) => {
+                if (response.status == 200) {
+                    alert("submission sucess");
+                }
 
+            }).catch((error) => {
+                if (error.response.status == 500) {
+                    alert("submission failed")
+                }
+
+            })
+    }
     return (
         <div class="col-md-12">
             <div className="row">
@@ -153,20 +181,20 @@ export const Compare = () => {
                         {userData1 && <TwitterCard id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
                     </div>
                     {userData1 && <input id="resolve1" type="radio" value="state" name="resolve" onClick={(e) => {
-                    
+
                         var id1 = document.getElementById("resolvesection1");
                         id1.style.boxShadow = "20px 20px 50px 15px green";
                         var id2 = document.getElementById("resolvesection2");
                         id2.style.boxShadow = "none";
-                        setChoosenUser(1);
+                        setChoosenUser(userData1.userid);
 
                     }} />}
                     {userData1 &&
                         <div>
-                            <input
+                            <Card
+                                id="catinpt"
                                 type="text"
-                                value={userData1.category}
-                            />
+                            >{userData1.category}</Card>
                         </div>}
 
                 </div>
@@ -185,19 +213,19 @@ export const Compare = () => {
                         {userData2 && <TwitterCard id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
                     </div>
                     {userData2 && <input id="resolve2" type="radio" value="state" name="resolve" onClick={(e) => {
-               
+
                         var id2 = document.getElementById("resolvesection2");
                         id2.style.boxShadow = "20px 20px 50px 15px green";
                         var id1 = document.getElementById("resolvesection1");
                         id1.style.boxShadow = "none";
-                        setChoosenUser(2);
+                        setChoosenUser(userData2.userid);
                     }} />}
                     {userData2 &&
                         <div>
-                            <input
+                            <Card
+                                id="catinpt"
                                 type="text"
-                                value={userData2.category}
-                            />
+                            >{userData2.category}</Card>
                         </div>}
                 </div>
 
@@ -205,7 +233,7 @@ export const Compare = () => {
             <div class="row">
 
                 {choosenUser && userData2 && userData1 && <div id="comparebuttons">
-                    <button className="CompareBtn">
+                    <button className="CompareBtn" onClick={handleSubmit}>
                         Submit!
                     </button>
                     <button onClick={handleCreateAnnotation} className="CompareBtn">

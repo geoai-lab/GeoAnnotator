@@ -67,6 +67,15 @@ class Submission(db.Model):
     project_name = db.Column(db.String, nullable = False)
     timestamp = db.Column(db.String)
     annotation = db.Column(db.String)
+
+class CompareSubmission(db.Model):
+    __tablename__ = 'compare-submissions'
+    submission_userid_1 = db.Column(db.String)
+    submission_userid_2 = db.Column(db.String)
+    submissionid_1 = db.Column(db.String)
+    submissionid_2 = db.Column(db.String)
+    choosing_correct_submission = db.Column(db.String)
+    userid = db.Column(db.String(32), primary_key = True)
    
   
 

@@ -12,7 +12,7 @@ import { MDBCol } from "mdbreact";
 import { useDebounce } from 'use-debounce';
 import AsyncSelect from 'react-select/async';
 import Loading from "./Loading";
-
+import "../CSS-files/Login.css"
 import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup, InputGroup } from "react-bootstrap";
 import { slide as Menu } from 'react-burger-menu'
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';

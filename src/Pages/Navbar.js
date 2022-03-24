@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Button } from './Button';
 import '../CSS-files/Navbar.css'
 import axios from "axios";
-import Login from './Login';
+
 import { useParams } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
@@ -79,7 +79,7 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
                         </div>
                         <ul className={click ? 'nav-menu active' : 'nav-menu'}>
                             <li className='nav-item'>
-                                {isLogin && <Link to={'/api'} className='nav-links' onClick={closeMobileMenu}>
+                                {isLogin && <Link to={'/api/any'} className='nav-links' onClick={closeMobileMenu}>
                                     Annotate
                                 </Link>}
                             </li>

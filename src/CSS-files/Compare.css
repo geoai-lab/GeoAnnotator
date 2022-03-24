@@ -8,6 +8,13 @@
     padding-right: 200px;
     z-index: 0;
 }
+#catinpt{
+  position: relative;
+  top: 440px;
+  width: 50%;
+  left: 25%;
+  z-index: 99999999999;
+}
 .column {
     float: left;
     width: 50%;

@@ -4,7 +4,6 @@ import { Submit_form } from './Pages/Submit_form';
 import { Navbar } from './Pages/Navbar'
 import Home from './Pages/Home';
 import { Compare } from './Pages/Compare';
-import Login from './Pages/Login';
 import CreateProject from './Pages/CreateProject';
 import { LoginRegistration } from './Pages/LoginRegistration';
 import axios from "axios";
@@ -33,12 +32,14 @@ function App() {
           setIsLoggedin(true);
           set_UserName(response.data.username)
           setProjectName(response.data.project_name)
+          setIsLoading(false);
         }
         if(response.status == 401){
           alert("login error");
+          setIsLoading(false);
         }
       })
-      setIsLoading(false);
+     
   }, [])
   if(isLoading){
     return(<Loading/>);
@@ -55,7 +56,8 @@ function App() {
           <Route path="/" element={<Home/>}/>
           <Route path="/logout" />
           <Route path='/createproject' element={<CreateProject />} />
-          <Route path={"/api"} element={<Submit_form />} />
+          <Route path={"/api/:tweetid"} element={<Submit_form />} />
+          <Route path={"/api/"} element={<Submit_form />} />
           <Route path='/compare' element={<Compare />} />
         </Routes>
       </Router>

@@ -25,7 +25,7 @@ export const Submit_form = ({ children }) => {
     const [projectDescription, setProjectDescription] = useState(null);
     const [submitKey, setSubmitKey] = useState(0)
     const [isDeleting, setIsDeleting] = useState(false);
-    
+    var params = useParams();
     // helpers
 
 
@@ -50,14 +50,18 @@ export const Submit_form = ({ children }) => {
         { value: 'C10', label: "C10: Multiple-areas" }
     ]
     useEffect(() => {
-        fetch('/api').then(response => {
+        setRefresh(data => data +1);
+        setCategory(null);
+        var linktograb = params.tweetid ? params.tweetid : 'any'
+        fetch('/api/' + linktograb).then(response => {
             if (response.ok) {
-                return response.json()
+                return response.json(); 
             }
             else {
                 alert("failed to grab data");
             }
         }).then(data => {
+            console.log("WERE GOING THRU HERE")
             console.log(data)
             setTweet(data)
             setIsloading(false)
@@ -123,9 +127,11 @@ export const Submit_form = ({ children }) => {
         return null;
     }
     const handleCategory = (e) => {
+        console.log(e);
         setCategory(e.label)
     }
     const handleSubmit = async () => {
+        params.tweetid = 'any';
         var popup = document.getElementById("myPopup2");
         popup.classList.toggle("show");
         setTimeout(function () {
@@ -251,8 +257,10 @@ export const Submit_form = ({ children }) => {
                             <div className="row">
 
                                 <label className="submit-section">
-                                    <Creatable options={category_options} onChange={handleCategory} placeholder="Select Category"
+                                    <Creatable options={category_options} onChange={handleCategory}
+                                        placeholder="Select Category"
                                         id="creatable-submit"
+                                        value={ category ? {"label":category} : null}
                                         maxMenuHeight={180} />
                                     {Required_comp(category) /*Required to fill in category*/}
                                 </label>

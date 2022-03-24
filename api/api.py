@@ -13,11 +13,11 @@ from flask_cors import CORS, cross_origin
 from flask_session import Session
 import redis
 from datetime import datetime, timedelta, timezone
-from models import db, tpr_database, User, LoginForm, Project, Submission
+from models import db, tpr_database, User, LoginForm, Project, Submission, CompareSubmission
 from dotenv import load_dotenv
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 from sqlalchemy.orm import sessionmaker
-
+import pandas as pd 
 
 load_dotenv()
 app = Flask(__name__)#static_folder="../build", static_url_path='/'
@@ -67,7 +67,7 @@ def get_current_user():
         return jsonify({"error": "Unauthorized"}), 401
     
     return jsonify({
-        "id": current_user.id,
+        "id": str(current_user.id),
         "email": current_user.email,
         "username": current_user.username
     }),200
@@ -91,7 +91,7 @@ def login():
    
 
     return jsonify({
-        "id": user.id,
+        "id": str(user.id),
         "email": user.email
     }),200
 
@@ -108,7 +108,7 @@ def logout():
 def create():
     return optionsData, 200
 
-@app.route("/project+descriptions", methods=["GET"])
+@app.route("/project+descriptions", methods=["GET","POST"])
 def project_descriptions():
     projects = Project.query.all()
     list_of_projects = []
@@ -151,46 +151,63 @@ def register_user():
     
     login_user(new_user)
     return jsonify({
-        "id": new_user.id,
+        "id": str(new_user.id),
         "email": new_user.email
     }), 200
 
-@app.route('/compare', methods =['GET'])
+@app.route('/compare', methods =['GET','POST'])
 @login_required
 def compare_data():
     project_name = session["project_name"]
     user_data = User.query.with_entities(User.username)
     list_usernames =[]
 
-    to_send_data = []                           # need to change the tweet id here later on 
+    to_send_data = []     
+    alreadySubmitted_ids = [idvid for subid in CompareSubmission.query.filter_by(userid = current_user.id).options(load_only(CompareSubmission.submission_userid_1, CompareSubmission.submission_userid_2)).all() for idvid in [subid.submission_userid_1,subid.submission_userid_2]]
+                       # need to change the tweet id here later on 
+
+    notYet_submitted = Submission.query.filter_by(project_name= project_name).filter(Submission.submission_id.notin_(alreadySubmitted_ids)) \
+                                .join(tpr_database, Submission.tweetid == tpr_database.id) \
+                                .join(Project, Submission.project_name == project_name) \
+                                .filter_by(project_name = project_name).add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
+
+    df = pd.DataFrame(notYet_submitted).astype(str)
+    to_iterate =None 
+    for name, group in df.groupby('id',sort=False):
+        to_iterate = group
+        break 
     all_submissions = Submission.query.filter_by(project_name = project_name, tweetid = "901774900481970176")\
                                     .join(tpr_database, Submission.tweetid == tpr_database.id) \
                                         .join(Project, Submission.project_name == project_name) \
                                             .filter_by(project_name = project_name) \
-                                                  .add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json) 
+                                                  .add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
                
                    
-    for filtered_submission in all_submissions:  # each group is a tweet set 
-        print(filtered_submission)
-        to_send_data.append({"text": filtered_submission[1],
-        "submission_id": filtered_submission[2],
-        "annotation": json.loads(filtered_submission[3])["annotation"],
-        "username":filtered_submission[4],
-        "projectGeojson": json.loads(filtered_submission[5])})
-
+    for indx,filtered_submission in to_iterate.iterrows():  # each group is a tweet set
+        to_send_data.append({"text": filtered_submission.text,
+        "submission_id": str(filtered_submission.submission_id),
+        "annotation": json.loads(filtered_submission.annotation)["annotation"],
+        "username":filtered_submission.username,
+        "projectGeojson": json.loads(filtered_submission.geo_json),
+        "tweetid":str(filtered_submission.id),
+        "userid":str(filtered_submission.userid)})
 
     return jsonify(to_send_data), 200
 
 
-@app.route('/api', methods=['GET'])
+@app.route('/api/<tweetid>', methods=['GET','POST'])
 @login_required
-def app_data():
+def app_data(tweetid):
+    print(tweetid)
+    print("HIII")
     submissions_exists = Submission.query.filter_by(userid = current_user.id) is not None 
     if(submissions_exists):
-       
-        tweets = Submission.query.filter_by(userid = current_user.id).outerjoin(tpr_database, Submission.tweetid != tpr_database.id).add_columns(tpr_database.text, tpr_database.id, tpr_database.correction_of_neuro ).first()
+        tweet_ids = [ids.tweetid for ids in Submission.query.filter_by(userid = current_user.id).options(load_only(Submission.tweetid)).all()]
+        tweets = tpr_database.query.filter(tpr_database.id.notin_(tweet_ids)).first()
     else:
         tweets = tpr_database.query.filter_by(id = "901774900481970176").first() #"901774900481970176" #.order_by(func.random()).first() #func.random()
+    if(tweetid != 'any'):
+        tweets = tpr_database.query.filter_by(id = str(tweetid)).first() 
     content = tweets.text
     project_name = session["project_name"]
     if project_name:
@@ -203,6 +220,8 @@ def app_data():
      'neuro_result':neuro_results_json,
      'project_description': {"label":project_json.project_name, "geo_json": json.loads(project_json.geo_json)}}
     return jsonify(toSend)
+
+
 
 # NEED TO TRY ON MULTIPLE USERS DOING IT AT THE SAME TIME! 
 @app.route('/api/submit', methods=['POST'])
@@ -228,6 +247,27 @@ def submission():
 
     return jsonify("Success"), 200
 
-
+@app.route('/compare/submit', methods=['POST'])
+@login_required
+def compare_submission():
+    print("HIIIIIIIIIIIIIIIIIIIIII")
+    print(request.json)
+    json_object = request.json
+    
+    userId1 = json_object['submission-userid-1']
+    userId2 = json_object['submission-userid-2']
+    submissionid1 = json_object['submissionid-1']
+    submissionid2 = json_object['submissionid-2']
+    choosenId = json_object['choosing-correct-submission']
+    CurrentUserId = current_user.id
+    new_submission = CompareSubmission(userid = CurrentUserId,
+                                     submission_userid_1 = userId1, 
+                                    submission_userid_2 = userId2, 
+                                    submissionid_1 = submissionid1,
+                                    submissionid_2 = submissionid2,
+                                    choosing_correct_submission = choosenId)
+    db.session.add(new_submission)
+    db.session.commit()
+    return jsonify("Success"), 200
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
