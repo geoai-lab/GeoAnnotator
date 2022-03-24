@@ -20,7 +20,7 @@ from sqlalchemy.orm import sessionmaker
 import pandas as pd 
 
 load_dotenv()
-app = Flask(__name__)#static_folder="../build", static_url_path='/'
+app = Flask(__name__,static_folder="../build", static_url_path='/')#
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///HarveyTwitter.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config["SECRET_KEY"] = "6236413AA53537DE57D1F6931653B"
