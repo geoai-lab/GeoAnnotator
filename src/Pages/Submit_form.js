@@ -12,6 +12,8 @@ import '../CSS-files/Submit_form.css';
 import { TwitterCard } from './TwitterCard';
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import Loading from "./Loading";
+import moment from "moment-timezone";
 export const Submit_form = ({ children }) => {
     const [tweet, setTweet] = useState('No Data... Please report to developer');
     const [isloading, setIsloading] = useState(true);
@@ -20,11 +22,12 @@ export const Submit_form = ({ children }) => {
     const [highlightSelection, setSelection] = useState([]);
     const [neuroHighlight, setNeuroHighlight] = useState({});
     const [highlighter, setHighlighter] = useState(null);
-    const [toggleSubmit, setToggleSubmit] = useState(false);
+    const [toggleSubmit, setToggleSubmit] = useState(1);
     const [MaplayersFunction, setMaplayersFunction] = useState();
     const [projectDescription, setProjectDescription] = useState(null);
     const [submitKey, setSubmitKey] = useState(0)
     const [isDeleting, setIsDeleting] = useState(false);
+    const [waitingForData, setWaitingForData] = useState(true);
     var params = useParams();
     // helpers
 
@@ -50,20 +53,24 @@ export const Submit_form = ({ children }) => {
         { value: 'C10', label: "C10: Multiple-areas" }
     ]
     useEffect(() => {
+        setWaitingForData(true);
         setRefresh(data => data +1);
         setCategory(null);
         var linktograb = params.tweetid ? params.tweetid : 'any'
         fetch('/api/' + linktograb).then(response => {
             if (response.ok) {
+                console.log("GRABBED DATA"); //doing it fast enough causes bugs 
                 return response.json(); 
             }
             else {
                 alert("failed to grab data");
             }
         }).then(data => {
-            console.log("WERE GOING THRU HERE")
-            console.log(data)
+            if(data.id == tweet.id){
+                setToggleSubmit(data => data+1); // reload again
+            }
             setTweet(data)
+            setWaitingForData(false);
             setIsloading(false)
             setNeuroHighlight(data.neuro_result)
             setProjectDescription({ "label": data.project_description.label, "geo_json": data.project_description.geo_json })
@@ -127,30 +134,32 @@ export const Submit_form = ({ children }) => {
         return null;
     }
     const handleCategory = (e) => {
-        console.log(e);
+        console.log(tweet);
         setCategory(e.label)
     }
     const handleSubmit = async () => {
+        setToggleSubmit(data => data + 1 )
         params.tweetid = 'any';
         var popup = document.getElementById("myPopup2");
         popup.classList.toggle("show");
+        
         setTimeout(function () {
             popup.classList.toggle("show");
         }, 1000)
         if (!category) {
             return null;
         }
-
         axios({
             method: "POST",
             url: '/api/submit',
             withCredentials: true,
+                // gives me "2016-03-22 12:00:00 am EDT"
             data: {
                 'tweetid': tweet.id, // handle user ID in backend 
                 'highlight': highlightSelection,
                 'category': category,
-                'spatial-footprint': MaplayersFunction,
-                'timestamp': new Date().toLocaleString()
+                'spatial-footprint': Object.keys(MaplayersFunction).map( key => key == -1? MaplayersFunction[-1] : MaplayersFunction[key].toGeoJSON()),
+                'timestamp': moment().tz("America/New_York").format("YYYY-MM-DD hh:mm:ss a z")
 
             }
         })
@@ -166,12 +175,8 @@ export const Submit_form = ({ children }) => {
                 }
 
             })
-        setToggleSubmit(data => !data)
+      
 
-    }
-
-    const deleteTextHighlight = () => {
-        highlighter.unhighlightSelection();
     }
 
     const handleTextSelection = () => {
@@ -192,7 +197,6 @@ export const Submit_form = ({ children }) => {
                         if (window.confirm("Delete this note (ID " + highlight.id + ")?")) {
                             highlighter.removeHighlights([highlight]);
                         }
-
                         setSelection(highlights => {
                             delete highlights[highlight.id];
                             return highlights;
@@ -208,7 +212,6 @@ export const Submit_form = ({ children }) => {
         var highlight_object = highlighter.highlightSelection("highlight", { containerElementId: "tweet" })[0];
         var start_idx = highlight_object.characterRange.start
         var end_idx = highlight_object.characterRange.end
-        console.log(highlight_object)
         setSelection(allSelection => {
             return ({
                 ...allSelection,
@@ -217,13 +220,10 @@ export const Submit_form = ({ children }) => {
         })
         console.log(highlightSelection);
     };
-    const handlePopup = () => {
-        var popup = document.getElementById("myPopup2");
-        popup.classList.toggle("show");
-
-    }
+  
     return (
         <>
+          
             <Form>
 
                 {/*First Column*/}
@@ -284,7 +284,7 @@ export const Submit_form = ({ children }) => {
 
 
             </Form>
-
+            {waitingForData && <Loading/>}
         </>
 
     )

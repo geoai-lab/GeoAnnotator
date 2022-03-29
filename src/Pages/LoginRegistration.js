@@ -74,6 +74,7 @@ export const LoginRegistration = ({ onLogin, setLogin }) => {
 
             }).catch((error) => {
                 if (error.response.status == 401) {
+                    alert("Wrong Password or Email")
                     console.log(error.response)
                     console.log(error.response.status)
                     console.log(error.response.headers)

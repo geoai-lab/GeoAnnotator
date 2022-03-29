@@ -1,9 +1,9 @@
 import React from 'react'
 import "../CSS-files/Loading.css"
-export const Loading = () => {
+export const Loading = ({id}) => {
   return (
     <>
-                <div className="row">
+                <div id={id? id : "loading-id"} className="row" style={{"z-index": 99999999999999}}>
                     <div className="d-flex justify-content-center">
                         <div className='form-group col-md-12'>
                             <div className="windows8">

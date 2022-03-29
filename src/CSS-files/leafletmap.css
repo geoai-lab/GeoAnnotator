@@ -32,42 +32,48 @@
 }
 
 .deletesection {
-	position: absolute;
-	display: inline-block;
+	position: relative;
 	
-	overflow: hidden;
     text-overflow: ellipsis;
   }
   
- #deletemessage {
+ #deletemessage, #editmessage {
 display: inline-block;
   position:relative;
-  margin: 1px;
+  margin: 10px;
   outline: 0;
   width:100px;
-  cursor: pointer;
-  z-index: 999999999999;
 
-  border: none;
-
- 
+  left: 55%;
+  z-index: 999999;
   border: #000000 solid;
   border-radius: 7px;
   background-color: #d04c4c;
   color: white;
   font-weight: 100;
-  font-size: 20px;
-
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s
+  font-size: 25px;
+  cursor: pointer;
+  text-align: center;
+  transition: background .2s ease, color 0.2s ease, box-shadow 0.2s
   }
   
 #deletemessage:hover {
 background: rgba(255, 0, 0, 0.9);
-  
 	
   } 
+  #editmessage{
+	background-color: #d0c74c;
+	  position: absolute;
+	
+	  z-index: 999999;
+  }
+  #editmessage:hover{
+	background-color: #e5e091;
+  }
 
-
+#dropdown-item-button{
+	z-index: 99999999999;
+}
 .windows8,.wBall, .wInnerBall {
 	
 	height: 90%;

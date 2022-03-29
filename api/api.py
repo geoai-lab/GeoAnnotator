@@ -175,33 +175,30 @@ def compare_data():
     for name, group in df.groupby('id',sort=False):
         to_iterate = group
         break 
-    all_submissions = Submission.query.filter_by(project_name = project_name, tweetid = "901774900481970176")\
+    all_submissions = Submission.query.filter_by(project_name = project_name, tweetid = "901774898623692800")\
                                     .join(tpr_database, Submission.tweetid == tpr_database.id) \
                                         .join(Project, Submission.project_name == project_name) \
                                             .filter_by(project_name = project_name) \
                                                   .add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
                
                    
-    for indx,filtered_submission in to_iterate.iterrows():  # each group is a tweet set
-        to_send_data.append({"text": filtered_submission.text,
-        "submission_id": str(filtered_submission.submission_id),
-        "annotation": json.loads(filtered_submission.annotation)["annotation"],
-        "username":filtered_submission.username,
-        "projectGeojson": json.loads(filtered_submission.geo_json),
-        "tweetid":str(filtered_submission.id),
-        "userid":str(filtered_submission.userid)})
-
+    for filtered_submission in all_submissions:  # each group is a tweet set
+        to_send_data.append({"text": filtered_submission[1],
+        "submission_id": str(filtered_submission[2]),
+        "annotation": json.loads(filtered_submission[3])["annotation"],
+        "username":filtered_submission[4],
+        "projectGeojson": json.loads(filtered_submission[5]),
+        "tweetid":str(filtered_submission[6]),
+        "userid":str(filtered_submission[7])})
     return jsonify(to_send_data), 200
 
 
 @app.route('/api/<tweetid>', methods=['GET','POST'])
 @login_required
 def app_data(tweetid):
-    print(tweetid)
-    print("HIII")
     submissions_exists = Submission.query.filter_by(userid = current_user.id) is not None 
     if(submissions_exists):
-        tweet_ids = [ids.tweetid for ids in Submission.query.filter_by(userid = current_user.id).options(load_only(Submission.tweetid)).all()]
+        tweet_ids = [ids.tweetid for ids in Submission.query.filter_by(userid = current_user.id, project_name = session["project_name"]).options(load_only(Submission.tweetid)).all()]
         tweets = tpr_database.query.filter(tpr_database.id.notin_(tweet_ids)).first()
     else:
         tweets = tpr_database.query.filter_by(id = "901774900481970176").first() #"901774900481970176" #.order_by(func.random()).first() #func.random()
@@ -249,8 +246,6 @@ def submission():
 @app.route('/compare/submit', methods=['POST'])
 @login_required
 def compare_submission():
-    print("HIIIIIIIIIIIIIIIIIIIIII")
-    print(request.json)
     json_object = request.json
     
     userId1 = json_object['submission-userid-1']

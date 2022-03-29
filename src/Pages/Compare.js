@@ -6,6 +6,7 @@ import osm from "./osm-providers";
 import 'leaflet/dist/leaflet.css';
 import axios from "axios";
 import 'leaflet-geosearch/dist/geosearch.css';
+import 'leaflet/dist/leaflet.css';
 import "leaflet-draw/dist/leaflet.draw.css";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
@@ -31,7 +32,8 @@ L.Icon.Default.mergeOptions({
 export const Compare = () => {
     const [position, setPosition] = useState({ lat: 43.5128472, lng: -76.2510408 }); // { lat: 42.8864, lng: -78.8784 }
     const ZOOM_LEVEL = 12;
-    const mapRef = useRef();
+    const mapRef1 = useRef();
+    const mapRef2 = useRef();
     const [isloading, setIsloading] = useState(true)
     const [annotators, setAnnotators] = useState("");
     let { projectName } = useParams();
@@ -40,6 +42,8 @@ export const Compare = () => {
     const [userData2, setUserData2] = useState();
     const [curTweetId, setCurTweetId] = useState("");
     const [choosenUser, setChoosenUser] = useState(null);
+    const [userKey1, setUserKey1] = useState(1);
+    const [userKey2, setUserKey2] = useState(1);
     //position ZOOM_LEVEL
     useEffect(() => {
         axios({
@@ -50,6 +54,7 @@ export const Compare = () => {
             .then((response) => {
                 if (response.status == 200) {
                     console.log(response.data)
+                    
                     setAnnotators(response.data.map((user) => {
                         setCurTweetId(user.tweetid);
                         return ({
@@ -86,7 +91,7 @@ export const Compare = () => {
     }, [userData2])
     const MapSection = (e) => {
         return (
-            <MapContainer id='leaflet-compare' center={e.center} zoom={e.zoom} ref={mapRef}
+            <MapContainer key={e.key} id='leaflet-compare' center={e.center} zoom={e.zoom}
                 attributionControl={false}
                 whenCreated={map => {
                     var layer = e.geojsonData.addTo(map);
@@ -102,7 +107,6 @@ export const Compare = () => {
     }
     const pre_highlight = (idname, highlight_array) => {
         const sortable = Object.values(highlight_array).sort((a, b) => a.start_idx - b.start_idx)
-        console.log(sortable);
         var tweet_div = document.getElementById(idname);
         const range = Rangy.createRange()
         console.log(tweet_div);
@@ -169,16 +173,21 @@ export const Compare = () => {
             <div className="row">
                 <div className='column'>
                     <Select
-                        options={annotators}
+                        options={ (annotators && userData2) ? annotators.filter( data => data.label != userData2.label) : annotators }
                         className="selectCompare"
                         placeholder="Select Annotator"
                         onChange={(e) => {
+                            if(userData1 && (userData1.label == e.label)){
+                               return null; 
+                            }
+                            setUserKey1(data => data + 1);
                             setUserData1(e);
+                            
                         }}
                         maxMenuHeight={200} />
-                    {userData1 && <MapSection center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
+                    {userData1 && <MapSection key={1} center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
                     <div className="resolvesection" id="resolvesection1">
-                        {userData1 && <TwitterCard id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
+                        {userData1 && <TwitterCard key={userKey1} id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
                     </div>
                     {userData1 && <input id="resolve1" type="radio" value="state" name="resolve" onClick={(e) => {
 
@@ -201,16 +210,20 @@ export const Compare = () => {
                 <div className="column">
                     <Select
                         className="selectCompare"
-                        options={annotators}
+                        options={ (annotators && userData1) ? annotators.filter( data => data.label != userData1.label) : annotators }
                         placeholder="Select Annotator"
                         onChange={(e) => {
+                            if(userData2 && (userData2.label == e.label)){
+                                return null;
+                            }
+                            setUserKey2(data => data + 1);
                             setUserData2(e);
                         }}
                         onClick={(e) => e.preventDefault()}
                         maxMenuHeight={200} />
-                    {userData2 && <MapSection center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
+                    {userData2 && <MapSection key={2} center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
                     <div className="resolvesection" id="resolvesection2">
-                        {userData2 && <TwitterCard id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
+                        {userData2 && <TwitterCard key={userKey2} id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
                     </div>
                     {userData2 && <input id="resolve2" type="radio" value="state" name="resolve" onClick={(e) => {
 
