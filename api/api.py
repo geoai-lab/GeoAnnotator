@@ -171,7 +171,7 @@ def compare_data():
                                 .join(Project, Submission.project_name == project_name) \
                                 .filter_by(project_name = project_name).add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
 
-    df = pd.DataFrame(notYet_submitted).astype(str)
+    df = pd.DataFrame(notYet_submitted, columns = ["SubmissionObject","text","submission_id","annotation","username","geo_json","id","userid"]).astype(str)
     to_iterate =None  # grab the first group of unique IDS
     for name, group in df.groupby('id',sort=False):
         to_iterate = group
