@@ -149,6 +149,12 @@ export const Compare = () => {
     }
     const handleSubmit = () => {
         setWaitingForData(true);
+        setUserKey1(data => data + 1);
+        setUserData2(data => data + 1);
+        setUserData1(null);
+        setUserData2(null);
+        setChoosenUser(null);
+        setSubmissionEffect(data => !data);
         axios({
             method: "POST",
             url: '/compare/submit',
@@ -164,7 +170,7 @@ export const Compare = () => {
             .then((response) => {
                 if (response.status == 200) {
                     alert("submission sucess");
-                    setSubmissionEffect(data => !data);
+
                 }
 
             }).catch((error) => {
@@ -176,7 +182,7 @@ export const Compare = () => {
     }
     return (
         <>
-            <div class="col-md-12">
+            {!waitingForData && <div class="col-md-12">
                 <div className="row">
                     <div className='column'>
                         <Select
@@ -259,8 +265,8 @@ export const Compare = () => {
                         </button>
                     </div>}
                 </div>
-            </div>
-            {waitingForData && <Loading/>}
+            </div>}
+            {waitingForData && <Loading />}
         </>
     )
 }

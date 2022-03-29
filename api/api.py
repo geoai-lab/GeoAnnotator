@@ -162,10 +162,11 @@ def compare_data():
     list_usernames =[]
 
     to_send_data = []     
-    alreadySubmitted_ids = [idvid for subid in CompareSubmission.query.filter_by(userid = current_user.id).options(load_only(CompareSubmission.submission_userid_1, CompareSubmission.submission_userid_2)).all() for idvid in [subid.submission_userid_1,subid.submission_userid_2]]
+    alreadySubmitted_ids = [idvid for subid in CompareSubmission.query.filter_by(userid = current_user.id).options(load_only(CompareSubmission.submissionid_1, CompareSubmission.submissionid_2)).all() for idvid in [subid.submissionid_1,subid.submissionid_2]]
                        # need to change the tweet id here later on 
 
     # grab submissions you haven't looked at yet 
+    print(alreadySubmitted_ids)
     notYet_submitted = Submission.query.filter_by(project_name= project_name).filter(Submission.submission_id.notin_(alreadySubmitted_ids)) \
                                 .join(tpr_database, Submission.tweetid == tpr_database.id) \
                                 .join(Project, Submission.project_name == project_name) \
@@ -173,15 +174,15 @@ def compare_data():
 
     df = pd.DataFrame(notYet_submitted, columns = ["SubmissionObject","text","submission_id","annotation","username","geo_json","id","userid"]).astype(str)
     to_iterate =None  # grab the first group of unique IDS
+    print(df['submission_id'])
     for name, group in df.groupby('id',sort=False):
         to_iterate = group
         break 
-    print(to_iterate)
-    all_submissions = Submission.query.filter_by(project_name = project_name, tweetid = "901774898623692800")\
-                                    .join(tpr_database, Submission.tweetid == tpr_database.id) \
-                                        .join(Project, Submission.project_name == project_name) \
-                                            .filter_by(project_name = project_name) \
-                                                  .add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
+    # all_submissions = Submission.query.filter_by(project_name = project_name, tweetid = "901774898623692800")\
+    #                                 .join(tpr_database, Submission.tweetid == tpr_database.id) \
+    #                                     .join(Project, Submission.project_name == project_name) \
+    #                                         .filter_by(project_name = project_name) \
+    #                                               .add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
                
                    
     for idx,filtered_submission in to_iterate.iterrows():  # each group is a tweet set
