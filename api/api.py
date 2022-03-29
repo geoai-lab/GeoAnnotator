@@ -165,16 +165,18 @@ def compare_data():
     alreadySubmitted_ids = [idvid for subid in CompareSubmission.query.filter_by(userid = current_user.id).options(load_only(CompareSubmission.submission_userid_1, CompareSubmission.submission_userid_2)).all() for idvid in [subid.submission_userid_1,subid.submission_userid_2]]
                        # need to change the tweet id here later on 
 
+    # grab submissions you haven't looked at yet 
     notYet_submitted = Submission.query.filter_by(project_name= project_name).filter(Submission.submission_id.notin_(alreadySubmitted_ids)) \
                                 .join(tpr_database, Submission.tweetid == tpr_database.id) \
                                 .join(Project, Submission.project_name == project_name) \
                                 .filter_by(project_name = project_name).add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
 
     df = pd.DataFrame(notYet_submitted).astype(str)
-    to_iterate =None 
+    to_iterate =None  # grab the first group of unique IDS
     for name, group in df.groupby('id',sort=False):
         to_iterate = group
         break 
+    print(to_iterate)
     all_submissions = Submission.query.filter_by(project_name = project_name, tweetid = "901774898623692800")\
                                     .join(tpr_database, Submission.tweetid == tpr_database.id) \
                                         .join(Project, Submission.project_name == project_name) \
@@ -182,14 +184,14 @@ def compare_data():
                                                   .add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
                
                    
-    for filtered_submission in all_submissions:  # each group is a tweet set
-        to_send_data.append({"text": filtered_submission[1],
-        "submission_id": str(filtered_submission[2]),
-        "annotation": json.loads(filtered_submission[3])["annotation"],
-        "username":filtered_submission[4],
-        "projectGeojson": json.loads(filtered_submission[5]),
-        "tweetid":str(filtered_submission[6]),
-        "userid":str(filtered_submission[7])})
+    for idx,filtered_submission in to_iterate.iterrows():  # each group is a tweet set
+        to_send_data.append({"text": filtered_submission.text,
+        "submission_id": str(filtered_submission.submission_id),
+        "annotation": json.loads(filtered_submission.annotation)["annotation"],
+        "username":filtered_submission.username,
+        "projectGeojson": json.loads(filtered_submission.geo_json),
+        "tweetid":str(filtered_submission.id),
+        "userid":str(filtered_submission.userid)})
     return jsonify(to_send_data), 200
 
 
