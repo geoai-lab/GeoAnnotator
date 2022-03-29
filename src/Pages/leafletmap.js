@@ -66,7 +66,13 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     useEffect(() => {
 
         if (searchBar && onChange) { // only fires during the /api
-
+            if (mapLayers) {
+                setMapLayers(layers => {
+                    Object.keys(layers).map(key => map.removeLayer(layers[key]));
+                    return null;
+                });
+                setUniqueKey(data => data + 1);
+            }
             var location_total = ""
             if (Object.keys(onChange).length !== 0) {
                 for (var predicted of onChange) {
@@ -134,7 +140,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         /* 
         Function only used when user is creating project and the addistion of geojsons are already here
         */
-        
+
         if (geojson_type && map) {
             var layer = L.geoJSON(geojson_type, {
                 style: isBorder ? { "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } :
@@ -241,7 +247,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         setIsinitial(false)
         const { layerType, layer } = e;
         const id = layer._leaflet_id;
-        const geoJson = layer.toGeoJSON();
+        //const geoJson = layer.toGeoJSON();
         console.log(layer);
         setMapLayers((prevLayers) => ({
             ...prevLayers,
@@ -262,7 +268,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         for (const [key, value] of Object.entries(layers)) {
             setMapLayers((prevLayers) => ({
                 ...prevLayers,
-                [key]: value.toGeoJSON()
+                [key]: value
             }));
         }
     }
@@ -291,7 +297,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
             setMapLayers((prevLayers) => {
                 delete prevLayers[-1];
                 return prevLayers;
-            }); 
+            });
         }
         setEditing(false);
         setChangeOpen(data => !data);
@@ -311,15 +317,13 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         if (mapLayers && (Object.keys(mapLayers).length > 0)) {
             if (window.confirm("There are still polygons on the screen. This will delete everything. Do you want to continue?")) {
                 setMapLayers(layers => {
-                    Object.keys(layers).map( key => map.removeLayer(layers[key]));
+                    Object.keys(layers).map(key => map.removeLayer(layers[key]));
                     return null;
                 });
-                console.log(map._layers);
-                console.log(mapLayers);
-                setUniqueKey(data => data +1);
+                setUniqueKey(data => data + 1);
             }
-            else{
-                return null; 
+            else {
+                return null;
             }
         }
         setPosition(

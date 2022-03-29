@@ -111,7 +111,6 @@ export const Submit_form = ({ children }) => {
                 continue;
             } else {
                 var objLocation = neuroHighlight[keys[keyIndex]]
-                console.log(objLocation.start_idx)
                 range.setStart(Node, objLocation.start_idx - new_index_side);
                 range.setEnd(Node, objLocation.end_idx - new_index_side);
                 new_index_side = objLocation.end_idx
@@ -194,7 +193,7 @@ export const Submit_form = ({ children }) => {
 
                         var highlight = highlighter.getHighlightForElement(this);
                         console.log(highlight)
-                        if (window.confirm("Delete this note (ID " + highlight.id + ")?")) {
+                        if (window.confirm("Delete this Highlight?")) {
                             highlighter.removeHighlights([highlight]);
                         }
                         setSelection(highlights => {
