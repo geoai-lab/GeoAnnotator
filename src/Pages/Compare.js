@@ -10,6 +10,7 @@ import 'leaflet/dist/leaflet.css';
 import "leaflet-draw/dist/leaflet.draw.css";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
+import Loading from "./Loading";
 import '../CSS-files/Compare.css'
 import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup, Card } from "react-bootstrap";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -44,6 +45,8 @@ export const Compare = () => {
     const [choosenUser, setChoosenUser] = useState(null);
     const [userKey1, setUserKey1] = useState(1);
     const [userKey2, setUserKey2] = useState(1);
+    const [waitingForData, setWaitingForData] = useState(true);
+    const [submissionEffect, setSubmissionEffect] = useState(true);
     //position ZOOM_LEVEL
     useEffect(() => {
         axios({
@@ -54,20 +57,21 @@ export const Compare = () => {
             .then((response) => {
                 if (response.status == 200) {
                     console.log(response.data)
-                    
+                    setWaitingForData(false);
+                    setChoosenUser(null);
                     setAnnotators(response.data.map((user) => {
                         setCurTweetId(user.tweetid);
                         return ({
                             "label": user.username,
                             "value": user.username,
-                            "submissionid": user.submission_id, 
+                            "submissionid": user.submission_id,
                             "text": user.text,
                             "highlight": user.annotation.highlight,
-                            "userid":user.userid,
+                            "userid": user.userid,
                             "category": user.annotation.category,
                             "geojson": L.geoJSON(Object.values(user.annotation["spatial-footprint"])),
                             "projectGeojson": L.geoJSON(user.projectGeojson,
-                                { style: { "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } })    
+                                { style: { "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } })
 
                         });
                     }));
@@ -78,7 +82,7 @@ export const Compare = () => {
                 }
             })
     }
-        , [])
+        , [submissionEffect])
     useEffect(() => {
         if (userData1) {
             pre_highlight("tweetcard1", userData1.highlight)
@@ -143,7 +147,8 @@ export const Compare = () => {
     const handleCreateAnnotation = () => {
         navigate("/api/" + curTweetId);
     }
-    const handleSubmit = () =>{
+    const handleSubmit = () => {
+        setWaitingForData(true);
         axios({
             method: "POST",
             url: '/compare/submit',
@@ -151,14 +156,15 @@ export const Compare = () => {
             data: {
                 'submission-userid-1': userData1.userid, // handle user ID in backend 
                 'submission-userid-2': userData2.userid,
-                'submissionid-1':userData1.submissionid,
-                'submissionid-2':userData2.submissionid, 
+                'submissionid-1': userData1.submissionid,
+                'submissionid-2': userData2.submissionid,
                 'choosing-correct-submission': choosenUser
             }
         })
             .then((response) => {
                 if (response.status == 200) {
                     alert("submission sucess");
+                    setSubmissionEffect(data => !data);
                 }
 
             }).catch((error) => {
@@ -169,92 +175,92 @@ export const Compare = () => {
             })
     }
     return (
-        <div class="col-md-12">
-            <div className="row">
-                <div className='column'>
-                    <Select
-                        options={ (annotators && userData2) ? annotators.filter( data => data.label != userData2.label) : annotators }
-                        className="selectCompare"
-                        placeholder="Select Annotator"
-                        onChange={(e) => {
-                            if(userData1 && (userData1.label == e.label)){
-                               return null; 
-                            }
-                            setUserKey1(data => data + 1);
-                            setUserData1(e);
-                            
-                        }}
-                        maxMenuHeight={200} />
-                    {userData1 && <MapSection key={1} center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
-                    <div className="resolvesection" id="resolvesection1">
-                        {userData1 && <TwitterCard key={userKey1} id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
+        <>
+            <div class="col-md-12">
+                <div className="row">
+                    <div className='column'>
+                        <Select
+                            options={(annotators && userData2) ? annotators.filter(data => data.label != userData2.label) : annotators}
+                            className="selectCompare"
+                            placeholder="Select Annotator"
+                            onChange={(e) => {
+                                if (userData1 && (userData1.label == e.label)) {
+                                    return null;
+                                }
+                                setUserKey1(data => data + 1);
+                                setUserData1(e);
+                            }}
+                            maxMenuHeight={200} />
+                        {userData1 && <MapSection key={1} center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
+                        <div className="resolvesection" id="resolvesection1">
+                            {userData1 && <TwitterCard key={userKey1} id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
+                        </div>
+                        {userData1 && <input id="resolve1" type="radio" value="state" name="resolve" onClick={(e) => {
+                            var id1 = document.getElementById("resolvesection1");
+                            id1.style.boxShadow = "20px 20px 50px 15px green";
+                            var id2 = document.getElementById("resolvesection2");
+                            id2.style.boxShadow = "none";
+                            setChoosenUser(userData1.userid);
+
+                        }} />}
+                        {userData1 &&
+                            <div>
+                                <Card
+                                    id="catinpt"
+                                    type="text"
+                                >{userData1.category}</Card>
+                            </div>}
+
                     </div>
-                    {userData1 && <input id="resolve1" type="radio" value="state" name="resolve" onClick={(e) => {
+                    <div className="column">
+                        <Select
+                            className="selectCompare"
+                            options={(annotators && userData1) ? annotators.filter(data => data.label != userData1.label) : annotators}
+                            placeholder="Select Annotator"
+                            onChange={(e) => {
+                                if (userData2 && (userData2.label == e.label)) {
+                                    return null;
+                                }
+                                setUserKey2(data => data + 1);
+                                setUserData2(e);
+                            }}
+                            onClick={(e) => e.preventDefault()}
+                            maxMenuHeight={200} />
+                        {userData2 && <MapSection key={2} center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
+                        <div className="resolvesection" id="resolvesection2">
+                            {userData2 && <TwitterCard key={userKey2} id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
+                        </div>
+                        {userData2 && <input id="resolve2" type="radio" value="state" name="resolve" onClick={(e) => {
 
-                        var id1 = document.getElementById("resolvesection1");
-                        id1.style.boxShadow = "20px 20px 50px 15px green";
-                        var id2 = document.getElementById("resolvesection2");
-                        id2.style.boxShadow = "none";
-                        setChoosenUser(userData1.userid);
-
-                    }} />}
-                    {userData1 &&
-                        <div>
-                            <Card
-                                id="catinpt"
-                                type="text"
-                            >{userData1.category}</Card>
-                        </div>}
+                            var id2 = document.getElementById("resolvesection2");
+                            id2.style.boxShadow = "20px 20px 50px 15px green";
+                            var id1 = document.getElementById("resolvesection1");
+                            id1.style.boxShadow = "none";
+                            setChoosenUser(userData2.userid);
+                        }} />}
+                        {userData2 &&
+                            <div>
+                                <Card
+                                    id="catinpt"
+                                    type="text"
+                                >{userData2.category}</Card>
+                            </div>}
+                    </div>
 
                 </div>
-                <div className="column">
-                    <Select
-                        className="selectCompare"
-                        options={ (annotators && userData1) ? annotators.filter( data => data.label != userData1.label) : annotators }
-                        placeholder="Select Annotator"
-                        onChange={(e) => {
-                            if(userData2 && (userData2.label == e.label)){
-                                return null;
-                            }
-                            setUserKey2(data => data + 1);
-                            setUserData2(e);
-                        }}
-                        onClick={(e) => e.preventDefault()}
-                        maxMenuHeight={200} />
-                    {userData2 && <MapSection key={2} center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
-                    <div className="resolvesection" id="resolvesection2">
-                        {userData2 && <TwitterCard key={userKey2} id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
-                    </div>
-                    {userData2 && <input id="resolve2" type="radio" value="state" name="resolve" onClick={(e) => {
+                <div class="row">
 
-                        var id2 = document.getElementById("resolvesection2");
-                        id2.style.boxShadow = "20px 20px 50px 15px green";
-                        var id1 = document.getElementById("resolvesection1");
-                        id1.style.boxShadow = "none";
-                        setChoosenUser(userData2.userid);
-                    }} />}
-                    {userData2 &&
-                        <div>
-                            <Card
-                                id="catinpt"
-                                type="text"
-                            >{userData2.category}</Card>
-                        </div>}
+                    {choosenUser && userData2 && userData1 && <div id="comparebuttons">
+                        <button className="CompareBtn" onClick={handleSubmit}>
+                            Submit!
+                        </button>
+                        <button onClick={handleCreateAnnotation} className="CompareBtn">
+                            Create new annotation
+                        </button>
+                    </div>}
                 </div>
-
             </div>
-            <div class="row">
-
-                {choosenUser && userData2 && userData1 && <div id="comparebuttons">
-                    <button className="CompareBtn" onClick={handleSubmit}>
-                        Submit!
-                    </button>
-                    <button onClick={handleCreateAnnotation} className="CompareBtn">
-                        Create new annotation
-                    </button>
-                </div>}
-            </div>
-        </div>
-
+            {waitingForData && <Loading/>}
+        </>
     )
 }
