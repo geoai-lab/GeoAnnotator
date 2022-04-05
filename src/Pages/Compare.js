@@ -55,6 +55,7 @@ export const Compare = () => {
             withCredentials: true
         })
             .then((response) => {
+                
                 if (response.status == 200) {
                     console.log(response.data)
                     setWaitingForData(false);
@@ -79,6 +80,9 @@ export const Compare = () => {
             }).catch((error) => {
                 if (error.response.status == 401) {
                     alert("No data found");
+                }
+                else if (error.response.status == 500) {
+                    alert("All current submissions have been resolved by you");
                 }
             })
     }

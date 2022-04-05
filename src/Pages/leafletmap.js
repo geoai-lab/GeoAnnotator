@@ -86,11 +86,11 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                     setTempTimeout(true)
                     setIsloading(false)
                     if (data[0] && map) {
-                        setGeojsonTag(data[0].raw.geojson)
+                        setGeojsonTag(data[0].geometry)
                         setUniqueKey(data => data + 1)
                     }
                 })
-            }, 1500)
+            }, 0)
             setUniqueKey(data => data + 1)
 
             return () => clearTimeout(res_api)
@@ -182,13 +182,13 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                         var listData = []
                         for (var pair of data) {
                             listData.push({
-                                label: pair.label, value: pair.label, latlng: { y: pair.y, x: pair.x },
-                                bounds: pair.bounds, geojson: pair.raw.geojson
+                                label: pair.properties.display_name, value: pair.properties.display_name,
+                                bounds: pair.bbox, geojson: pair.geometry
                             })
                         }
                         return listData
                     }));
-                }, 1500);
+                }, 0);
             });
             return myPromise;
         }
@@ -200,8 +200,8 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                         var listData = []
                         for (var pair of data) {
                             listData.push({
-                                label: pair.label, value: pair.label, latlng: { y: pair.y, x: pair.x },
-                                bounds: pair.bounds, geojson: pair.raw.geojson
+                                label: pair.properties.display_name, value: pair.properties.display_name,
+                                bounds: pair.bbox, geojson: pair.geometry
                             })
                         }
                         return listData
@@ -215,7 +215,12 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }
     const fetchData = async (input_string) => {
         try {
-            const data = await provider.search({ query: input_string, country: "us", credentials: "same-origin", format: "geojson" })
+
+
+            var response_string = "https://geoai.geog.buffalo.edu/nominatim/search?q=" + input_string + "&format=geojson&polygon_geojson=1";
+            const data = await fetch(response_string).then(response =>  response.json() ).then(data => data.features) // .properties.display_name 
+          
+            // https://geoai.geog.buffalo.edu/nominatim/search?q=Buffalo+University&format=geojson
             return data
         }
         catch (error) {
@@ -223,22 +228,6 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         }
     }
 
-    const ChangeView = (center) => {
-        //I could have it only run when positions change 
-
-        useEffect(() => {
-            // should only change when position changes 
-
-            if (!isinitial) {
-                return null
-            }
-            map.setView(center.center, 12);
-            map.fitBounds(rectangleBoundary)
-            setIsinitial(false)
-            return null
-        }, [position])
-        return null;
-    }
 
     if (isloading) {
         return (<Loading />);
@@ -248,7 +237,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         const { layerType, layer } = e;
         const id = layer._leaflet_id;
         //const geoJson = layer.toGeoJSON();
-        console.log(layer);
+        
         setMapLayers((prevLayers) => ({
             ...prevLayers,
             [id]: layer
@@ -326,12 +315,8 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                 return null;
             }
         }
-        setPosition(
-            { lat: json_value.latlng.y, lng: json_value.latlng.x }
-        )
-        setRectangleBoundary(
-            json_value.bounds
-        )
+    
+      
         setEditing(false);
         setIsinitial(true);
         setGeojsonTag(json_value.geojson);
@@ -353,7 +338,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                                     setMap(map);
                                     Addgeojson(map, geojson, true);
                                 }}>
-                                <ChangeView center={position} />
+                              
                                 <FeatureGroup >
                                     <EditControl
                                         position="topright"

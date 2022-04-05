@@ -161,12 +161,15 @@ def compare_data():
     user_data = User.query.with_entities(User.username)
     list_usernames =[]
 
-    to_send_data = []     
+    to_send_data = []    
+    for f in CompareSubmission.query.all():
+        print("HU")
+        print(f)
+        print("HI")
     alreadySubmitted_ids = [idvid for subid in CompareSubmission.query.filter_by(userid = current_user.id).options(load_only(CompareSubmission.submissionid_1, CompareSubmission.submissionid_2)).all() for idvid in [subid.submissionid_1,subid.submissionid_2]]
                        # need to change the tweet id here later on 
-
+    
     # grab submissions you haven't looked at yet 
-    print(alreadySubmitted_ids)
     notYet_submitted = Submission.query.filter_by(project_name= project_name).filter(Submission.submission_id.notin_(alreadySubmitted_ids)) \
                                 .join(tpr_database, Submission.tweetid == tpr_database.id) \
                                 .join(Project, Submission.project_name == project_name) \

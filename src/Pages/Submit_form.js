@@ -21,7 +21,7 @@ export const Submit_form = ({ children }) => {
     const [category, setCategory] = useState('')
     const [highlightSelection, setSelection] = useState([]);
     const [neuroHighlight, setNeuroHighlight] = useState({});
-    const [highlighter, setHighlighter] = useState(null);
+  
     const [toggleSubmit, setToggleSubmit] = useState(1);
     const [MaplayersFunction, setMaplayersFunction] = useState();
     const [projectDescription, setProjectDescription] = useState(null);
@@ -29,7 +29,39 @@ export const Submit_form = ({ children }) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [waitingForData, setWaitingForData] = useState(true);
     var params = useParams();
-    // helpers
+    Rangy.init();
+    const highlighter = Rangy.createHighlighter(); 
+    const Applier = Rangy.createClassApplier("highlight", {
+        ignoreWhiteSpace: true,
+        elementTagName: "mark",
+        tagNames: ["mark"],
+        onElementCreate: function (elem, classApplier){
+            console.log(classApplier);
+
+        },
+        elementProperties: {
+            p: "#tweet",
+            onclick: function (eventObj) {
+                console.log(highlighter.serialize());
+                
+                var highlight = highlighter.getHighlightForElement(this);
+                console.log('hi');
+                console.log(highlight)
+                if (window.confirm("Delete this Highlight?")) {
+                    highlighter.removeHighlights([highlight]);
+                    setSelection(highlights => {
+                        delete highlights[highlight.id];
+                        return highlights;
+                    })
+                }
+                console.log(highlight.id)
+                return highlight.id;
+            }
+        }
+    })
+    highlighter.addClassApplier(
+        Applier
+    );
 
 
     const Required_comp = (value) => <input
@@ -58,8 +90,7 @@ export const Submit_form = ({ children }) => {
         setCategory(null);
         var linktograb = params.tweetid ? params.tweetid : 'any'
         fetch('/api/' + linktograb).then(response => {
-            if (response.ok) {
-                console.log("GRABBED DATA"); //doing it fast enough causes bugs 
+            if (response.ok) { 
                 return response.json(); 
             }
             else {
@@ -77,18 +108,18 @@ export const Submit_form = ({ children }) => {
         }
         )
 
-        setHighlighter(Rangy.createHighlighter())
+       
         setSelection([])
 
-
+        
     }, [toggleSubmit])
     useEffect(() => {
-        Rangy.init()
+       
         if(!neuroHighlight){
             return;
         }
         var tweet_div = document.getElementById("tweet");
-        const range = Rangy.createRange()
+        //const range = Rangy.createRange()
         if (!tweet_div) {
             return null;
         }
@@ -96,12 +127,17 @@ export const Submit_form = ({ children }) => {
         if (tweet_div.childNodes[1]) {
             console.log(tweet_div.childNodes[1].tagName)
         }
+        var neuroDict = {};
+        var neuroId = 1
         for (var highlightByAI of neuroHighlight) {
-            setSelection(allSelection => [...allSelection, highlightByAI])
+            neuroDict[neuroId] = highlightByAI;
+            neuroId = neuroId + 1;
         }
+        setSelection(neuroDict);
         var keys = Object.keys(neuroHighlight)
         var new_index_side = 0
         for (var [nodeIndex, keyIndex] = [0, 0]; keyIndex < keys.length;) {
+            var range = Rangy.createRange()
             var Node = tweet_div.childNodes[nodeIndex]
             if (!Node) {
                 break
@@ -114,18 +150,22 @@ export const Submit_form = ({ children }) => {
                 range.setStart(Node, objLocation.start_idx - new_index_side);
                 range.setEnd(Node, objLocation.end_idx - new_index_side);
                 new_index_side = objLocation.end_idx
-                const mark = document.createElement('mark');
-                range.surroundContents(mark);
+               
+                var highlight_object = highlighter.highlightRanges("highlight", [range],{ containerElementId: "tweet" })[0]
+                console.log(highlight_object)
+                //range.surroundContents(mark);
                 keyIndex++;
                 nodeIndex++;
             }
+            
         }
+        
+        
 
     }, [neuroHighlight])
 
     const handleClickRefresh = () => {
         setRefresh(refresh + 1)
-        console.log(projectDescription.geo_json)
         setSelection([])
 
     }
@@ -182,32 +222,7 @@ export const Submit_form = ({ children }) => {
         var tweetdiv = document.getElementById('tweet');
         const selection = Rangy.getSelection(tweetdiv);
         // need to solve the indeces bug 
-        highlighter.addClassApplier(
-            Rangy.createClassApplier("highlight", {
-                ignoreWhiteSpace: true,
-                elementTagName: "mark",
-                tagNames: ["mark"],
-                elementProperties: {
-                    p: "#tweet",
-                    onclick: function () {
-
-                        var highlight = highlighter.getHighlightForElement(this);
-                        console.log(highlight)
-                        if (window.confirm("Delete this Highlight?")) {
-                            highlighter.removeHighlights([highlight]);
-                        }
-                        setSelection(highlights => {
-                            delete highlights[highlight.id];
-                            return highlights;
-                        })
-                        return highlight.id;
-                    }
-                }
-            })
-        );
-        var selection_scnd = window.getSelection();
-        console.log(selection_scnd.focusNode.data[selection_scnd.focusOffset]);
-
+       
         var highlight_object = highlighter.highlightSelection("highlight", { containerElementId: "tweet" })[0];
         var start_idx = highlight_object.characterRange.start
         var end_idx = highlight_object.characterRange.end
