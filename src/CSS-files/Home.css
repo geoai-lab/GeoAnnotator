@@ -1,12 +1,17 @@
 #landing-page{
     margin-top: 10px;
+    background: url("earth_background.png");
+    background-repeat: none;
+    color: aliceblue;
+    padding: 100px;
+    
 }
 #landing-img img{
     position: relative;
     height: 260px;
     width: 1500px;
     align-items: center;
-    left: 2%;
+    left: 1.2%;
 
 }
 #landing-page h1{

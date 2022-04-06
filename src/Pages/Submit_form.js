@@ -68,7 +68,6 @@ export const Submit_form = ({ children }) => {
     ]
     useEffect(() => {
         setWaitingForData(true);
-     
         setRefresh(data => data +1);
         setCategory(null);
         var linktograb = params.tweetid ? params.tweetid : 'any'
@@ -253,9 +252,8 @@ export const Submit_form = ({ children }) => {
 
 
                         </div>
-                        <div>
-                            <div className="row">
-
+                        <div className="row" style={{"padding-top":"100px"}}>
+                            <div className="col-md">
                                 <label className="submit-section">
                                     <Creatable options={category_options} onChange={handleCategory}
                                         placeholder="Select Category"
@@ -267,7 +265,7 @@ export const Submit_form = ({ children }) => {
 
                             </div>
 
-                            <div className="popup2">
+                            <div className="col-md" id="popup2">
                                 <span className="popuptext2" id="myPopup2">Submitted!</span>
                                 <button
                                     class="learn-more"

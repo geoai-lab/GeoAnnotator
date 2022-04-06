@@ -21,7 +21,6 @@ function App() {
   const [_username, set_UserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    setIsLoading(true);
     axios({
       method: "POST",
       url: "/@me",

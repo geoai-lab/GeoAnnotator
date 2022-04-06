@@ -322,8 +322,8 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
     return (
         <>
-
-            <div className="row">
+        <div class="container">
+            <div className="row" style={{"z-index":-55,"height":"0%"}}>
                 <div className="col text-center">
 
                     <div className='form-group col-md-13'>
@@ -425,7 +425,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                 </div>
 
             </div>
-
+            </div>
 
 
         </>

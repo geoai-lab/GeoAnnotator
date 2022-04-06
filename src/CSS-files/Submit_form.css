@@ -2,13 +2,16 @@
     float: left;
     width: 50%;
     margin: auto;
-    z-index: 9999;
+    z-index: 0;
 
   }
   .column2{
     bottom: -80px;
     position:relative;
     width: 30%;
+    z-index: 0;
+   
+
     
   }
   
@@ -69,7 +72,7 @@
     }
 
 #submitbuttonsection button{
-    padding-top: 100px;
+    padding-top: 500px;
     background-color: #e0fbf2;
     border: 2px solid #00423e;
     border-radius: 30px;
@@ -79,7 +82,6 @@
     display: inline-block;
     font-weight: 100;
     font-size: 15px;
-    z-index: 99999999999999999;
     text-align: center;
     text-decoration: none;
     user-select: none;
@@ -122,13 +124,13 @@
   -webkit-transform: scale(1.1);
 }
 #creatable-submit{
-  width: 70%;
+  width: 120%;
   
 }
 #submitbutton-annotate{
   position:absolute;
-  left: 100px;
-  bottom: 50px; 
+  left: 120px;
+  bottom: 20px; 
 }
 #submitbuttonsection button:active{
   background-color: rgba(183, 240, 225, 0.884);
@@ -136,9 +138,8 @@
 }
 #tweetsection{
   position: relative;
-  padding-top: 50px;
-  bottom: 100px;
-  z-index: -1;
+  
+  bottom: 5px;
 }
 #refresh-button {
   background: url('spinner.gif') no-repeat center center;
@@ -235,7 +236,7 @@
 
 
 /* Popup container - can be anything you want */
-.popup2 {
+#popup2 {
   position: relative;
   display: inline-block;
   cursor: pointer;
@@ -249,7 +250,7 @@
 
 
 /* The actual popup */
-.popup2 .popuptext2 {
+#popup2 .popuptext2 {
   visibility: hidden;
   width: 160px;
   background-color: #555;
@@ -265,7 +266,7 @@
 }
 
 /* Popup arrow */
-.popup2 .popuptext2::after {
+#popup2 .popuptext2::after {
   content: "";
   position: absolute;
  
@@ -277,7 +278,7 @@
 }
 
 /* Toggle this class - hide and show the popup */
-.popup2 .show {
+#popup2 .show {
   opacity: 0;
   visibility: visible;
   -webkit-animation: fadeIn 1s;

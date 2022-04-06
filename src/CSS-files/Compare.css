@@ -1,8 +1,8 @@
 #leaflet-compare {
-    height: -1%;
-    width: 49%;
-    top: 16%;
-    padding: 200px 70px;
+    height: 60%;
+    width: 96.5%;
+    top: 110px;
+    left: 10px;
     position: absolute;
     border-radius: 0.1%;
     padding-right: 200px;
@@ -10,53 +10,50 @@
 }
 #catinpt{
   position: relative;
-  top: 440px;
+  top: 410px;
   width: 50%;
   left: 25%;
   z-index: 99999999999;
 }
-.column {
-    float: left;
+/* .column {
+   
     width: 50%;
   }
   /* Clear floats after the columns */
-  .row:after {
+  /* .row:after {
     content: "";
     display: table;
     clear: both;
-  }
+  } */ 
   #resolve1, #resolve2{
     
     position: relative;
-    
-    top: 230%;
-    right: 85%;
-    
+    top:355px;
+    right: 340px;
     -webkit-transform: scale(2.5); /* Chrome, Safari, Opera */
     transform: scale(2.5);
- 
+    z-index: 99;
     
  
   }
   .selectCompare{
     position: relative;
-    top: 10px;
+    top: 65px;
     font-size: .8em;
-    z-index: -1;
+    z-index: 3;
   }
   .resolvesection mark{
     background-color: #e2ab15;
   }
-  #comparebuttons{
-    display: inline-block;
-  }
+ 
   #resolvesection1, #resolvesection2{
     position: relative;
     width: -moz-fit-content;
     display: inline-block;
     width: 80%;
-    right: 0px;
-    top: 430px;
+    margin: 50px;
+    left: 10px;
+    top: 480px;
     transition: all .3s ease-in;
    
   }
@@ -70,13 +67,12 @@
   position:relative;
   margin: 10px;
   outline: 0;
-  top: 420px;
+  
   cursor: pointer;
-  z-index: 999999999999;
 
+  z-index: 20;
   border: none;
-
-  height: 25px;
+  height: 45px;
  
   border-radius: 7px;
   background-color: #4cb3d0;
@@ -89,5 +85,11 @@
   .CompareBtn:hover{
     background: rgba(45, 203, 206, 0.9);
     box-shadow: 0 6px 20px #000;
+  }
+   #comparebuttons{
+    display: inline-block;
+    top: 720px;
+    right: 10px;
+    position: relative;
   }
  

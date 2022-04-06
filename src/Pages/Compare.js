@@ -55,7 +55,7 @@ export const Compare = () => {
             withCredentials: true
         })
             .then((response) => {
-                
+
                 if (response.status == 200) {
                     console.log(response.data)
                     setWaitingForData(false);
@@ -186,91 +186,107 @@ export const Compare = () => {
     }
     return (
         <>
-            {!waitingForData && <div class="col-md-12">
-                <div className="row">
-                    <div className='column'>
-                        <Select
-                            options={(annotators && userData2) ? annotators.filter(data => data.label != userData2.label) : annotators}
-                            className="selectCompare"
-                            placeholder="Select Annotator"
-                            onChange={(e) => {
-                                if (userData1 && (userData1.label == e.label)) {
-                                    return null;
-                                }
-                                setUserKey1(data => data + 1);
-                                setUserData1(e);
-                            }}
-                            maxMenuHeight={200} />
-                        {userData1 && <MapSection key={1} center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
-                        <div className="resolvesection" id="resolvesection1">
-                            {userData1 && <TwitterCard key={userKey1} id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
+            <div className="container" id="compareSection">
+                {!waitingForData &&
+                    <div>
+                        <div className="row" style={{ "height": "100%", "width": "100%", "position": "absolute", "left": "10px" }}>
+                            <div className='col' style={{ "z-index": "10", "height": "100%", "width": "50%", "position": "relative" }}>
+                                <div className="row">
+                                    <Select
+                                        options={(annotators && userData2) ? annotators.filter(data => data.label != userData2.label) : annotators}
+                                        className="selectCompare"
+                                        placeholder="Select Annotator"
+                                        onChange={(e) => {
+                                            if (userData1 && (userData1.label == e.label)) {
+                                                return null;
+                                            }
+                                            setUserKey1(data => data + 1);
+                                            setUserData1(e);
+                                        }}
+                                        maxMenuHeight={200} />
+                                </div>
+                                <div className="row">
+                                    {userData1 && <MapSection key={1} center={position} zoom={ZOOM_LEVEL} geojsonData={userData1.geojson} projectdata={userData1.projectGeojson} />}
+                                </div>
+                                <div class="row">
+                                    <div className="resolvesection" id="resolvesection1">
+                                        {userData1 && <TwitterCard key={userKey1} id="usercard1" title="choose which highlight is correct" tweet_id={"tweetcard1"}>{userData1.text}</TwitterCard>}
+                                    </div>
+                                </div>
+                                {userData1 && <input id="resolve1" type="radio" value="state" name="resolve" onClick={(e) => {
+                                    var id1 = document.getElementById("resolvesection1");
+                                    id1.style.boxShadow = "20px 20px 50px 15px green";
+                                    var id2 = document.getElementById("resolvesection2");
+                                    id2.style.boxShadow = "none";
+                                    setChoosenUser(userData1.userid);
+
+                                }} />}
+                                {userData1 &&
+                                    <div>
+                                        <Card
+                                            id="catinpt"
+                                            type="text"
+                                        >{userData1.category}</Card>
+                                    </div>}
+
+                            </div>
+                            <div className="col" style={{ "width": "50%", "position": "relative" }}>
+                                <div class="row">
+                                    <Select
+                                        className="selectCompare"
+                                        options={(annotators && userData1) ? annotators.filter(data => data.label != userData1.label) : annotators}
+                                        placeholder="Select Annotator"
+                                        onChange={(e) => {
+                                            if (userData2 && (userData2.label == e.label)) {
+                                                return null;
+                                            }
+                                            setUserKey2(data => data + 1);
+                                            setUserData2(e);
+                                        }}
+                                        onClick={(e) => e.preventDefault()}
+                                        maxMenuHeight={200} />
+                                </div>
+                                <div class="row">
+                                    {userData2 && <MapSection key={2} center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
+                                </div>
+                                <div class="row">
+                                    <div className="resolvesection" id="resolvesection2">
+                                        {userData2 && <TwitterCard key={userKey2} id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
+                                    </div>
+                                </div>
+                                {userData2 && <input id="resolve2" type="radio" value="state" name="resolve" onClick={(e) => {
+
+                                    var id2 = document.getElementById("resolvesection2");
+                                    id2.style.boxShadow = "20px 20px 50px 15px green";
+                                    var id1 = document.getElementById("resolvesection1");
+                                    id1.style.boxShadow = "none";
+                                    setChoosenUser(userData2.userid);
+                                }} />}
+                                {userData2 &&
+                                    <div>
+                                        <Card
+                                            id="catinpt"
+                                            type="text"
+                                        >{userData2.category}</Card>
+                                    </div>}
+
+                            </div>
+
                         </div>
-                        {userData1 && <input id="resolve1" type="radio" value="state" name="resolve" onClick={(e) => {
-                            var id1 = document.getElementById("resolvesection1");
-                            id1.style.boxShadow = "20px 20px 50px 15px green";
-                            var id2 = document.getElementById("resolvesection2");
-                            id2.style.boxShadow = "none";
-                            setChoosenUser(userData1.userid);
-
-                        }} />}
-                        {userData1 &&
-                            <div>
-                                <Card
-                                    id="catinpt"
-                                    type="text"
-                                >{userData1.category}</Card>
+                        <div class="row">
+                            {choosenUser && userData2 && userData1 && <div id="comparebuttons">
+                                <button className="CompareBtn" onClick={handleSubmit}>
+                                    Submit!
+                                </button>
+                                <button onClick={handleCreateAnnotation} className="CompareBtn">
+                                    Create new annotation
+                                </button>
                             </div>}
-
-                    </div>
-                    <div className="column">
-                        <Select
-                            className="selectCompare"
-                            options={(annotators && userData1) ? annotators.filter(data => data.label != userData1.label) : annotators}
-                            placeholder="Select Annotator"
-                            onChange={(e) => {
-                                if (userData2 && (userData2.label == e.label)) {
-                                    return null;
-                                }
-                                setUserKey2(data => data + 1);
-                                setUserData2(e);
-                            }}
-                            onClick={(e) => e.preventDefault()}
-                            maxMenuHeight={200} />
-                        {userData2 && <MapSection key={2} center={position} zoom={ZOOM_LEVEL} geojsonData={userData2.geojson} projectdata={userData2.projectGeojson} />}
-                        <div className="resolvesection" id="resolvesection2">
-                            {userData2 && <TwitterCard key={userKey2} id="usercard2" title="choose which highlight is correct" tweet_id={"tweetcard2"}>{userData2.text}</TwitterCard>}
                         </div>
-                        {userData2 && <input id="resolve2" type="radio" value="state" name="resolve" onClick={(e) => {
-
-                            var id2 = document.getElementById("resolvesection2");
-                            id2.style.boxShadow = "20px 20px 50px 15px green";
-                            var id1 = document.getElementById("resolvesection1");
-                            id1.style.boxShadow = "none";
-                            setChoosenUser(userData2.userid);
-                        }} />}
-                        {userData2 &&
-                            <div>
-                                <Card
-                                    id="catinpt"
-                                    type="text"
-                                >{userData2.category}</Card>
-                            </div>}
-                    </div>
-
-                </div>
-                <div class="row">
-
-                    {choosenUser && userData2 && userData1 && <div id="comparebuttons">
-                        <button className="CompareBtn" onClick={handleSubmit}>
-                            Submit!
-                        </button>
-                        <button onClick={handleCreateAnnotation} className="CompareBtn">
-                            Create new annotation
-                        </button>
                     </div>}
-                </div>
-            </div>}
+            </div>
             {waitingForData && <Loading />}
+
         </>
     )
 }

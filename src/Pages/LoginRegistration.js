@@ -107,7 +107,7 @@ export const LoginRegistration = ({ onLogin, setLogin }) => {
     }
     return (
         <>
-            <div class="row">
+            <div class="row" style={{"top":"50px","left":"40%","position":"absolute"}}>
                 <div class="col-md-12">
                     <div class="d-flex justify-content-center">
                         <SelectProject setChanger={setChangeOpening} changeOpen={changeOpening} onSubmit={handleSubmit} setProjectName={setCurrLoginProject} />

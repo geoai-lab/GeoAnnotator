@@ -24,7 +24,7 @@ function Home() {
           <div class="row" id="landing-img">
             <img src={homepageimg} alt="nsf"/>
           </div>
-          <div class="row">
+          <div class="row" style={{"padding":"40px"}}>
             <h2 style={{float:"left"}}>
                 <strong>About GLUE</strong>
             </h2>

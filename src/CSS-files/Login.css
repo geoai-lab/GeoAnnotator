@@ -9,7 +9,7 @@
     position: relative;
     display: block;
     width:100%;
-    top: 10%;
+    top: 30%;
     display: inline-block;
  
   }
@@ -48,7 +48,7 @@
   .dropdown-content {
     display: none;
     position: absolute;
-    bottom: 300px;
+    bottom: 500px;
     min-width: 100px;
     width: 0px;
     z-index: 1;
@@ -105,7 +105,7 @@
   .login-form{
     position: relative;
     background-color: rgba(209, 208, 205, 0.734);
-    top: 400px;
+    top: 100px;
     width:400px;
     
     margin: 0 auto 0 auto;
@@ -166,7 +166,7 @@
 
   position: absolute;
   left: 50%;
-  bottom:-60%;
+  bottom:-100%;
   
  }
  button.learn-more{
