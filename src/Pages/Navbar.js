@@ -91,8 +91,7 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
                             <ul className='nav-item'>
                                 {isLogin && <li className='nav-links' onClick={closeMobileMenu}>
                                     Project
-                                    <SubMenu id="submenu1" data={[{ label: "Create a Project", link: "/createproject", function: null },
-                                    { label: "Select Project", link: "/api", function: null }]} />
+                                    <SubMenu id="submenu1" data={[{ label: "Create a Project", link: "/createproject", function: null }]} />
                                 </li>}
 
                             </ul>
@@ -101,8 +100,7 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
 
                                     <li className='nav-links'>
                                         {"Welcome, " + _username}
-                                        <SubMenu id="submenu2" data={[{ label: "logout", link: "/", "function": handleLogout },
-                                        { label: "settings", link: "/", "function": null }]} />
+                                        <SubMenu id="submenu2" data={[{ label: "logout", link: "/", "function": handleLogout }]} />
                                     </li>}
 
 
