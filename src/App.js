@@ -19,8 +19,9 @@ function App() {
   
   const [projectName, setProjectName] = useState("")
   const [_username, set_UserName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
+    setIsLoading(true);
     axios({
       method: "POST",
       url: "/@me",
@@ -38,7 +39,8 @@ function App() {
           alert("login error");
           
         }
-      })
+       
+      }).then( setIsLoading(false));
      
   }, [])
   if(isLoading){

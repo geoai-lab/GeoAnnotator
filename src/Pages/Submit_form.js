@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { Card, Form, Button } from "react-bootstrap";
 
-import Highlighter from "react-highlight-colors";
 import Creatable from 'react-select/creatable';
 import { Leafletmap } from "./Leafletmap";
 import "rangy/lib/rangy-textrange";
-import 'rangy/lib/rangy-highlighter'
-import 'rangy/lib/rangy-classapplier'
+import 'rangy/lib/rangy-highlighter';
+import 'rangy/lib/rangy-classapplier';
 import Rangy from "rangy";
 import '../CSS-files/Submit_form.css';
 import { TwitterCard } from './TwitterCard';
@@ -26,9 +25,11 @@ export const Submit_form = ({ children }) => {
     const [MaplayersFunction, setMaplayersFunction] = useState();
     const [projectDescription, setProjectDescription] = useState(null);
     const [submitKey, setSubmitKey] = useState(0)
-    const [isDeleting, setIsDeleting] = useState(false);
     const [waitingForData, setWaitingForData] = useState(true);
+    const [markKeyIdentifier, setMarkKeyIdentifier] = useState(1);
+    const [highlightObjects, setHighlightObjects] = useState({}); 
     var params = useParams();
+    const memoizedValue = () => highlightObjects;
     Rangy.init();
     const highlighter = Rangy.createHighlighter(); 
     const Applier = Rangy.createClassApplier("highlight", {
@@ -36,26 +37,37 @@ export const Submit_form = ({ children }) => {
         elementTagName: "mark",
         tagNames: ["mark"],
         onElementCreate: function (elem, classApplier){
-            console.log(classApplier);
-
+            setMarkKeyIdentifier(data => data +1);
+            // need to delete if there is intersection
+        },
+        elementAttributes:{
+            key:markKeyIdentifier
         },
         elementProperties: {
             p: "#tweet",
             onclick: function (eventObj) {
-                console.log(highlighter.serialize());
-                
-                var highlight = highlighter.getHighlightForElement(this);
-                console.log('hi');
-                console.log(highlight)
+                const keyIdentifier = this.getAttribute("key"); 
+                var LatestHighlightobjects = null;
+                setHighlightObjects(data=> {
+                    LatestHighlightobjects = data;
+                    return(data);
+                })
+                console.log("EVERYTHING BELOW");
+                console.log(LatestHighlightobjects)
+                console.log("ABOVE")
+                var highlight = LatestHighlightobjects[keyIdentifier];
+                console.log(highlight);
+                console.log( highlighter.removeHighlights([highlight]))
                 if (window.confirm("Delete this Highlight?")) {
                     highlighter.removeHighlights([highlight]);
                     setSelection(highlights => {
                         delete highlights[highlight.id];
                         return highlights;
                     })
+                    console.log(Selection);
                 }
-                console.log(highlight.id)
-                return highlight.id;
+            
+                return highlight;
             }
         }
     })
@@ -63,7 +75,7 @@ export const Submit_form = ({ children }) => {
         Applier
     );
 
-
+   
     const Required_comp = (value) => <input
         tabIndex={-1}
         autoComplete="off"
@@ -85,7 +97,9 @@ export const Submit_form = ({ children }) => {
         { value: 'C10', label: "C10: Multiple-areas" }
     ]
     useEffect(() => {
+        setMarkKeyIdentifier(1);
         setWaitingForData(true);
+       // setHighlightObjects({});
         setRefresh(data => data +1);
         setCategory(null);
         var linktograb = params.tweetid ? params.tweetid : 'any'
@@ -134,10 +148,11 @@ export const Submit_form = ({ children }) => {
             neuroId = neuroId + 1;
         }
         setSelection(neuroDict);
+        var range = Rangy.createRange(tweet_div)
         var keys = Object.keys(neuroHighlight)
         var new_index_side = 0
+        var ObjectToAdd = {}
         for (var [nodeIndex, keyIndex] = [0, 0]; keyIndex < keys.length;) {
-            var range = Rangy.createRange()
             var Node = tweet_div.childNodes[nodeIndex]
             if (!Node) {
                 break
@@ -150,15 +165,19 @@ export const Submit_form = ({ children }) => {
                 range.setStart(Node, objLocation.start_idx - new_index_side);
                 range.setEnd(Node, objLocation.end_idx - new_index_side);
                 new_index_side = objLocation.end_idx
-               
+                var charRange =  highlighter
+         
                 var highlight_object = highlighter.highlightRanges("highlight", [range],{ containerElementId: "tweet" })[0]
-                console.log(highlight_object)
+                highlight_object.characterRange.end = objLocation.end_idx;
+                highlight_object.characterRange.start = objLocation.start_idx;
+                ObjectToAdd[keyIndex+1] = highlight_object;
                 //range.surroundContents(mark);
                 keyIndex++;
                 nodeIndex++;
             }
-            
         }
+       
+        setHighlightObjects(ObjectToAdd);
         
         
 
@@ -229,9 +248,16 @@ export const Submit_form = ({ children }) => {
         setSelection(allSelection => {
             return ({
                 ...allSelection,
-                [highlight_object.id]: { "location_name": selection.toString(), "start_idx": start_idx, "end_idx": end_idx }
+                [markKeyIdentifier]: { "location_name": selection.toString(), "start_idx": start_idx, "end_idx": end_idx }
             })
         })
+        setHighlightObjects(allHighlights => {
+            return({
+                ...allHighlights, 
+                [markKeyIdentifier]:highlight_object
+            });
+        })
+        setMarkKeyIdentifier(key => key+1);
         console.log(highlightSelection);
     };
   

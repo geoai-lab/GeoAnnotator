@@ -1,0 +1,24 @@
+#landing-page{
+    margin-top: 10px;
+}
+#landing-img img{
+    position: relative;
+    height: 260px;
+    width: 1500px;
+    align-items: center;
+    left: 2%;
+
+}
+#landing-page h1{
+    font-family: 'Merriweather';
+    font-weight: 300;
+}
+#landing-page h2{
+    font-family: 'Merriweather';
+    font-weight: 300;
+}
+#sponsors-img{
+    position: relative;
+    height: 26px;
+    width: 1000px;
+}

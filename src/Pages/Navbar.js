@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Button } from './Button';
 import '../CSS-files/Navbar.css'
 import axios from "axios";
-
+import { SelectProject } from './SelectProject';
 import { useParams } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
@@ -66,7 +66,7 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
 
     return (
         <>
-            <div class="col-md-12">
+            <div class="col-md-12" id="navigation-bar">
                 <nav className='navbar navbar-default navbar-fixed-top'>
                     <div className="navbar-container">
                         <div className="d-inline-flex p-2">

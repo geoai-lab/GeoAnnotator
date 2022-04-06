@@ -6,8 +6,10 @@
     margin: auto;
     font-family: 'segoe ui';
   }
+
   
 .navbar {
+
     background: #5d7d85;
     font-family: Arial, Helvetica, sans-serif;
     height: 60px;
@@ -225,5 +227,7 @@
       transition: 250ms;
     }
   }
-  
+  #navigation-bar{
+    position: sticky;
+  }
   
