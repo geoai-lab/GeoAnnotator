@@ -137,6 +137,7 @@
   position: relative;
   padding-top: 50px;
   bottom: 100px;
+  z-index: -1;
 }
 #refresh-button {
   background: url('spinner.gif') no-repeat center center;

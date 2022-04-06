@@ -42,6 +42,7 @@
     position: relative;
     top: 10px;
     font-size: .8em;
+    z-index: -1;
   }
   .resolvesection mark{
     background-color: #e2ab15;

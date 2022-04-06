@@ -76,12 +76,14 @@
   
   }
   .nav-item:hover .nav__submenu{
+    z-index: 99999999999999999;
     display: block;
    
   }
   .nav__submenu, .nav__submenu-item a {
     font-weight: 300;
     text-transform: none;
+    z-index: 99999999999999999;
     display: none;
     position: relative;
     width: 180px;
@@ -103,6 +105,8 @@
     border: #242222;
     transition: all .3s ease-in;
     border-radius: 5px;
+    z-index: 99999999999999999;
+    
     
   }
   
