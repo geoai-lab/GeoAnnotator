@@ -74,54 +74,54 @@ export const CreateProject = ({ children }) => {
 
 
     return (
-
-        <div class="row">
-            <div className="createBox">
-                <div className="column">
-                    <div class="col">
-                        <Card className="form-create">
-                            Project Name: <input id="projectnameinput" onChange={(e) => setProjectName(e.target.value)} />
-                            <div className="radio_buttonsection">
-                                <div className="div-table-row">
-                                    <div className="div-table-col">
-                                        Select a State  <Select
-                                            options={dataOptions}
-                                            className="createSelect"
-                                            placeholder="Select a State"
-                                            value={stateLabel}
-                                            onChange={handleStateClick} />
-                                    </div>
-                                    <div className="div-table-col">
-                                        <input className="radiobutton" id="drawradio" type="radio" name="createProj"
-                                            onClick={() => {
-                                                setSelectionState(false);
-                                                setStateLabel(null);
-                                            }} /> Draw the geographic score on map
+        <div className="container">
+            <div class="row">
+                <div className="createBox">
+                    <div className="col" style={{ "width": "50%", "position": "relative" , "float":"left"}}>
+                        <div class="row">
+                            <Card className="form-create">
+                                Project Name: <input id="projectnameinput" onChange={(e) => setProjectName(e.target.value)} />
+                                <div className="radio_buttonsection">
+                                    <div className="div-table-row">
+                                        <div className="div-table-col">
+                                            Select a State  <Select
+                                                options={dataOptions}
+                                                className="createSelect"
+                                                placeholder="Select a State"
+                                                value={stateLabel}
+                                                onChange={handleStateClick} />
+                                        </div>
+                                        <div className="div-table-col">
+                                            <input className="radiobutton" id="drawradio" type="radio" name="createProj"
+                                                onClick={() => {
+                                                    setSelectionState(false);
+                                                    setStateLabel(null);
+                                                }} /> Draw the geographic score on map
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
 
 
 
-                            <label class="custom-file-upload">
-                                <input type="file" onChange={handletwitterDataInput} />
-                                {file ? "Uploaded: " + file.name : "Upload Twitter Data"}
-                            </label>
-                        </Card>
+                                <label class="custom-file-upload">
+                                    <input type="file" onChange={handletwitterDataInput} />
+                                    {file ? "Uploaded: " + file.name : "Upload Twitter Data"}
+                                </label>
+                            </Card>
+                        </div>
+                        <div class="row">
+                            <button type="secondary" class="button" id="createbtn" style={{ "float": "left" }} onClick={handleSave} >Save</button>
+                        </div>
                     </div>
-                    <div class="col">
-                        <button type="secondary" class="button" id="createbtn" style={{ "float": "left" }} onClick={handleSave} >Save</button>
-                    </div>
-                </div>
 
-                <div className="column">
-                    {/* Below is map re renders after every switch of state or drawing */}
-                    {selectionState ? <Leafletmap key="1" id="create-map" geojson={jsondata} id="create-map" drawings={false} setMaplayersFunction={setMapLayers} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={true} drawings={true} setMaplayersFunction={setMapLayers} />}
+                    <div className="col" style={{ "width": "50%", "position": "relative" ,"float":"right"}}>
+                        {/* Below is map re renders after every switch of state or drawing */}
+                        {selectionState ? <Leafletmap key="1" id="create-map" geojson={jsondata} drawings={false} setMaplayersFunction={setMapLayers} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={true} drawings={true} setMaplayersFunction={setMapLayers} />}
+                    </div>
                 </div>
             </div>
         </div>
-
     );
 }
 

@@ -106,6 +106,8 @@ input[type="file"] {
    
 }
 #create-map{
-  width: 48%;
-  top: 65px;
+  width: 108%;
+  height: 600px;
+  top: 75px;
+  left: 55px;
 }

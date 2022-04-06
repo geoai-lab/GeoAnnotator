@@ -5,28 +5,28 @@ import Popup from 'reactjs-popup';
 import { Card } from 'react-bootstrap';
 import Select from 'react-select'
 import { Button } from 'react-bootstrap';
-export const SelectProject = ({setChanger, changeOpen, onSubmit,setProjectName}) => {
+export const SelectProject = ({ setChanger, changeOpen, onSubmit, setProjectName }) => {
     const [project, setProjects] = useState([])
-    useEffect(()=>{
+    useEffect(() => {
         fetch('/project+descriptions').then(response => {
             if (response.ok) {
-              return response.json()
+                return response.json()
             }
-          }).then(data => {
+        }).then(data => {
             var projectList = []
             for (var project of data) {
-              projectList.push({ "label": project["project-name"], "value": project["project-name"] })
+                projectList.push({ "label": project["project-name"], "value": project["project-name"] })
             }
             setProjects(projectList)
-      
-          }
-          )
-    },[])
+
+        }
+        )
+    }, [])
     return (
         <>
             <Popup
                 open={changeOpen}
-                onClose={ () => setChanger(false)}
+                onClose={() => setChanger(false)}
                 modal
                 nested
             >
@@ -44,11 +44,16 @@ export const SelectProject = ({setChanger, changeOpen, onSubmit,setProjectName})
                                     onChange={(e) => setProjectName(e.label)}
                                     placeholder="Select.." />
                                 <Button id="select-submission" class="btn mt-3"
-                                    onClick={() =>{
-                                    setChanger(false);
-                                    onSubmit(false); 
-                                    return(null);
+                                    onClick={() => {
+                                        setChanger(false);
+                                        onSubmit(false);
+                                        return (null);
                                     }}>Submit</Button>
+                                <Button id="select-submission" class="btn mt-3"
+                                    onClick={() => {
+                                        window.location.href='/createproject';
+                                        return (null);
+                                    }}>Create a Project</Button>
                             </div>
                         </Card>
                     </>

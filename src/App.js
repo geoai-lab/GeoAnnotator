@@ -41,7 +41,7 @@ function App() {
        
       }).then( setIsLoading(false));
      
-  }, [])
+  }, [loggedin])
   if(isLoading){
     return(<Loading/>);
   }

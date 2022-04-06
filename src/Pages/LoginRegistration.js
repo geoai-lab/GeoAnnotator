@@ -7,7 +7,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import { SelectProject } from './SelectProject';
-export const LoginRegistration = ({ onLogin, setLogin }) => {
+export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
     const [isRegistering, setIsRegistering] = useState(false);
     const [currentProject, setCurrLoginProject] = useState();
     const [changeOpening, setChangeOpening] = useState(false);

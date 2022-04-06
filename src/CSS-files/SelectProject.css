@@ -66,8 +66,9 @@
   #select-submission{
       position: relative;
       margin-top: 10px;
+      margin-left: 10px;
       background-color: rgb(32, 108, 174);
-      left: 45%;
+      left: 30%;
   }
   #select-submission:hover{
     background-color: rgb(59, 152, 235);
