@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 import os
 from sqlalchemy.orm import load_only
 from flask_bcrypt import Bcrypt
+import urllib.parse
 from itertools import groupby
 from operator import attrgetter
 import json
@@ -18,7 +19,7 @@ from dotenv import load_dotenv
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 from sqlalchemy.orm import sessionmaker
 import pandas as pd 
-
+import requests
 load_dotenv()
 app = Flask(__name__,static_folder="../build", static_url_path='/')#
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///HarveyTwitter.db"
@@ -44,6 +45,7 @@ login_manager.init_app(app)
 
 with app.app_context():
     optionsData = jsonify(json.load(open('../../createProjectOptions.json'))) # '../../createProjectOptions.json'
+    configurationsData = json.load(open('../../configuration_data.json'))
 
 
 
@@ -58,10 +60,9 @@ def index():
 
 @app.route("/@me", methods = ["POST"]) # might need to change 
 def get_current_user():
-    
     if not session["project_name"]:
         return jsonify({"error": "did not select project"}), 401
-    #print(current_user.is_authenticated)
+   
     if not current_user.is_authenticated:
         return jsonify({"error": "Unauthorized"}), 401
     
@@ -87,8 +88,6 @@ def login():
         return jsonify({"error": "Unauthorized"}), 401
     
     login_user(user)
-   
-
     return jsonify({
         "id": str(user.id),
         "email": user.email
@@ -162,10 +161,6 @@ def compare_data():
     list_usernames =[]
 
     to_send_data = []    
-    for f in CompareSubmission.query.all():
-        print("HU")
-        print(f)
-        print("HI")
     alreadySubmitted_ids = [idvid for subid in CompareSubmission.query.filter_by(userid = current_user.id).options(load_only(CompareSubmission.submissionid_1, CompareSubmission.submissionid_2)).all() for idvid in [subid.submissionid_1,subid.submissionid_2]]
                        # need to change the tweet id here later on 
     
@@ -177,7 +172,6 @@ def compare_data():
 
     df = pd.DataFrame(notYet_submitted, columns = ["SubmissionObject","text","submission_id","annotation","username","geo_json","id","userid"]).astype(str)
     to_iterate =None  # grab the first group of unique IDS
-    print(df['submission_id'])
     for name, group in df.groupby('id',sort=False):
         to_iterate = group
         break 
@@ -216,7 +210,13 @@ def app_data(tweetid):
         project_json = Project.query.filter_by(project_name = project_name).first()
     else:
         return jsonify({"error": "No Project on session"}), 409
-    neuro_results_json = json.loads(tweets.correction_of_neuro)
+    urlEncoded = urllib.parse.quote(tweets.text)
+    toRequestModel = "{}={}".format(configurationsData['modelLink'],urlEncoded)
+    response = requests.get(toRequestModel)
+    if response.status_code != 200:
+        return  jsonify({"error": "Rest Api Model unable to grab data"}), 409
+
+    neuro_results_json =response.json()['annotation']
     toSend = {'id': str(tweets.id), 
      'content': content,
      'neuro_result':neuro_results_json,

@@ -27,17 +27,8 @@
       margin: auto;    
   }
   .highlight {
-    background-color: rgb(255, 247, 0);
-    cursor: pointer;
-    content: "Delete?";
-    
-}
-.highlight:hover{
-  background-color: rgba(248, 41, 41, 0.721);
-}
-.highlight-neuro {
-  background-color: rgba(255, 0, 0, 0.666);
-}
+    background-color: rgb(255, 247, 0);  
+  }
 
 
   .avatar {

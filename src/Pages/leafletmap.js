@@ -76,7 +76,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
             var location_total = ""
             if (Object.keys(onChange).length !== 0) {
                 for (var predicted of onChange) {
-                    location_total = location_total + predicted.location_name + " "
+                    location_total = location_total + predicted.locationDesc + " "
                 }
             }
             setSearchText(location_total)
@@ -177,8 +177,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     const handleloadOptions = (input) => {
         if (input) {
             const myPromise = new Promise((resolve, reject) => {
-                typingTimer = setTimeout(() => {
-                    resolve(fetchData(input).then(data => {
+                resolve(fetchData(input).then(data => {
                         var listData = []
                         for (var pair of data) {
                             listData.push({
@@ -188,7 +187,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                         }
                         return listData
                     }));
-                }, 0);
+              
             });
             return myPromise;
         }
@@ -206,7 +205,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                         }
                         return listData
                     }));
-                }, 1000)
+                })
                 return altPromise;
             }
 
@@ -215,12 +214,8 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }
     const fetchData = async (input_string) => {
         try {
-
-
             var response_string = "https://geoai.geog.buffalo.edu/nominatim/search?q=" + input_string + "&format=geojson&polygon_geojson=1";
-            const data = await fetch(response_string).then(response =>  response.json() ).then(data => data.features) // .properties.display_name 
-          
-            // https://geoai.geog.buffalo.edu/nominatim/search?q=Buffalo+University&format=geojson
+            const data = await fetch(response_string).then(response =>  response.json() ).then(data => data.features)  
             return data
         }
         catch (error) {

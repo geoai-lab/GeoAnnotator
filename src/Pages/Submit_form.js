@@ -24,12 +24,9 @@ export const Submit_form = ({ children }) => {
     const [toggleSubmit, setToggleSubmit] = useState(1);
     const [MaplayersFunction, setMaplayersFunction] = useState();
     const [projectDescription, setProjectDescription] = useState(null);
-    const [submitKey, setSubmitKey] = useState(0)
     const [waitingForData, setWaitingForData] = useState(true);
-    const [markKeyIdentifier, setMarkKeyIdentifier] = useState(1);
-    const [highlightObjects, setHighlightObjects] = useState({}); 
+    
     var params = useParams();
-    const memoizedValue = () => highlightObjects;
     Rangy.init();
     const highlighter = Rangy.createHighlighter(); 
     const Applier = Rangy.createClassApplier("highlight", {
@@ -37,38 +34,11 @@ export const Submit_form = ({ children }) => {
         elementTagName: "mark",
         tagNames: ["mark"],
         onElementCreate: function (elem, classApplier){
-            setMarkKeyIdentifier(data => data +1);
+            
             // need to delete if there is intersection
         },
-        elementAttributes:{
-            key:markKeyIdentifier
-        },
         elementProperties: {
-            p: "#tweet",
-            onclick: function (eventObj) {
-                const keyIdentifier = this.getAttribute("key"); 
-                var LatestHighlightobjects = null;
-                setHighlightObjects(data=> {
-                    LatestHighlightobjects = data;
-                    return(data);
-                })
-                console.log("EVERYTHING BELOW");
-                console.log(LatestHighlightobjects)
-                console.log("ABOVE")
-                var highlight = LatestHighlightobjects[keyIdentifier];
-                console.log(highlight);
-                console.log( highlighter.removeHighlights([highlight]))
-                if (window.confirm("Delete this Highlight?")) {
-                    highlighter.removeHighlights([highlight]);
-                    setSelection(highlights => {
-                        delete highlights[highlight.id];
-                        return highlights;
-                    })
-                    console.log(Selection);
-                }
-            
-                return highlight;
-            }
+            p: "#tweet"
         }
     })
     highlighter.addClassApplier(
@@ -97,9 +67,8 @@ export const Submit_form = ({ children }) => {
         { value: 'C10', label: "C10: Multiple-areas" }
     ]
     useEffect(() => {
-        setMarkKeyIdentifier(1);
         setWaitingForData(true);
-       // setHighlightObjects({});
+     
         setRefresh(data => data +1);
         setCategory(null);
         var linktograb = params.tweetid ? params.tweetid : 'any'
@@ -114,6 +83,7 @@ export const Submit_form = ({ children }) => {
             if(data.id == tweet.id){
                 setToggleSubmit(data => data+1); // reload again
             }
+            console.log(data)
             setTweet(data)
             setWaitingForData(false);
             setIsloading(false)
@@ -121,6 +91,7 @@ export const Submit_form = ({ children }) => {
             setProjectDescription({ "label": data.project_description.label, "geo_json": data.project_description.geo_json })
         }
         )
+ 
 
        
         setSelection([])
@@ -151,7 +122,7 @@ export const Submit_form = ({ children }) => {
         var range = Rangy.createRange(tweet_div)
         var keys = Object.keys(neuroHighlight)
         var new_index_side = 0
-        var ObjectToAdd = {}
+
         for (var [nodeIndex, keyIndex] = [0, 0]; keyIndex < keys.length;) {
             var Node = tweet_div.childNodes[nodeIndex]
             if (!Node) {
@@ -162,23 +133,17 @@ export const Submit_form = ({ children }) => {
                 continue;
             } else {
                 var objLocation = neuroHighlight[keys[keyIndex]]
-                range.setStart(Node, objLocation.start_idx - new_index_side);
-                range.setEnd(Node, objLocation.end_idx - new_index_side);
-                new_index_side = objLocation.end_idx
-                var charRange =  highlighter
-         
+                range.setStart(Node, objLocation.startIdx - new_index_side);
+                range.setEnd(Node, objLocation.endIdx - new_index_side);
+                new_index_side = objLocation.endIdx
                 var highlight_object = highlighter.highlightRanges("highlight", [range],{ containerElementId: "tweet" })[0]
-                highlight_object.characterRange.end = objLocation.end_idx;
-                highlight_object.characterRange.start = objLocation.start_idx;
-                ObjectToAdd[keyIndex+1] = highlight_object;
-                //range.surroundContents(mark);
+                highlight_object.characterRange.end = objLocation.endIdx;
+                highlight_object.characterRange.start = objLocation.startIdx;
                 keyIndex++;
                 nodeIndex++;
             }
         }
-       
-        setHighlightObjects(ObjectToAdd);
-        
+    
         
 
     }, [neuroHighlight])
@@ -228,7 +193,6 @@ export const Submit_form = ({ children }) => {
 
             }).catch((error) => {
                 if (error.response.status == 500) {
-
                     alert("submission failed")
                 }
 
@@ -240,24 +204,20 @@ export const Submit_form = ({ children }) => {
     const handleTextSelection = () => {
         var tweetdiv = document.getElementById('tweet');
         const selection = Rangy.getSelection(tweetdiv);
-        // need to solve the indeces bug 
+        const ranges = selection.getAllRanges();
        
+        // need to solve the indeces bug 
+        var intersection = highlighter.getIntersectingHighlights(ranges);
         var highlight_object = highlighter.highlightSelection("highlight", { containerElementId: "tweet" })[0];
         var start_idx = highlight_object.characterRange.start
         var end_idx = highlight_object.characterRange.end
         setSelection(allSelection => {
             return ({
                 ...allSelection,
-                [markKeyIdentifier]: { "location_name": selection.toString(), "start_idx": start_idx, "end_idx": end_idx }
+                [highlight_object.id]: { "location_name": selection.toString(), "start_idx": start_idx, "end_idx": end_idx }
             })
         })
-        setHighlightObjects(allHighlights => {
-            return({
-                ...allHighlights, 
-                [markKeyIdentifier]:highlight_object
-            });
-        })
-        setMarkKeyIdentifier(key => key+1);
+     
         console.log(highlightSelection);
     };
   
@@ -307,7 +267,7 @@ export const Submit_form = ({ children }) => {
 
                             </div>
 
-                            <div className="popup2" key={submitKey}>
+                            <div className="popup2">
                                 <span className="popuptext2" id="myPopup2">Submitted!</span>
                                 <button
                                     class="learn-more"
