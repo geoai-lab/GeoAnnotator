@@ -1,0 +1,111 @@
+
+.form-create{
+  position: relative;
+  border: 1px solid #cccccc;
+  width: 564px;
+  height: 100%;
+  padding: 20px;
+  top: 100px;
+  display: flex;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 55px;
+  margin: auto;
+  box-shadow: 3px 10px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;   
+  }
+  .div-table-col{
+    padding-bottom: 45px;
+  }
+  .form-create input{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#ecf0f1;
+    border: #ccc 1px solid;
+    border-bottom: #ccc 2px solid;
+    width:100%;
+    font-size:1em;
+    border-radius:4px;
+  }
+  input#projectnameinput{
+    height: 30px;
+    width: 70%;
+    align-self: center;
+  }
+  .form-create #selection{
+    display: block;
+  }
+  .form-create .radiobutton{
+    top: 110px;
+  }
+  .form-create #createable_createproject{
+    display: block;
+  
+}
+input[type="file"] {
+  display: none;
+}
+.custom-file-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+#createbtn {
+  display: inline-block;
+  position:relative;
+  left:45%;
+  top:120px;
+  outline: 0;
+  cursor: pointer;
+  width: 10%;
+  
+  border: none;
+
+  height: 25px;
+ 
+  border-radius: 7px;
+  background-color: #0096f3;
+  color: white;
+  font-weight: 100;
+  font-size: 10px;
+  box-shadow: 0 4px 14px 0 #000;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+#createbtn:hover {
+  background: rgba(0, 157, 255, 0.9);
+  box-shadow: 0 6px 20px #000;
+}
+  
+    
+  .createSelect{
+    position: absolute;
+    display: inline-block;
+    margin-top: -13px;
+    width: 100%;
+  
+  }
+
+
+
+
+.radio_buttonsection{
+  position:relative;
+  display: table;         
+  width: auto;   
+}
+.div-table-row{
+  display: table-row;
+
+}
+.div-table-col {
+  position: relative;
+  top: 20px;
+  width:50%; 
+  display: table-cell;         
+   
+}
+#create-map{
+  width: 48%;
+  top: 65px;
+}

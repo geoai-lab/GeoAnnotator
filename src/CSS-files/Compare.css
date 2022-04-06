@@ -1,0 +1,92 @@
+#leaflet-compare {
+    height: -1%;
+    width: 49%;
+    top: 16%;
+    padding: 200px 70px;
+    position: absolute;
+    border-radius: 0.1%;
+    padding-right: 200px;
+    z-index: 0;
+}
+#catinpt{
+  position: relative;
+  top: 440px;
+  width: 50%;
+  left: 25%;
+  z-index: 99999999999;
+}
+.column {
+    float: left;
+    width: 50%;
+  }
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  #resolve1, #resolve2{
+    
+    position: relative;
+    
+    top: 230%;
+    right: 85%;
+    
+    -webkit-transform: scale(2.5); /* Chrome, Safari, Opera */
+    transform: scale(2.5);
+ 
+    
+ 
+  }
+  .selectCompare{
+    position: relative;
+    top: 10px;
+    font-size: .8em;
+  }
+  .resolvesection mark{
+    background-color: #e2ab15;
+  }
+  #comparebuttons{
+    display: inline-block;
+  }
+  #resolvesection1, #resolvesection2{
+    position: relative;
+    width: -moz-fit-content;
+    display: inline-block;
+    width: 80%;
+    right: 0px;
+    top: 430px;
+    transition: all .3s ease-in;
+   
+  }
+  #usercard2, #usercard1{
+    font-size: .8em;
+    display: inline-block;
+    
+  }
+  .CompareBtn{
+  display: inline-block;
+  position:relative;
+  margin: 10px;
+  outline: 0;
+  top: 420px;
+  cursor: pointer;
+  z-index: 999999999999;
+
+  border: none;
+
+  height: 25px;
+ 
+  border-radius: 7px;
+  background-color: #4cb3d0;
+  color: white;
+  font-weight: 100;
+  font-size: 10px;
+  box-shadow: 0 4px 14px 0 #000;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .CompareBtn:hover{
+    background: rgba(45, 203, 206, 0.9);
+    box-shadow: 0 6px 20px #000;
+  }
+ 

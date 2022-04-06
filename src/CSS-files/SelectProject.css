@@ -1,0 +1,74 @@
+.modal2 {
+    font-size: 12px;
+  }
+  .modal2 > .header {
+    width: 100%;
+    border-bottom: 1px solid gray;
+    font-size: 18px;
+    text-align: center;
+    padding: 5px;
+  }
+  .modal2 > .popup-content {
+    width: 100%;
+    padding: 10px 5px;
+  }
+  .modal2 > .actions {
+    width: 100%;
+    padding: 10px 5px;
+    margin: auto;
+    text-align: center;
+  }
+  .modal2 > .close {
+    cursor: pointer;
+    position: absolute;
+    display: block;
+    padding: 2px 5px;
+    line-height: 20px;
+    right: -10px;
+    top: -10px;
+    font-size: 24px;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #cfcece;
+  }
+  #exitbutton{
+      border-radius: 80%;
+      top: -11px;
+      width: 4%;
+      left: 97.9%;
+      z-index: 99999;
+      position: absolute;
+      transition: all .2s ease-in;
+  }
+  #exitbutton:hover{
+    background-color: red;
+}
+@keyframes anvil {
+    0% {
+      transform: scale(1) translateY(0px);
+      opacity: 0;
+      box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+    }
+    1% {
+      transform: scale(0.96) translateY(10px);
+      opacity: 0;
+      box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+    }
+    100% {
+      transform: scale(1) translateY(0px);
+      opacity: 1;
+      box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+    }
+  }
+  .modal2 {
+    -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+  }
+  #select-submission{
+      position: relative;
+      margin-top: 10px;
+      background-color: rgb(32, 108, 174);
+      left: 45%;
+  }
+  #select-submission:hover{
+    background-color: rgb(59, 152, 235);
+  }

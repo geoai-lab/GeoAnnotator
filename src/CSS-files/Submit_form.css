@@ -1,0 +1,305 @@
+.column2, .column1 {
+    float: left;
+    width: 50%;
+    margin: auto;
+
+
+  }
+  .column2{
+    bottom: -80px;
+    position:relative;
+    width: 30%;
+    
+  }
+  
+
+
+
+
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  .column1,.column2{
+    
+      margin: auto;    
+  }
+  .highlight {
+    background-color: rgb(255, 247, 0);
+    cursor: pointer;
+    content: "Delete?";
+    
+}
+.highlight:hover{
+  background-color: rgba(248, 41, 41, 0.721);
+}
+.highlight-neuro {
+  background-color: rgba(255, 0, 0, 0.666);
+}
+
+
+  .avatar {
+    width: 6%;
+    height: 70%;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  .name {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    margin-right: 0.3em;
+  }
+  .handle {
+    color: #8899a6;
+    font-size: 13px;
+  }
+  .time {
+    padding-left: 0.3em;
+    color: #8899a6;
+  }
+  .time::before {
+    content: '\00b7';
+    padding-right: 0.3em;
+  }
+  #loading {
+    background: url('spinner.gif') no-repeat center center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 9999999;
+}
+#highlight-button , #refresh-button {
+    border-radius: 50%;
+    border: 1px solid black;
+    }
+
+#submitbuttonsection button{
+    padding-top: 100px;
+    background-color: #e0fbf2;
+    border: 2px solid #00423e;
+    border-radius: 30px;
+    box-shadow: #422800 4px 4px 0 0;
+    color: #422800;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 100;
+    font-size: 15px;
+    z-index: 99999999999;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    
+  }
+  
+  #submitbuttonsection button:hover {
+    background-color: #fff;
+  }
+  
+  #submitbuttonsection button:active {
+    box-shadow: #422800 2px 2px 0 0;
+    transform: translate(2px, 2px);
+  }
+  
+  @media (min-width: 768px) {
+    #submitbuttonsection button {
+      min-width: 120px;
+      padding: 0 25px;
+    }
+  
+}
+#submitbuttonsection i{
+  position: relative;
+  right: 0px; 
+  top: -1px;
+}
+
+.submit-section{
+  top: 30px;
+}
+#submitbuttonsection button:hover{
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  transition: all .2s ease-in-out;
+  -moz-transition: all .2s ease-in-out;
+  -ms-transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+}
+#creatable-submit{
+  width: 70%;
+  
+}
+#submitbutton-annotate{
+  position:absolute;
+  left: 100px;
+  bottom: 50px; 
+}
+#submitbuttonsection button:active{
+  background-color: rgba(183, 240, 225, 0.884);
+  transition: all .1s ease-in-out;
+}
+#tweetsection{
+  position: relative;
+  padding-top: 50px;
+  bottom: 100px;
+}
+#refresh-button {
+  background: url('spinner.gif') no-repeat center center;
+}
+.list-group{
+  max-height: 300px;
+  margin-bottom: 10px;
+  overflow:scroll;
+  -webkit-overflow-scrolling: touch;
+}
+.windows8 {
+	position: absolute;
+  left: 40%;
+	width: 182px;
+	height:182px;
+}
+.windows8 .wBall {
+	position: absolute;
+	width: 173px;
+	height: 173px;
+	opacity: 0;
+	transform: rotate(225deg);
+	animation: orbit 3.3s infinite;
+}
+.windows8 .wBall .wInnerBall{
+	position: absolute;
+	width: 23px;
+	height: 23px;
+	background: #000000;
+	left:0px;
+	top:0px;
+	border-radius: 23px;
+}
+.windows8 #wBall_1 {
+	animation-delay: 0.72s;
+}
+.windows8 #wBall_2 {
+	animation-delay: 0.14s;
+}
+.windows8 #wBall_3 {
+	animation-delay: 0.29s;
+}
+.windows8 #wBall_4 {
+	animation-delay: 0.43s;
+}
+.windows8 #wBall_5 {
+	animation-delay: 0.58s;
+}
+@keyframes orbit {
+	0% {
+		opacity: 1;
+		z-index:99;
+		transform: rotate(180deg);
+		animation-timing-function: ease-out;
+	}
+	7% {
+		opacity: 1;
+		transform: rotate(300deg);
+		animation-timing-function: linear;
+		origin:0%;
+	}
+	30% {
+		opacity: 1;
+		transform:rotate(410deg);
+		animation-timing-function: ease-in-out;
+		origin:7%;
+	}
+	39% {
+		opacity: 1;
+		transform: rotate(645deg);
+		animation-timing-function: linear;
+		origin:30%;
+	}
+	70%{
+		opacity: 1;
+		transform: rotate(770deg);
+		animation-timing-function: ease-out;
+		origin:39%;
+	}
+	75%{
+		opacity: 1;
+		transform: rotate(900deg);
+		animation-timing-function: ease-out;
+		origin:70%;
+	}
+	76% {
+		opacity: 0;
+		transform:rotate(900deg);
+	}100% {
+		opacity: 0;
+		transform: rotate(900deg);
+	}
+}
+
+
+/* Popup container - can be anything you want */
+.popup2 {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-origin: padding-box;
+ 
+}
+
+
+/* The actual popup */
+.popup2 .popuptext2 {
+  visibility: hidden;
+  width: 160px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  margin-left: -80px;
+  left: 145px;
+  top: -160px;
+}
+
+/* Popup arrow */
+.popup2 .popuptext2::after {
+  content: "";
+  position: absolute;
+ 
+  left: 40%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Toggle this class - hide and show the popup */
+.popup2 .show {
+  opacity: 0;
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+  0% {opacity: 0;}
+  50% {opacity:1 ;}
+100%{opacity:0;}
+}
+
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  50% {opacity:1 ;}
+100%{opacity:0;}
+}

@@ -1,0 +1,157 @@
+
+  #create-map {
+    height: 90%;
+    width: 8%;
+    top: 8%;
+    position: absolute;
+    z-index: 0;
+}
+#annotate-map {
+    height: 87%;
+    width: 60%;
+    top: 10%;
+    position: absolute;
+    left: 2%;
+    z-index: 0;
+}
+.suggestions{
+	
+    position: fixed;
+    width: 30%;
+	top: -5%;
+    margin: 10%;
+}
+#suggestion-title{
+    position: absolute;
+    top: 660px;
+	width: 50%;
+    font-size: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 700px;
+}
+
+.deletesection {
+	position: relative;
+	
+    text-overflow: ellipsis;
+  }
+  
+ #deletemessage, #editmessage {
+display: inline-block;
+  position:relative;
+  margin: 10px;
+  outline: 0;
+  width:100px;
+
+  left: 55%;
+  z-index: 999999;
+  border: #000000 solid;
+  border-radius: 7px;
+  background-color: #d04c4c;
+  color: white;
+  font-weight: 100;
+  font-size: 25px;
+  cursor: pointer;
+  text-align: center;
+  transition: background .2s ease, color 0.2s ease, box-shadow 0.2s
+  }
+  
+#deletemessage:hover {
+background: rgba(255, 0, 0, 0.9);
+	
+  } 
+  #editmessage{
+	background-color: #d0c74c;
+	  position: absolute;
+	
+	  z-index: 999999;
+  }
+  #editmessage:hover{
+	background-color: #e5e091;
+  }
+
+#dropdown-item-button{
+	z-index: 99999999999;
+}
+.windows8,.wBall, .wInnerBall {
+	
+	height: 90%;
+    width: 50%;
+    top: 30%;
+    position: absolute;
+    left: 50%;
+    z-index: 0;
+}
+ .wBall {
+	
+	transform: rotate(225deg);
+	animation: orbit 3.3s infinite;
+}
+ .wBall .wInnerBall{
+
+	background: #000000;
+    bottom: 1000px;
+	border-radius: 6px;
+}
+.windows8 #wBall_1 {
+	animation-delay: 0.72s;
+}
+.windows8 #wBall_2 {
+	animation-delay: 0.14s;
+}
+.windows8 #wBall_3 {
+	animation-delay: 0.29s;
+}
+.windows8 #wBall_4 {
+	animation-delay: 0.43s;
+}
+.windows8 #wBall_5 {
+	animation-delay: 0.58s;
+}
+@keyframes orbit {
+	0% {
+		opacity: 1;
+		z-index:99;
+		transform: rotate(180deg);
+		animation-timing-function: ease-out;
+	}
+	7% {
+		opacity: 1;
+		transform: rotate(300deg);
+		animation-timing-function: linear;
+		origin:0%;
+	}
+	30% {
+		opacity: 1;
+		transform:rotate(410deg);
+		animation-timing-function: ease-in-out;
+		origin:7%;
+	}
+	39% {
+		opacity: 1;
+		transform: rotate(645deg);
+		animation-timing-function: linear;
+		origin:30%;
+	}
+	70%{
+		opacity: 1;
+		transform: rotate(770deg);
+		animation-timing-function: ease-out;
+		origin:39%;
+	}
+	75%{
+		opacity: 1;
+		transform: rotate(900deg);
+		animation-timing-function: ease-out;
+		origin:70%;
+	}
+	76% {
+		opacity: 0;
+		transform:rotate(900deg);
+	}100% {
+		opacity: 0;
+		transform: rotate(900deg);
+	}
+}
+
