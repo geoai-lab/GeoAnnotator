@@ -97,7 +97,6 @@
     display: grid;
     box-sizing: border-box;
     background: #44494d;
-    height: 28px;
     color: white;
     position: relative;
     grid-gap: 1000px;
@@ -106,7 +105,6 @@
     transition: all .3s ease-in;
     border-radius: 5px;
     z-index: 99999999999999999;
-    
     
   }
   
@@ -120,9 +118,9 @@
     height: 100%;
   }
   .nav-item .nav__submenu{
-    bottom: -90%;
+    bottom: -60%;
     position:absolute;
-    transition: all .3s ease-in;
+    transition: all .1s ease-in;
   }
   
   #submenu1{
@@ -137,9 +135,9 @@
   }
 
   .nav-links:hover, .nav__submenu-item:hover, .nav__submenu-item a:hover {
-    color:#242222;
-    border-bottom: 4px solid #fff;
-    transition: all .4s ease-out;
+    color:#2fb5b7;
+    border-bottom: 1px solid #fff;
+    transition: all .15s ease-out;
     cursor: pointer;
   }
 
