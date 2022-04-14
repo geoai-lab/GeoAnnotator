@@ -8,10 +8,11 @@ import { useParams } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import * as util from "./Util.js"
+import { useNavigate } from "react-router-dom";
 export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
-
+    const navigate = useNavigate();
     let { projectName } = useParams();
 
     const handleClick = () => {
@@ -55,10 +56,14 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
                     <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown"  style={{"padding-right":"15px"}}>
                         <ul className="navbar-nav" id="menu-items">
                             <li className='nav-item'>
-                                {isLogin && <a class="nav-link" href="/api/any">Annotate </a>}
+                                {isLogin && <a class="nav-link" style={{"cursor":"pointer"}} onClick={ () => {
+                                    navigate("/api/any" )
+                                }}>Annotate </a>}
                             </li>
                             <li className='nav-item'>
-                                {isLogin && <a class="nav-link" href="/compare">Compare Annotations </a>}
+                                {isLogin && <a class="nav-link" style={{"cursor":"pointer"}} onClick={ () => {
+                                    navigate("/compare")
+                                }}>Compare Annotations </a>}
                             </li>
                             <li className="nav-item dropdown">
                                 {isLogin &&
@@ -67,7 +72,9 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
                                     </a>
                                 }
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a class="dropdown-item" href="/createproject">Create a Project</a>
+                                    <a class="dropdown-item" style={{"cursor":"pointer"}} onClick={ () => {
+                                    navigate("/createproject")
+                                }}>Create a Project</a>
                                 </div>
 
                             </li>
