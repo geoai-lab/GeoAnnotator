@@ -213,7 +213,7 @@ def app_data(tweetid):
     if response.status_code != 200:
         return  jsonify({"error": "Rest Api Model unable to grab data"}), 409
 
-    neuro_results_json =response.json()['annotation']
+    neuro_results_json = response.json()['annotation']
     toSend = {'id': str(tweets.id), 
      'content': content,
      'neuro_result':neuro_results_json,

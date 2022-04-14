@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Loading from "./Loading";
 import moment from "moment-timezone";
+import * as util from "./Util.js"
 export const Submit_form = ({ children }) => {
     const [tweet, setTweet] = useState('No Data... Please report to developer');
     const [isloading, setIsloading] = useState(true);
@@ -80,9 +81,9 @@ export const Submit_form = ({ children }) => {
                 alert("failed to grab data");
             }
         }).then(data => {
-            if(data.id == tweet.id){
-                setToggleSubmit(data => data+1); // reload again
-            }
+            // if(data.id == tweet.id){
+            //     setToggleSubmit(data => data+1); // reload again
+            // }
             console.log(data)
             setTweet(data)
             setWaitingForData(false);
@@ -161,20 +162,13 @@ export const Submit_form = ({ children }) => {
         setCategory(e.label)
     }
     const handleSubmit = async () => {
-        
         params.tweetid = 'any';
-        var popup = document.getElementById("myPopup2");
-        popup.classList.toggle("show");
-        
-        setTimeout(function () {
-            popup.classList.toggle("show");
-        }, 1000)
         if (!category) {
-            
+            util.ToggleMessage("error","You did not choose any category");
             return null;
         }
         if(MaplayersFunction === null){
-            alert("You did not have any drawings made");
+            util.ToggleMessage("error","You do not have any map drawing/polygon");
             return null;
         }
         axios({
@@ -191,8 +185,8 @@ export const Submit_form = ({ children }) => {
 
             }
         }).then((response) => {
-                alert(response)
                 if (response.status == 200) {
+                    util.ToggleMessage("success","Successful Submission!",function(){}, 1000);
                     setToggleSubmit(data => data + 1 )
                 }
 
@@ -269,7 +263,6 @@ export const Submit_form = ({ children }) => {
                                 </label>
                             </div>
                             <div className="col" id="popup2">
-                                {/* <span className="popuptext2" id="myPopup2">Submitted!</span> */}
                                 <button
                                     class="learn-more"
                                     type='button'
