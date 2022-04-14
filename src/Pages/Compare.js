@@ -18,7 +18,7 @@ import { TwitterCard } from './TwitterCard'
 import Rangy from "rangy";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+import * as util from './Util.js';
 // Once checked double check with saved on database theres a bounds and a x y 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -51,7 +51,7 @@ export const Compare = () => {
     useEffect(() => {
         axios({
             method: "GET",
-            url: "/compare",
+            url: "/comparison",
             withCredentials: true
         })
             .then((response) => {
@@ -82,7 +82,7 @@ export const Compare = () => {
                     alert("No data found");
                 }
                 else if (error.response.status == 500) {
-                    alert("All current submissions have been resolved by you");
+                    util.ToggleMessage("primary","All submissions have been resolved by you");
                 }
             })
     }

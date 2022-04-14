@@ -15,6 +15,8 @@ import AsyncSelect from 'react-select/async';
 import Popup from 'reactjs-popup';
 import Loading from "./Loading";
 import "../CSS-files/Login.css"
+import * as util from './Util.js';
+import $ from "jquery";
 import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup, InputGroup } from "react-bootstrap";
 import { slide as Menu } from 'react-burger-menu'
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -30,7 +32,7 @@ L.Icon.Default.mergeOptions({
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png",
 });
 
-export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawings, setMaplayersFunction }) => {
+export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawings, setMaplayersFunction, editControl }) => {
     const provider = new OpenStreetMapProvider({
         params: {
             email: 'jv11699@gmail.com', // auth for large number of requests
@@ -59,12 +61,12 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     const [selectGeojson, setSelectGeojson] = useState();
     const [changeOpen, setChangeOpen] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [drawControls, setDrawControls] = useState();
     const ZOOM_LEVEL = 4;
     const [showGJOptions, setShowGJOptions] = useState(false);
     const mapRef = useRef();
     var typingTimer;
     useEffect(() => {
-
         if (searchBar && onChange) { // only fires during the /api
             if (mapLayers) {
                 setMapLayers(layers => {
@@ -178,16 +180,16 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         if (input) {
             const myPromise = new Promise((resolve, reject) => {
                 resolve(fetchData(input).then(data => {
-                        var listData = []
-                        for (var pair of data) {
-                            listData.push({
-                                label: pair.properties.display_name, value: pair.properties.display_name,
-                                bounds: pair.bbox, geojson: pair.geometry
-                            })
-                        }
-                        return listData
-                    }));
-              
+                    var listData = []
+                    for (var pair of data) {
+                        listData.push({
+                            label: pair.properties.display_name, value: pair.properties.display_name,
+                            bounds: pair.bbox, geojson: pair.geometry
+                        })
+                    }
+                    return listData
+                }));
+
             });
             return myPromise;
         }
@@ -215,7 +217,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     const fetchData = async (input_string) => {
         try {
             var response_string = "https://geoai.geog.buffalo.edu/nominatim/search?q=" + input_string + "&format=geojson&polygon_geojson=1";
-            const data = await fetch(response_string).then(response =>  response.json() ).then(data => data.features)  
+            const data = await fetch(response_string).then(response => response.json()).then(data => data.features)
             return data
         }
         catch (error) {
@@ -228,11 +230,15 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         return (<Loading />);
     }
     const _onCreate = (e) => {
+        if(!drawings){
+       
+            $("a.leaflet-draw-draw-polygon").hide();
+        }
         setIsinitial(false)
         const { layerType, layer } = e;
         const id = layer._leaflet_id;
         //const geoJson = layer.toGeoJSON();
-        
+
         setMapLayers((prevLayers) => ({
             ...prevLayers,
             [id]: layer
@@ -257,8 +263,10 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         }
     }
     const _onDeleted = (e) => {
-        setIsinitial(false)
-        // Returns the deleted polygons
+        setIsinitial(false);
+        if(!drawings && drawControls){
+            drawControls._toolbars.draw._modes.polygon.handler.enable();
+        }
         const { layerType, layer } = e;
         const layers = e.layers._layers
         if (Object.keys(layers).length == 0) {
@@ -299,132 +307,149 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }
     const handleClickSearch = (json_value) => {
         if (mapLayers && (Object.keys(mapLayers).length > 0)) {
-            if (window.confirm("There are still polygons on the screen. This will delete everything. Do you want to continue?")) {
-                setMapLayers(layers => {
-                    Object.keys(layers).map(key => map.removeLayer(layers[key]));
-                    return null;
+            util.ToggleMessage("warning","There are still polygons on the screen. This will delete everything. Do you want to continue?",
+                function(){
+                    setMapLayers(layers => {
+                        Object.keys(layers).map(key => map.removeLayer(layers[key]));
+                        return null;
+                    });
+                    setUniqueKey(data => data + 1);
+                    setEditing(false);
+                    setIsinitial(true);
+                    setGeojsonTag(json_value.geojson);
+                    setLocationTitle(json_value.label);
+                    $("#popupMessageWarning").hide("fade");
                 });
-                setUniqueKey(data => data + 1);
-            }
-            else {
-                return null;
-            }
+          
+           
+        }else{
+            setEditing(false);
+            setIsinitial(true);
+            setGeojsonTag(json_value.geojson);
+            setLocationTitle(json_value.label);
         }
-    
-      
-        setEditing(false);
-        setIsinitial(true);
-        setGeojsonTag(json_value.geojson);
-        setLocationTitle(json_value.label);
+
+
+       
     }
 
 
 
     return (
         <>
-        <div class="container">
-            <div className="row" style={{"z-index":-55,"height":"0%"}}>
-                <div className="col text-center">
+            <div class="container">
+                <div className="row" style={{ "z-index": -55, "height": "0%" }}>
+                    <div className="col text-center">
 
-                    <div className='form-group col-md-13'>
-                        <div>
-                            <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={map}
-                                attributionControl={false} whenCreated={map => {
-                                    setMap(map);
-                                    Addgeojson(map, geojson, true);
-                                }}>
-                              
-                                <FeatureGroup >
-                                    <EditControl
-                                        position="topright"
-                                        ref={map}
-                                        onCreated={_onCreate}
-                                        onEdited={_onEdit}
-                                        onDeleted={_onDeleted}
-                                        draw={drawings ?
-                                            {
-                                                rectangle: true,
-                                                circle: false,
-                                                circlemarker: false,
-                                                marker: true,
-                                                polyline: true
-                                            }
-                                            :
-                                            {
-                                                rectangle: false,
-                                                circle: false,
-                                                circlemarker: false,
-                                                marker: false,
-                                                polyline: false,
-                                                polygon: false
-                                            }
+                        <div className='form-group col-md-13'>
+                            <div>
+                                <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={map}
+                                    attributionControl={false} whenCreated={map => {
+                                        setMap(map);
+                                        Addgeojson(map, geojson, true);
+                                    }}>
+
+                                    <FeatureGroup >
+                                        {editControl &&
+                                            <EditControl
+                                                position="topright"
+                                                ref={map}
+                                                onCreated={_onCreate}
+                                                onEdited={_onEdit}
+                                                onDeleted={_onDeleted}
+                                                onMounted={(drawControl) => {
+                                                    
+                                                    setDrawControls(drawControl._toolbars.draw._modes.polygon.handler);
+                                                    if (!drawings) {
+                                                        drawControl._toolbars.draw._modes.polygon.handler.enable();
+                                                    }
+                                                }}
+                                                edit={true}
+                                                draw={drawings ?
+                                                    {
+                                                        rectangle: true,
+                                                        circle: false,
+                                                        circlemarker: false,
+                                                        marker: true,
+                                                        polyline: true
+                                                    }
+                                                    :
+                                                    {
+                                                        rectangle: false,
+                                                        circle: false,
+                                                        circlemarker: false,
+                                                        marker: false,
+                                                        polyline: false,
+                                                        polygon: true
+                                                    }
+                                                }
+
+                                            />
                                         }
-
+                                    </FeatureGroup>
+                                    <TileLayer
+                                        url={osm.maptiler.url}
+                                        attribution={osm.maptiler.attribution}
                                     />
-                                </FeatureGroup>
-                                <TileLayer
-                                    url={osm.maptiler.url}
-                                    attribution={osm.maptiler.attribution}
-                                />
-                            </MapContainer>
+                                </MapContainer>
 
-                        </div>
-                        <div className="suggestions" >
+                            </div>
+                            <div className="suggestions" >
 
 
-                            {searchBar && <AsyncSelect
-                                cacheOptions
-                                id="dropdown-item-button" title="Suggestions"
-                                variant="secondary"
-                                placeholder="Search Location"
-                                value={SearchText ? { label: SearchText, value: SearchText } : null}
-                                defaultOptions
-                                align={{ lg: 'start' }}
-                                onChange={handleClickSearch}
-                                loadOptions={handleloadOptions}
-                                filterOption={(options) => options}>
-                            </AsyncSelect>}
+                                {searchBar && <AsyncSelect
+                                    cacheOptions
+                                    id="dropdown-item-button" title="Suggestions"
+                                    variant="secondary"
+                                    placeholder="Search Location"
+                                    value={SearchText ? { label: SearchText, value: SearchText } : null}
+                                    defaultOptions
+                                    align={{ lg: 'start' }}
+                                    onChange={handleClickSearch}
+                                    loadOptions={handleloadOptions}
+                                    filterOption={(options) => options}>
+                                </AsyncSelect>}
 
 
-                        </div>
-                        <Popup
-                            open={changeOpen}
-                            onClose={() => setChangeOpen(false)}
-                            modal
-                            nested
-                        >
-                            {close => (
-                                <>
-                                    <button id="exitbutton" onClick={close}>
-                                        &times;
-                                    </button>
-                                    <Card className="modal2">
-                                        <div className="header"> Polygon Option </div>
-                                        <div className="popup-content">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div className="deletesection" id="deletebox">
-                                                        <span className="deletemessage" id="deletemessage" onClick={handleDeleteGeojson}>Delete</span>
+                            </div>
+                            <Popup
+                                open={changeOpen}
+                                onClose={() => setChangeOpen(false)}
+                                modal
+                                nested
+                            >
+                                {close => (
+                                    <>
+                                        <button id="exitbutton" onClick={close}>
+                                            &times;
+                                        </button>
+                                        <Card className="modal2">
+                                            <div className="header"> Polygon Option </div>
+                                            <div className="popup-content">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div className="deletesection" id="deletebox">
+                                                            <span className="deletemessage" id="deletemessage" onClick={handleDeleteGeojson}>Delete</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div className="editsection" id="editbox">
-                                                        <span className="deletemessage" id="editmessage" onClick={handleEditGeoJson}>Edit</span>
+                                                    <div class="col">
+                                                        <div className="editsection" id="editbox">
+                                                            <span className="deletemessage" id="editmessage" onClick={handleEditGeoJson}>Edit</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </Card>
-                                </>
-                            )}
-                        </Popup>
-                        <div id="suggestion-title">
-                            {locationTitle}
+                                        </Card>
+                                    </>
+                                )}
+                            </Popup>
+                            <div id="suggestion-title">
+                                {locationTitle}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-            </div>
+                </div>
             </div>
 
 

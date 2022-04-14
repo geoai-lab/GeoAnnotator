@@ -67,11 +67,12 @@ export const Submit_form = ({ children }) => {
         { value: 'C10', label: "C10: Multiple-areas" }
     ]
     useEffect(() => {
+        console.log("REPEARING HERE")
         setWaitingForData(true);
         setRefresh(data => data +1);
         setCategory(null);
         var linktograb = params.tweetid ? params.tweetid : 'any'
-        fetch('/api/' + linktograb).then(response => {
+        fetch('/api-grab/' + linktograb).then(response => {
             if (response.ok) { 
                 return response.json(); 
             }
@@ -160,7 +161,7 @@ export const Submit_form = ({ children }) => {
         setCategory(e.label)
     }
     const handleSubmit = async () => {
-        setToggleSubmit(data => data + 1 )
+        
         params.tweetid = 'any';
         var popup = document.getElementById("myPopup2");
         popup.classList.toggle("show");
@@ -169,6 +170,11 @@ export const Submit_form = ({ children }) => {
             popup.classList.toggle("show");
         }, 1000)
         if (!category) {
+            
+            return null;
+        }
+        if(MaplayersFunction === null){
+            alert("You did not have any drawings made");
             return null;
         }
         axios({
@@ -184,15 +190,18 @@ export const Submit_form = ({ children }) => {
                 'timestamp': moment().tz("America/New_York").format("YYYY-MM-DD hh:mm:ss a z")
 
             }
-        })
-            .then((response) => {
+        }).then((response) => {
+                alert(response)
                 if (response.status == 200) {
-
+                    setToggleSubmit(data => data + 1 )
                 }
 
             }).catch((error) => {
                 if (error.response.status == 500) {
-                    alert("submission failed")
+                    alert("submission failed");
+                }
+                else if(error.response === 409){
+                    alert("submission failed");
                 }
 
             })
@@ -228,10 +237,9 @@ export const Submit_form = ({ children }) => {
                 {/*First Column*/}
                 <div className="row">
                     <div className="column1">
-                        {!isloading && projectDescription && <Leafletmap id="annotate-map" onChange={neuroHighlight} searchBar={true} drawings={true} setMaplayersFunction={setMaplayersFunction}
+                        {!isloading && projectDescription && <Leafletmap id="annotate-map" onChange={neuroHighlight} searchBar={true} drawings={true} editControl={true} setMaplayersFunction={setMaplayersFunction}
                             geojson={projectDescription.geo_json} />}
                     </div>
-
                     {/*Second column*/}
                     <div className="column2" >
                         <div className="row" id="tweetsection">
@@ -248,12 +256,9 @@ export const Submit_form = ({ children }) => {
                                     title="Delete Highlights"
                                     onClick={handleClickRefresh}><i className="fa-solid fa-arrow-rotate-right"></i></Button>
                             </div>
-
-
-
                         </div>
                         <div className="row" style={{"padding-top":"100px"}}>
-                            <div className="col-md">
+                            <div className="col" style={{"padding-right":"50px"}}>
                                 <label className="submit-section">
                                     <Creatable options={category_options} onChange={handleCategory}
                                         placeholder="Select Category"
@@ -262,11 +267,9 @@ export const Submit_form = ({ children }) => {
                                         maxMenuHeight={180} />
                                     {Required_comp(category) /*Required to fill in category*/}
                                 </label>
-
                             </div>
-
-                            <div className="col-md" id="popup2">
-                                <span className="popuptext2" id="myPopup2">Submitted!</span>
+                            <div className="col" id="popup2">
+                                {/* <span className="popuptext2" id="myPopup2">Submitted!</span> */}
                                 <button
                                     class="learn-more"
                                     type='button'

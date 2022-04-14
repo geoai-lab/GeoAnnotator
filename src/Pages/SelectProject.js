@@ -24,41 +24,39 @@ export const SelectProject = ({ setChanger, changeOpen, onSubmit, setProjectName
     }, [])
     return (
         <>
-            <Popup
-                open={changeOpen}
-                onClose={() => setChanger(false)}
-                modal
-                nested
-            >
-                {close => (
-                    <>
-                        <button id="exitbutton" onClick={close}>
-                            &times;
-                        </button>
-                        <Card className="modal2">
-                            <div className="header"> Select a Project </div>
-                            <div className="popup-content">
-                                <Select
-                                    id="selectBar"
-                                    options={project}
-                                    onChange={(e) => setProjectName(e.label)}
-                                    placeholder="Select.." />
-                                <Button id="select-submission" class="btn mt-3"
-                                    onClick={() => {
-                                        setChanger(false);
-                                        onSubmit(false);
-                                        return (null);
-                                    }}>Submit</Button>
-                                <Button id="select-submission" class="btn mt-3"
-                                    onClick={() => {
-                                        window.location.href='/createproject';
-                                        return (null);
-                                    }}>Create a Project</Button>
-                            </div>
-                        </Card>
-                    </>
-                )}
-            </Popup>
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Select a Project</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <Select
+                                id="selectBar"
+                                options={project}
+                                onChange={(e) => setProjectName(e.label)}
+                                placeholder="Select.." />
+
+                        </div>
+                        <div class="modal-footer">
+                            <Button id="select-submission" class="btn mt-3" data-dismiss="modal"
+                                onClick={() => {
+                                    setChanger(false);
+                                    onSubmit(false);
+                                    return (null);
+                                }}>Submit</Button>
+                            <Button id="select-submission" class="btn mt-3" data-dismiss="modal"
+                                onClick={() => {
+                                    window.location.href = '/createproject';
+                                    return (null);
+                                }}>Create a Project</Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }

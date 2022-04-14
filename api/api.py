@@ -82,10 +82,10 @@ def login():
     session["project_name"] = project_name
     user = User.query.filter_by(email=loginform.email.data).first()
     if user is None:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"error": "Wrong Email/Password"}), 401
 
     if not bcrypt.check_password_hash(user.password, loginform.password.data):
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"error": "Wrong Email/Password"}), 401
     
     login_user(user)
     return jsonify({
@@ -101,7 +101,7 @@ def logout():
     logout_user()
     return redirect("/", code=200)
 
-@app.route("/createproject", methods=["GET"])
+@app.route("/createprojects", methods=["GET"])
 @login_required
 def create():
     return optionsData, 200
@@ -133,9 +133,7 @@ def register_user():
     email = request.json["email"]
     password = request.json["password"]
     retype = request.json["retypepassword"]
-    username = request.json["username"]
-    project_name = request.json["project"]
-    session["project_name"] = project_name        
+    username = request.json["username"]      
     user_exists = User.query.filter_by(email=email).first() is not None
 
     if user_exists:
@@ -147,13 +145,12 @@ def register_user():
     db.session.add(new_user)
     db.session.commit()
     
-    login_user(new_user)
     return jsonify({
         "id": str(new_user.id),
         "email": new_user.email
     }), 200
 
-@app.route('/compare', methods =['GET','POST'])
+@app.route('/comparison', methods =['GET','POST'])
 @login_required
 def compare_data():
     project_name = session["project_name"]
@@ -193,7 +190,7 @@ def compare_data():
     return jsonify(to_send_data), 200
 
 
-@app.route('/api/<tweetid>', methods=['GET','POST'])
+@app.route('/api-grab/<tweetid>', methods=['GET','POST'])
 @login_required
 def app_data(tweetid):
     submissions_exists = Submission.query.filter_by(userid = current_user.id) is not None 
@@ -246,7 +243,7 @@ def submission():
                  timestamp = timestamp, annotation = annotation, username = current_user.username)
     db.session.add(new_submission)
     db.session.commit()
-
+    
     return jsonify("Success"), 200
 
 @app.route('/compare/submit', methods=['POST'])

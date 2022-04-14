@@ -1,12 +1,11 @@
 #tweet-card {
     border: 1px solid #cccccc;
     width: 564px;
-    height: 250px;
-    padding: 10px;
+  
     display: flex;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
-    line-height: 55px;
+    line-height: 30px;
     margin: auto;
     box-shadow: 3px 10px 20px rgba(0, 0, 0, 0.2);
     border-radius: 3px;
@@ -17,7 +16,7 @@
   }
   #tweet{
     flex-direction: column;
-    letter-spacing: 1px;
+    letter-spacing: .8px;
     font-style: normal;
     font-size: .8em;
     font-family: Arial, Helvetica, sans-serif;

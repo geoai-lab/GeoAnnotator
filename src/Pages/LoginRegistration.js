@@ -7,10 +7,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import { SelectProject } from './SelectProject';
+import * as util from './Util.js';
 export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
     const [isRegistering, setIsRegistering] = useState(false);
     const [currentProject, setCurrLoginProject] = useState();
     const [changeOpening, setChangeOpening] = useState(false);
+    const [popupmessageOpen, setPopupmessageOpen] = useState(false);
     const navigate = useNavigate();
     const [loginForm, setloginForm] = useState({
         email: "",
@@ -22,11 +24,11 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
         retypepassword: "",
         username: ""
     })
-    const inputE1 = useRef(null);
     const HandleRegister = (event) => {
         event.preventDefault();
         setIsRegistering((data) => !data);
     }
+
     function handleChange(event) {
         const { value, name } = event.target
         if (!isRegistering) {
@@ -42,7 +44,11 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
         }
     }
     const handleSubmit = (isCreating) => {
-        console.log(isRegistering);
+        console.log(currentProject);
+        if(!currentProject){
+            util.ToggleMessage("error","Please Choose a project");
+            return; 
+        }
         axios({
             method: "POST",
             url: isRegistering ? "/register" : "/login",
@@ -62,8 +68,14 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
             .then((response) => {
                 if (response.status == 200) {
                     console.log("login succesful");
+                   
+                    if (isRegistering) {
+                        util.ToggleMessage("success","Registration Successful");
+                        navigate("/")
+                        return;
+                    }
+                    util.ToggleMessage("success","Log-In Successful");
                     setLogin(true);
-                    isRegistering ? alert("successful on registering") : alert("successfuly logged in");
                     if (isCreating) {
                         navigate("/createproject");
                     }
@@ -74,13 +86,11 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
 
             }).catch((error) => {
                 if (error.response.status == 401) {
-                    alert("Wrong Password or Email")
-                    console.log(error.response)
-                    console.log(error.response.status)
-                    console.log(error.response.headers)
+                    util.ToggleMessage("error",error.response.data.error);
                 }
                 else if (error.response.status == 409) {
-                    alert(error.response.data)
+                    util.ToggleMessage("error",error.response.data.error);
+              
                 }
             })
 
@@ -105,9 +115,11 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
             )
         }
     }
+   
     return (
         <>
-            <div class="row" style={{"top":"50px","left":"40%","position":"absolute"}}>
+           
+            <div class="row" style={{ "top": "50px", "left": "40%", "position": "absolute" }}>
                 <div class="col-md-12">
                     <div class="d-flex justify-content-center">
                         <SelectProject setChanger={setChangeOpening} changeOpen={changeOpening} onSubmit={handleSubmit} setProjectName={setCurrLoginProject} />
@@ -121,10 +133,11 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
 
                                     <div class="form-field d-flex align-items-center"> <span class="fas fa-key"></span> <input onChange={handleChange} type="password" name="password" id="pwd" placeholder="Password"
                                         text={loginForm.password} value={loginForm.password} required /> </div>
-                                    <button id="login-button" class="btn mt-3" onClick={(e) => {
+                                    <button id="login-button" class="btn mt-3" data-target="#exampleModal" data-toggle="modal" onClick={(e) => {
                                         e.preventDefault();
                                         setChangeOpening(true);
                                     }}>Login</button>
+
                                 </form>
                                 <div class="text-center fs-6"> <a href="#">Forget password?</a> or <a href="#" onClick={HandleRegister}>Sign up</a> </div>
                             </div>
@@ -142,8 +155,8 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
                                     <div class="form-field d-flex align-items-center"> <span class="fas fa-key"></span> <input onChange={handleChange} type="password" name="retypepassword" id="repwd" placeholder="Retype-Password"
                                         text={registerForm.retypepassword} value={registerForm.retypepassword} /> </div>
                                     <button id="login-button" class="btn mt-3" onClick={(e) => {
-                                        e.preventDefault();
-                                        setChangeOpening(true);
+                                        HandleRegister(e);
+                                        handleSubmit(false);
                                     }}>Register</button>
                                 </form>
                                 <div class="text-center fs-6"><a href="#" onClick={HandleRegister}>Login?</a> </div>

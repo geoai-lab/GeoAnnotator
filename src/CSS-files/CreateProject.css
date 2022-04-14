@@ -34,12 +34,9 @@
   .form-create #selection{
     display: block;
   }
-  .form-create .radiobutton{
-    top: 110px;
-  }
-  .form-create #createable_createproject{
-    display: block;
   
+  .form-create #createable_createproject{
+    display: block; 
 }
 input[type="file"] {
   display: none;
@@ -77,23 +74,20 @@ input[type="file"] {
   box-shadow: 0 6px 20px #000;
 }
   
-    
+
   .createSelect{
     position: absolute;
     display: inline-block;
-    margin-top: -13px;
+    float: right;
     width: 100%;
+    padding: 10px 50px 2px 5px;
+  }
   
+  
+  span.radioSection input[type="radio"]{
+    vertical-align: top;
   }
 
-
-
-
-.radio_buttonsection{
-  position:relative;
-  display: table;         
-  width: auto;   
-}
 .div-table-row{
   display: table-row;
 

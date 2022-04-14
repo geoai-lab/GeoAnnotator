@@ -9,8 +9,8 @@ import { LoginRegistration } from './Pages/LoginRegistration';
 import axios from "axios";
 import Loading from './Pages/Loading';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
 import React, { useEffect, useState } from 'react';
+import { PopupMessage } from './Pages/PopupMessage';
 
 function App() {
 
@@ -20,6 +20,7 @@ function App() {
   const [projectName, setProjectName] = useState("")
   const [_username, set_UserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [StateOptions,setDataOptions] = useState(null);
   useEffect(() => {
     axios({
       method: "POST",
@@ -42,12 +43,13 @@ function App() {
       }).then( setIsLoading(false));
      
   }, [loggedin])
+  
   if(isLoading){
     return(<Loading/>);
   }
   return (
     <div className="App">
-
+       <PopupMessage />
       <Router>
         <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} _username={_username} />
        

@@ -127,18 +127,13 @@
   width: 120%;
   
 }
-#submitbutton-annotate{
-  position:absolute;
-  left: 120px;
-  bottom: 20px; 
-}
 #submitbuttonsection button:active{
   background-color: rgba(183, 240, 225, 0.884);
   transition: all .1s ease-in-out;
 }
 #tweetsection{
   position: relative;
-  
+  cursor: text;
   bottom: 5px;
 }
 #refresh-button {
@@ -251,8 +246,7 @@
 
 /* The actual popup */
 #popup2 .popuptext2 {
-  visibility: hidden;
-  width: 160px;
+
   background-color: #555;
   color: #fff;
   text-align: center;
@@ -261,8 +255,8 @@
   position: absolute;
   z-index: 1;
   margin-left: -80px;
-  left: 145px;
-  top: -160px;
+
+
 }
 
 /* Popup arrow */
@@ -270,7 +264,7 @@
   content: "";
   position: absolute;
  
-  left: 40%;
+
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;

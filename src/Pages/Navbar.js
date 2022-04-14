@@ -7,6 +7,7 @@ import { SelectProject } from './SelectProject';
 import { useParams } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
+import * as util from "./Util.js"
 export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
@@ -25,14 +26,11 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
             url: "/logout",
         })
             .then((response) => {
-                alert("Successful logout")
-
+                util.ToggleMessage("success", "Successful logout")
                 OnLogin(false)
             }).catch((error) => {
                 if (error.response) {
-                    console.log(error.response)
-                    console.log(error.response.status)
-                    console.log(error.response.headers)
+                    util.ToggleMessage("error", "Error in logout")
                 }
             })
         setClick(false)
@@ -46,65 +44,43 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
         }
     };
 
-
-
-    const SubMenu = ({ data, id }) => {
-
-        return (
-            <ul id={id} className="nav__submenu">
-                {data.map(iter =>
-                    <li className="nav__submenu-item ">
-                        <Link to={iter.link} className='nav-links' onClick={iter.function} >{iter.label}</Link>
-                    </li>
-                )}
-            </ul>
-        );
-    }
-
-
-
-
     return (
         <>
             <div class="col-md-12" id="navigation-bar">
-                <nav className='navbar navbar-default navbar-fixed-top'>
-                    <div className="navbar-container">
-                        <div className="d-inline-flex p-2">
-                            <Link to={"/"} className='navbar-logo'>
-                                GeoAnnotator for Disaster-related Location Descriptions&nbsp; <i className="fa-solid fa-earth-americas" />
-                            </Link>
-                        </div>
-                        <div className='menu-icon' onClick={handleClick}>
-                            <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
-                        </div>
-                        <ul className={click ? 'nav-menu active' : 'nav-menu'}>
+                <nav className="navbar navbar-expand-lg navbar-light" style={{"background-color":"#83aeb8"}}>
+                    <a class="navbar-brand" href="/" id="navTitle"> GeoAnnotator for Disaster-related tweets&nbsp;   <i className="fa-solid fa-earth-americas" /></a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown"  style={{"padding-right":"15px"}}>
+                        <ul className="navbar-nav" id="menu-items">
                             <li className='nav-item'>
-                                {isLogin && <Link to={'/api/any'} className='nav-links' onClick={closeMobileMenu}>
-                                    Annotate
-                                </Link>}
+                                {isLogin && <a class="nav-link" href="/api/any">Annotate </a>}
                             </li>
                             <li className='nav-item'>
-                                {isLogin && <Link to={'/compare'} className='nav-links' onClick={closeMobileMenu}>
-                                    Compare Annotations
-                                </Link>}
+                                {isLogin && <a class="nav-link" href="/compare">Compare Annotations </a>}
                             </li>
-                            <ul className='nav-item'>
-                                {isLogin && <li className='nav-links' onClick={closeMobileMenu}>
-                                    Project
-                                    <SubMenu id="submenu1" data={[{ label: "Create a Project", link: "/createproject", function: null }]} />
-                                </li>}
-
-                            </ul>
-                            <ul className='nav-item'>
+                            <li className="nav-item dropdown">
                                 {isLogin &&
+                                    <a class="nav-link dropdown-toggle" style={{"cursor":"pointer"}} id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Project
+                                    </a>
+                                }
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" href="/createproject">Create a Project</a>
+                                </div>
 
-                                    <li className='nav-links'>
+                            </li>
+                            <li className="nav-item dropdown">
+                                {isLogin &&
+                                    <a class="nav-link dropdown-toggle" style={{"cursor":"pointer"}} id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         {"Welcome, " + _username}
-                                        <SubMenu id="submenu2" data={[{ label: "logout", link: "/", "function": handleLogout }]} />
-                                    </li>}
-
-
-                            </ul>
+                                    </a>
+                                }
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" href="/" onClick={handleLogout}>Logout</a>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </nav>
