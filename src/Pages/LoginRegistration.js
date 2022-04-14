@@ -45,7 +45,7 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
     }
     const handleSubmit = (isCreating) => {
         console.log(currentProject);
-        if(!currentProject){
+        if(!currentProject && !isRegistering){
             util.ToggleMessage("error","Please Choose a project");
             return; 
         }
@@ -67,8 +67,6 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
         })
             .then((response) => {
                 if (response.status == 200) {
-                    console.log("login succesful");
-                   
                     if (isRegistering) {
                         util.ToggleMessage("success","Registration Successful");
                         navigate("/")

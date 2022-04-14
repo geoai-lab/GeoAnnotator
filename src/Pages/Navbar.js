@@ -7,20 +7,13 @@ import { SelectProject } from './SelectProject';
 import { useParams } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
-import * as util from "./Util.js"
+import * as util from "./Util.js";
 import { useNavigate } from "react-router-dom";
 export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
     const navigate = useNavigate();
-    let { projectName } = useParams();
-
-    const handleClick = () => {
-        setClick(!click);
-    }
-    const closeMobileMenu = () => {
-        setClick(false)
-    }
+   
     const handleLogout = () => {
         axios({
             method: "POST",
@@ -37,13 +30,6 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
         setClick(false)
 
     }
-    const showButton = () => {
-        if (window.innerWidth <= 960) {
-            setButton(false);
-        } else {
-            setButton(true);
-        }
-    };
 
     return (
         <>
@@ -76,6 +62,12 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
                                     navigate("/createproject")
                                 }}>Create a Project</a>
                                 </div>
+                               <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" style={{"cursor":"pointer"}} onClick={ () => {
+                                    navigate("/createproject")
+                                }}>Create a Project</a>
+                                </div>
+                              
 
                             </li>
                             <li className="nav-item dropdown">
