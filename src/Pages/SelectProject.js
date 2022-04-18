@@ -5,7 +5,7 @@ import Popup from 'reactjs-popup';
 import { Card } from 'react-bootstrap';
 import Select from 'react-select'
 import { Button } from 'react-bootstrap';
-export const SelectProject = ({ setChanger, changeOpen, onSubmit, setProjectName }) => {
+export const SelectProject = ({id, addCreate, onSubmit, setProjectName, }) => {
     const [project, setProjects] = useState([])
     useEffect(() => {
         fetch('/project+descriptions').then(response => {
@@ -24,11 +24,12 @@ export const SelectProject = ({ setChanger, changeOpen, onSubmit, setProjectName
     }, [])
     return (
         <>
-            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <h1>{addCreate}</h1>
+            <div class="modal fade" id={id ? id : "exampleModal"} tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Select a Project</h5>
+                            <h5 class="modal-title" id="ModalLabel">Select a Project</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -44,13 +45,13 @@ export const SelectProject = ({ setChanger, changeOpen, onSubmit, setProjectName
                         <div class="modal-footer">
                             <Button id="select-submission" class="btn mt-3" data-dismiss="modal"
                                 onClick={() => {
-                                    setChanger(false);
                                     onSubmit(false);
                                     return (null);
                                 }}>Submit</Button>
+                    
                             <Button id="select-submission" class="btn mt-3" data-dismiss="modal"
                                 onClick={() => {
-                                    window.location.href = '/createproject';
+                                    onSubmit(true);
                                     return (null);
                                 }}>Create a Project</Button>
                         </div>

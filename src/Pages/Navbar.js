@@ -3,17 +3,19 @@ import { Link } from 'react-router-dom'
 import { Button } from './Button';
 import '../CSS-files/Navbar.css'
 import axios from "axios";
-import { SelectProject } from './SelectProject';
 import { useParams } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
+import { SelectProject } from './SelectProject';
 import * as util from "./Util.js";
 import { useNavigate } from "react-router-dom";
-export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
+import { DeleteProject } from './DeleteProject';
+export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }) => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
     const navigate = useNavigate();
-   
+    const [projectName, setProjectName] = useState(); 
+    const [deleteProjects, setDeleteProjects] = useState(); 
     const handleLogout = () => {
         axios({
             method: "POST",
@@ -30,49 +32,63 @@ export const Navbar = ({ children, isLogin, OnLogin, _username }) => {
         setClick(false)
 
     }
-
+    const handleSubmitSelectProject = () => {
+        axios({
+            method: "POST",
+            url: "/handleProject/select",
+            withCredentials: true,
+            data: {}
+        })
+    }
+    const handleDeleteProjects = () =>{
+        axios({
+            method: "POST",
+            url: "/handleProject/delete",
+            withCredentials: true,
+            data: {}
+        })
+    }   
     return (
         <>
+            <DeleteProject onSubmit={handleDeleteProjects} setProjectDeletion={setDeleteProjects} CurProjectName={CurProjectName}/>
+            <SelectProject id="navbarSelection" onSubmit={handleSubmitSelectProject} setProjectName={setProjectName} addCreate={false}/>
             <div class="col-md-12" id="navigation-bar">
-                <nav className="navbar navbar-expand-lg navbar-light" style={{"background-color":"#83aeb8"}}>
+                <nav className="navbar navbar-expand-lg navbar-light" style={{ "background-color": "#83aeb8" }}>
                     <a class="navbar-brand" href="/" id="navTitle"> GeoAnnotator for Disaster-related tweets&nbsp;   <i className="fa-solid fa-earth-americas" /></a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown"  style={{"padding-right":"15px"}}>
+                    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown" style={{ "padding-right": "15px" }}>
                         <ul className="navbar-nav" id="menu-items">
                             <li className='nav-item'>
-                                {isLogin && <a class="nav-link" style={{"cursor":"pointer"}} onClick={ () => {
-                                    navigate("/api/any" )
+                                {isLogin && <a class="nav-link" style={{ "cursor": "pointer" }} onClick={() => {
+                                    navigate("/api/any")
                                 }}>Annotate </a>}
                             </li>
                             <li className='nav-item'>
-                                {isLogin && <a class="nav-link" style={{"cursor":"pointer"}} onClick={ () => {
+                                {isLogin && <a class="nav-link" style={{ "cursor": "pointer" }} onClick={() => {
                                     navigate("/compare")
                                 }}>Compare Annotations </a>}
                             </li>
                             <li className="nav-item dropdown">
                                 {isLogin &&
-                                    <a class="nav-link dropdown-toggle" style={{"cursor":"pointer"}} id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle" style={{ "cursor": "pointer" }} id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Project
                                     </a>
                                 }
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a class="dropdown-item" style={{"cursor":"pointer"}} onClick={ () => {
-                                    navigate("/createproject")
-                                }}>Create a Project</a>
+                                    <a class="dropdown-item" style={{ "cursor": "pointer" }} onClick={() => {
+                                        navigate("/createproject")
+                                    }}>Create a Project</a>
+                                    <a class="dropdown-item" style={{ "cursor": "pointer" }} data-target="#deleteModal" data-toggle="modal">Delete a Project</a>
+                                     <a class="dropdown-item" style={{ "cursor": "pointer" }} data-target="#navbarSelection" data-toggle="modal">Select a Project</a>
                                 </div>
-                               <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a class="dropdown-item" style={{"cursor":"pointer"}} onClick={ () => {
-                                    navigate("/createproject")
-                                }}>Create a Project</a>
-                                </div>
-                              
+
 
                             </li>
                             <li className="nav-item dropdown">
                                 {isLogin &&
-                                    <a class="nav-link dropdown-toggle" style={{"cursor":"pointer"}} id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle" style={{ "cursor": "pointer" }} id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         {"Welcome, " + _username}
                                     </a>
                                 }

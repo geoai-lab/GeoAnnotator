@@ -20,7 +20,6 @@ function App() {
   const [projectName, setProjectName] = useState("")
   const [_username, set_UserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [StateOptions,setDataOptions] = useState(null);
   useEffect(() => {
     axios({
       method: "POST",
@@ -32,7 +31,7 @@ function App() {
         if (response.status == 200) {
           setIsLoggedin(true);
           set_UserName(response.data.username)
-          setProjectName(response.data.project_name)
+          setProjectName(response.data.projectName)
           setIsLoading(false);
         }
         if(response.status == 401){
@@ -51,7 +50,7 @@ function App() {
     <div className="App">
        <PopupMessage />
       <Router>
-        <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} _username={_username} />
+        <Navbar isLogin={loggedin} OnLogin={setIsLoggedin} _username={_username} CurProjectName={projectName}/>
        
         <Routes>
           

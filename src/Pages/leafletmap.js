@@ -61,7 +61,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     const [selectGeojson, setSelectGeojson] = useState();
     const [changeOpen, setChangeOpen] = useState(false);
     const [editing, setEditing] = useState(false);
-    const [drawControls, setDrawControls] = useState();
+    var drawingControls;
     const ZOOM_LEVEL = 4;
     const [showGJOptions, setShowGJOptions] = useState(false);
     const mapRef = useRef();
@@ -142,7 +142,6 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         /* 
         Function only used when user is creating project and the addistion of geojsons are already here
         */
-
         if (geojson_type && map) {
             var layer = L.geoJSON(geojson_type, {
                 style: isBorder ? { "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } :
@@ -195,7 +194,6 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         }
         else {
             if (SearchText) {
-
                 const altPromise = new Promise((resolve, reject) => {
                     resolve(fetchData(SearchText).then(data => {
                         var listData = []
@@ -264,8 +262,11 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }
     const _onDeleted = (e) => {
         setIsinitial(false);
-        if(!drawings && drawControls){
-            drawControls._toolbars.draw._modes.polygon.handler.enable();
+        if(!drawings){
+            setTimeout(() => {
+                drawingControls.enable();
+            },300)
+            
         }
         const { layerType, layer } = e;
         const layers = e.layers._layers
@@ -358,9 +359,9 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                                                 onEdited={_onEdit}
                                                 onDeleted={_onDeleted}
                                                 onMounted={(drawControl) => {
-                                                    
-                                                    setDrawControls(drawControl._toolbars.draw._modes.polygon.handler);
+                                                 
                                                     if (!drawings) {
+                                                        drawingControls = drawControl._toolbars.draw._modes.polygon.handler;
                                                         drawControl._toolbars.draw._modes.polygon.handler.enable();
                                                     }
                                                 }}

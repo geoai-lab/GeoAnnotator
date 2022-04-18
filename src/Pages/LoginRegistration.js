@@ -120,7 +120,7 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
             <div class="row" style={{ "top": "50px", "left": "40%", "position": "absolute" }}>
                 <div class="col-md-12">
                     <div class="d-flex justify-content-center">
-                        <SelectProject setChanger={setChangeOpening} changeOpen={changeOpening} onSubmit={handleSubmit} setProjectName={setCurrLoginProject} />
+                        <SelectProject onSubmit={handleSubmit} setProjectName={setCurrLoginProject} />
                         <ReactCardFlip isFlipped={isRegistering} flipDirection="horizontal">
                             <div key="front" class="wrapping">
                                 <div class="logo"> <img src="https://www.freepnglogos.com/uploads/twitter-logo-png/twitter-bird-symbols-png-logo-0.png" alt="" /> </div>

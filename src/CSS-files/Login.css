@@ -257,7 +257,7 @@ button.learn-more {
     color: #2f4a54;
     text-transform: uppercase;
     padding: 1.25em 1em;
-    background: #e0fbf2;
+    background: #8cbdad;
     border: 1px solid #00423e;
 
     
@@ -276,7 +276,7 @@ button.learn-more::before {
     right: 0;
     
     bottom: 0;
-    background: #b6d0c7;
+    background: #8ab0a3;
     border-radius: inherit;
     box-shadow: 0 0 0 2px, 0 0.625em 0 0;
     transform: translate3d(0, 0.75em, -1em);

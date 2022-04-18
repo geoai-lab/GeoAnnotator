@@ -13,13 +13,16 @@ import json
 from flask_cors import CORS, cross_origin
 from flask_session import Session
 import redis
+from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta, timezone
-from models import db, tpr_database, User, LoginForm, Project, Submission, CompareSubmission
+from models import db, tweet_database, User, LoginForm, Project, Submission, CompareSubmission
 from dotenv import load_dotenv
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 from sqlalchemy.orm import sessionmaker
 import pandas as pd 
 import requests
+from sqlalchemy.types import String, DateTime
+import io 
 load_dotenv()
 app = Flask(__name__,static_folder="../build", static_url_path='/')#
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///HarveyTwitter.db"
@@ -53,7 +56,6 @@ with app.app_context():
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
 
-
 @app.route('/')
 def index():
     return app.send_static_file("index.html")
@@ -69,7 +71,8 @@ def get_current_user():
     return jsonify({
         "id": str(current_user.id),
         "email": current_user.email,
-        "username": current_user.username
+        "username": current_user.username,
+        "projectName":session["project_name"]
     }),200
 
 
@@ -117,16 +120,18 @@ def project_descriptions():
 @app.route("/createproject-submit", methods=["POST"])
 @login_required
 def createproject_submission():
+    print(request.json)
     projectName = request.json["Project Name"]
     mapLayers = request.json["map-layers"]
     project_exists = Project.query.filter_by(project_name = projectName).first() is not None
 
     if(project_exists):
         return jsonify({"error": "project already exists"}), 409
+    session['project_name'] = projectName
     new_project = Project(project_name = projectName, geo_json = mapLayers )
     db.session.add(new_project)
     db.session.commit()
-    return redirect("/createproject", code=200)
+    return  jsonify({"success": "project created"}), 200
 
 @app.route("/register", methods=["POST"])
 def register_user():
@@ -155,7 +160,6 @@ def register_user():
 def compare_data():
     project_name = session["project_name"]
     user_data = User.query.with_entities(User.username)
-    list_usernames =[]
 
     to_send_data = []    
     alreadySubmitted_ids = [idvid for subid in CompareSubmission.query.filter_by(userid = current_user.id).options(load_only(CompareSubmission.submissionid_1, CompareSubmission.submissionid_2)).all() for idvid in [subid.submissionid_1,subid.submissionid_2]]
@@ -163,9 +167,9 @@ def compare_data():
     
     # grab submissions you haven't looked at yet 
     notYet_submitted = Submission.query.filter_by(project_name= project_name).filter(Submission.submission_id.notin_(alreadySubmitted_ids)) \
-                                .join(tpr_database, Submission.tweetid == tpr_database.id) \
+                                .join(tweet_database, Submission.tweetid == tweet_database.id) \
                                 .join(Project, Submission.project_name == project_name) \
-                                .filter_by(project_name = project_name).add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
+                                .filter_by(project_name = project_name).add_columns(tweet_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tweet_database.id, Submission.userid) 
 
     df = pd.DataFrame(notYet_submitted, columns = ["SubmissionObject","text","submission_id","annotation","username","geo_json","id","userid"]).astype(str)
     to_iterate =None  # grab the first group of unique IDS
@@ -173,10 +177,10 @@ def compare_data():
         to_iterate = group
         break 
     # all_submissions = Submission.query.filter_by(project_name = project_name, tweetid = "901774898623692800")\
-    #                                 .join(tpr_database, Submission.tweetid == tpr_database.id) \
+    #                                 .join(tweet_database, Submission.tweetid == tweet_database.id) \
     #                                     .join(Project, Submission.project_name == project_name) \
     #                                         .filter_by(project_name = project_name) \
-    #                                               .add_columns(tpr_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tpr_database.id, Submission.userid) 
+    #                                               .add_columns(tweet_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tweet_database.id, Submission.userid) 
                
                    
     for idx,filtered_submission in to_iterate.iterrows():  # each group is a tweet set
@@ -189,18 +193,26 @@ def compare_data():
         "userid":str(filtered_submission.userid)})
     return jsonify(to_send_data), 200
 
-
+@app.route('/handleProject/<type>', methods=["POST"])
+@login_required
+def handleProjectSelection(type):
+    print(type)
+    if type == "select":
+        print("hi")
+    else:
+        print("hi")
+    return jsonify({"success": "Project Complete"}), 200
 @app.route('/api-grab/<tweetid>', methods=['GET','POST'])
 @login_required
 def app_data(tweetid):
     submissions_exists = Submission.query.filter_by(userid = current_user.id) is not None 
     if(submissions_exists):
         tweet_ids = [ids.tweetid for ids in Submission.query.filter_by(userid = current_user.id, project_name = session["project_name"]).options(load_only(Submission.tweetid)).all()]
-        tweets = tpr_database.query.filter(tpr_database.id.notin_(tweet_ids)).first()
+        tweets = tweet_database.query.filter_by(projectName = session["project_name"]).filter(tweet_database.id.notin_(tweet_ids)).first()
     else:
-        tweets = tpr_database.query.filter_by(id = "901774900481970176").first() #"901774900481970176" #.order_by(func.random()).first() #func.random()
+        tweets = tweet_database.query.filter_by(projectName = session["project_name"]).first() #"901774900481970176" #.order_by(func.random()).first() #func.random()
     if(tweetid != 'any'):
-        tweets = tpr_database.query.filter_by(id = str(tweetid)).first() 
+        tweets = tweet_database.query.filter_by(id = str(tweetid)).first() 
     content = tweets.text
     project_name = session["project_name"]
     if project_name:
@@ -220,9 +232,30 @@ def app_data(tweetid):
      'project_description': {"label":project_json.project_name, "geo_json": json.loads(project_json.geo_json)}}
     return jsonify(toSend)
 
+# sql injection might happen here since there is no login required 
+@app.route('/uploadfile', methods=['POST'])
+@login_required
+def uploading_textFile():
+    try:
+        projectName = request.form['projectName']
+        project_exists = Project.query.filter_by(project_name = projectName).first() is not None
+        if project_exists:
+            return jsonify({"error":"Project Name Already Exists"}), 401
+        file = request.files['file']
+        df = pd.read_json(file.stream.read().decode("UTF8"), lines=True, encoding="utf8")[['text','id','created_at']]
+        df['projectName'] = projectName
+        dtype={"text": String(),"id":String(), "created_at":DateTime(), "projectName":String()}
+        rowsAffected = df.to_sql(name = 'TwitterDataSet',con = db.engine, index = False, if_exists='append',dtype=dtype)
+    except Exception as e: 
+        print(
+        type(e).__name__,          # TypeError
+        __file__,                  # /tmp/example.py
+        e.__traceback__.tb_lineno  # 2
+        )
+        return jsonify({"error": "File Upload Fail"}), 401
+    return jsonify({"success": "Upload Complete"}), 200
 
 
-# NEED TO TRY ON MULTIPLE USERS DOING IT AT THE SAME TIME! 
 @app.route('/api/submit', methods=['POST'])
 @login_required
 def submission():

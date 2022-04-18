@@ -11,16 +11,15 @@ def get_uuid():
     return uuid4().hex
 
 class tweet_database(db.Model):
-    __tablename__ = 'HarveyTwitterDataSet'
-    index = db.Column(db.Integer)
-    id = db.Column(db.Integer, primary_key = True)
+    __tablename__ = 'TwitterDataSet'
+    id = db.Column(db.String, unique=True, primary_key = True)
     text = db.Column(db.String, nullable = False)
     created_at = db.Column(db.String)
+    projectName = db.Column(db.String)
     def __str__(self):
         return f'{self.id},{self.text},{self.created_at}'
 class tpr_database(db.Model):
     __tablename__ = 'NeuroTPR-dataset'
-  
     text = db.Column(db.String, nullable = False)
     id = db.Column(db.String, unique=True,primary_key = True)
     created_at = db.Column(db.String)

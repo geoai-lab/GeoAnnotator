@@ -59,19 +59,18 @@ input[type="file"] {
   
   border: none;
 
-  height: 25px;
+
  
-  border-radius: 7px;
-  background-color: #0096f3;
-  color: white;
+ 
+ 
   font-weight: 100;
   font-size: 10px;
-  box-shadow: 0 4px 14px 0 #000;
+ 
   transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 #createbtn:hover {
-  background: rgba(0, 157, 255, 0.9);
-  box-shadow: 0 6px 20px #000;
+ 
+  box-shadow: 0 6px 10px #000;
 }
   
 
@@ -104,4 +103,5 @@ input[type="file"] {
   height: 600px;
   top: 75px;
   left: 55px;
+  z-index: 0;
 }

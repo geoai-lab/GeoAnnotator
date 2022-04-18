@@ -13,7 +13,8 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Loading from "./Loading";
 import moment from "moment-timezone";
-import * as util from "./Util.js"
+import * as util from "./Util.js";
+import { TableContent } from "./TableContent";
 export const Submit_form = ({ children }) => {
     const [tweet, setTweet] = useState('No Data... Please report to developer');
     const [isloading, setIsloading] = useState(true);
@@ -243,17 +244,19 @@ export const Submit_form = ({ children }) => {
                                     className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Highlight Text"
+                                    style={{"margin-right":"60px"}}
                                     onClick={handleTextSelection}><i className="fa-solid fa-highlighter"></i></Button>
                                 <Button
                                     className="btn btn-secondary btn-floating"
                                     type='button'
                                     title="Delete Highlights"
-                                    onClick={handleClickRefresh}><i className="fa-solid fa-arrow-rotate-right"></i></Button>
+                                    onClick={handleClickRefresh}><i class="fa-solid fa-trash-can"></i></Button>
                             </div>
                         </div>
                         <div className="row" style={{"padding-top":"100px"}}>
                             <div className="col" style={{"padding-right":"50px"}}>
                                 <label className="submit-section">
+                                    <TableContent />
                                     <Creatable options={category_options} onChange={handleCategory}
                                         placeholder="Select Category"
                                         id="creatable-submit"
@@ -264,7 +267,7 @@ export const Submit_form = ({ children }) => {
                             </div>
                             <div className="col" id="popup2">
                                 <button
-                                    class="learn-more"
+                                    class="button-19" role="button"
                                     type='button'
                                     id="submitbutton-annotate"
                                     title="Submit Annotation"
@@ -278,7 +281,7 @@ export const Submit_form = ({ children }) => {
 
 
             </Form>
-            {waitingForData && <Loading/>}
+            {waitingForData && <Loading />}
         </>
 
     )

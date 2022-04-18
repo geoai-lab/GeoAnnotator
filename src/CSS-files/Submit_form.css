@@ -70,31 +70,10 @@
     border-radius: 50%;
     border: 1px solid black;
     }
-
-#submitbuttonsection button{
-    padding-top: 500px;
-    background-color: #e0fbf2;
-    border: 2px solid #00423e;
-    border-radius: 30px;
-    box-shadow: #422800 4px 4px 0 0;
-    color: #422800;
-    cursor: pointer;
-    display: inline-block;
-    font-weight: 100;
-    font-size: 15px;
-    text-align: center;
-    text-decoration: none;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-
-    
-  }
   
-  #submitbuttonsection button:hover {
-    background-color: #fff;
+  #submitbuttonsection button{
+    background-color: rgb(83, 159, 170);
   }
-  
   #submitbuttonsection button:active {
     box-shadow: #422800 2px 2px 0 0;
     transform: translate(2px, 2px);
@@ -295,4 +274,66 @@
 #myPopup2{
   visibility: hidden;
   right: 200px;
+}
+
+
+
+/* CSS */
+.button-19 {
+  appearance: button;
+  background-color: #43777d;
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: inline-block;
+  font-family: din-round,sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  line-height: 20px;
+  margin: 0;
+  outline: none;
+  overflow: visible;
+  padding: 13px 16px;
+  text-align: center;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  transform: translateZ(0);
+  transition: filter .2s;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.button-19:after {
+  background-clip: padding-box;
+  background-color: #379289;
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  bottom: -4px;
+  content: "";
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: -1;
+}
+
+.button-19:main,
+.button-19:focus {
+  user-select: auto;
+}
+
+.button-19:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.button-19:disabled {
+  cursor: auto;
 }
