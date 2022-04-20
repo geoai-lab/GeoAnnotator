@@ -27,7 +27,7 @@ export const Submit_form = ({ children }) => {
     const [MaplayersFunction, setMaplayersFunction] = useState();
     const [projectDescription, setProjectDescription] = useState(null);
     const [waitingForData, setWaitingForData] = useState(true);
-    
+    const [colorList, setColorList] = useState(["brown","orange","yellow","green","blue","indigo","violet","purple","pink","red"])
     var params = useParams();
     Rangy.init();
     const highlighter = Rangy.createHighlighter(); 
@@ -36,6 +36,11 @@ export const Submit_form = ({ children }) => {
         elementTagName: "mark",
         tagNames: ["mark"],
         onElementCreate: function (elem, classApplier){
+            setColorList(colors => {
+                elem.style.backgroundColor = colors.pop();
+                return colors; 
+            })
+            
             
             // need to delete if there is intersection
         },
@@ -48,26 +53,6 @@ export const Submit_form = ({ children }) => {
     );
 
    
-    const Required_comp = (value) => <input
-        tabIndex={-1}
-        autoComplete="off"
-        style={{ opacity: 0, height: 0 }}
-        onChange={handleCategory}
-        value={value}
-        required
-    />
-    const category_options = [
-        { value: 'C1', label: 'C1:House number addresses' },
-        { value: 'C2', label: 'C2: Street names' },
-        { value: 'C3', label: 'C3: Highways' },
-        { value: 'C4', label: "C4: Exits of highways" },
-        { value: 'C5', label: "C5: Intersection of roads (rivers)" },
-        { value: 'C6', label: "C6: Natural features" },
-        { value: 'C7', label: "C7: Other human-made features" },
-        { value: 'C8', label: "C8: Local Organizations" },
-        { value: 'C9', label: "C9: Admin units" },
-        { value: 'C10', label: "C10: Multiple-areas" }
-    ]
     useEffect(() => {
         console.log("REPEARING HERE")
         setWaitingForData(true);
@@ -158,10 +143,7 @@ export const Submit_form = ({ children }) => {
     if (isloading) {
         return null;
     }
-    const handleCategory = (e) => {
-        console.log(tweet);
-        setCategory(e.label)
-    }
+   
     const handleSubmit = async () => {
         params.tweetid = 'any';
         if (!category) {
@@ -253,16 +235,10 @@ export const Submit_form = ({ children }) => {
                                     onClick={handleClickRefresh}><i class="fa-solid fa-trash-can"></i></Button>
                             </div>
                         </div>
-                        <div className="row" style={{"padding-top":"100px"}}>
+                        <div className="row" style={{"padding-top":"20px"}}>
                             <div className="col" style={{"padding-right":"50px"}}>
                                 <label className="submit-section">
                                     <TableContent />
-                                    <Creatable options={category_options} onChange={handleCategory}
-                                        placeholder="Select Category"
-                                        id="creatable-submit"
-                                        value={ category ? {"label":category} : null}
-                                        maxMenuHeight={180} />
-                                    {Required_comp(category) /*Required to fill in category*/}
                                 </label>
                             </div>
                             <div className="col" id="popup2">

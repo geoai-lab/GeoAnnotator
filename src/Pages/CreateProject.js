@@ -136,6 +136,7 @@ export const CreateProject = ({ children }) => {
                                             <div className="row">
                                                 <div className="col-md-3">
                                                     <input className="radiobutton" id="drawradio" type="radio" name="selectState"
+                                                        style={{ top: "20px", position: "relative" }}
                                                         checked={selectionState}
                                                         onClick={() => {
                                                             setSelectionState(true);

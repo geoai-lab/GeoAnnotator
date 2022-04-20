@@ -29,8 +29,9 @@
     
       margin: auto;    
   }
-  .highlight {
-    background-color: rgb(255, 247, 0);  
+  .highlight:hover{
+    background-color: #422800;
+    cursor: pointer;
   }
 
 
