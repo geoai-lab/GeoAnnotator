@@ -111,7 +111,8 @@ def create():
 
 @app.route("/project+descriptions", methods=["GET","POST"])
 def project_descriptions():
-    projects = Project.query.all()
+    projects = Project.query.filter_by(isDeleted = 0).all()
+    print(projects)
     list_of_projects = []
     for project in projects:
         list_of_projects.append({"project-name": project.project_name, "geo_json": project.geo_json})
@@ -120,7 +121,6 @@ def project_descriptions():
 @app.route("/createproject-submit", methods=["POST"])
 @login_required
 def createproject_submission():
-    print(request.json)
     projectName = request.json["Project Name"]
     mapLayers = request.json["map-layers"]
     project_exists = Project.query.filter_by(project_name = projectName).first() is not None
@@ -128,7 +128,7 @@ def createproject_submission():
     if(project_exists):
         return jsonify({"error": "project already exists"}), 409
     session['project_name'] = projectName
-    new_project = Project(project_name = projectName, geo_json = mapLayers )
+    new_project = Project(project_name = projectName, geo_json = mapLayers, isDeleted = 0 )
     db.session.add(new_project)
     db.session.commit()
     return  jsonify({"success": "project created"}), 200
@@ -255,6 +255,15 @@ def uploading_textFile():
         return jsonify({"error": "File Upload Fail"}), 401
     return jsonify({"success": "Upload Complete"}), 200
 
+@app.route('/deleteproject', methods=['POST'])
+@login_required
+def deleting_projects():
+    projects = request.json['projects']
+    queried_projects = Project.query.filter(Project.project_name.in_(projects))
+    for query in queried_projects:
+        query.isDeleted = 1 
+    db.session.commit()
+    return jsonify({"success": "Upload Complete"}), 200
 
 @app.route('/api/submit', methods=['POST'])
 @login_required

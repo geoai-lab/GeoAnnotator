@@ -32,7 +32,7 @@ L.Icon.Default.mergeOptions({
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png",
 });
 
-export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawings, setMaplayersFunction, editControl }) => {
+export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawings, setMaplayersFunction, editControl, setCurrentLocationDescription, noRepeat }) => {
     const provider = new OpenStreetMapProvider({
         params: {
             email: 'jv11699@gmail.com', // auth for large number of requests
@@ -63,6 +63,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     const [editing, setEditing] = useState(false);
     var drawingControls;
     const ZOOM_LEVEL = 4;
+    var LeafletMap;
     const [showGJOptions, setShowGJOptions] = useState(false);
     const mapRef = useRef();
     var typingTimer;
@@ -156,7 +157,16 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                     }
 
                 }
-            }).addTo(map)
+            })
+            layer.addTo(map)
+            if(noRepeat){
+                if(Object.keys(mapLayers).length > 0){
+                    setMapLayers(data => {
+                        map.removeLayer(data['-1']);
+                    })
+                }
+                setMapLayers({"-1":layer})
+            }
             //this section if to fit the latest layer onto the screen
             if (geojsonLayer) {
                 setGeojsonLayer(data => {
@@ -229,14 +239,20 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }
     const _onCreate = (e) => {
         if(!drawings){
-       
             $("a.leaflet-draw-draw-polygon").hide();
         }
         setIsinitial(false)
         const { layerType, layer } = e;
         const id = layer._leaflet_id;
         //const geoJson = layer.toGeoJSON();
-
+        if(setCurrentLocationDescription){
+            setCurrentLocationDescription(data => {
+                layer.options.color = data.color;
+                layer.options.fillColor = data.color;
+                return data;
+            }); 
+        }
+        console.log(layer);
         setMapLayers((prevLayers) => ({
             ...prevLayers,
             [id]: layer
@@ -269,6 +285,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
             
         }
         const { layerType, layer } = e;
+       
         const layers = e.layers._layers
         if (Object.keys(layers).length == 0) {
             return
@@ -344,9 +361,10 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
                         <div className='form-group col-md-13'>
                             <div>
-                                <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={map}
+                                <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={mapRef}
                                     attributionControl={false} whenCreated={map => {
                                         setMap(map);
+                                        LeafletMap = map;
                                         Addgeojson(map, geojson, true);
                                     }}>
 
@@ -354,7 +372,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                                         {editControl &&
                                             <EditControl
                                                 position="topright"
-                                                ref={map}
+                                                ref={mapRef}
                                                 onCreated={_onCreate}
                                                 onEdited={_onEdit}
                                                 onDeleted={_onDeleted}

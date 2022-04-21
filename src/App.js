@@ -21,6 +21,7 @@ function App() {
   const [_username, set_UserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
+    setIsLoading(true);
     axios({
       method: "POST",
       url: "/@me",
@@ -54,7 +55,7 @@ function App() {
        
         <Routes>
           
-          {!loggedin && <Route path='/' element={<LoginRegistration setLogin={setIsLoggedin}/>} exact />}
+          {!isLoading && !loggedin && <Route path='/' element={<LoginRegistration setLogin={setIsLoggedin}/>} exact />}
           <Route path="/" element={<Home/>}/>
           <Route path="/logout" />
           <Route path='/createproject' element={<CreateProject />} />

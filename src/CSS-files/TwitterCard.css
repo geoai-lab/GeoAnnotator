@@ -10,8 +10,8 @@
     box-shadow: 3px 10px 20px rgba(0, 0, 0, 0.2);
     border-radius: 3px;
     border: 0;
-    z-index: -5;
-    cursor: text;
+    z-index: 0;
+    cursor: auto;
     
   }
   #tweet{

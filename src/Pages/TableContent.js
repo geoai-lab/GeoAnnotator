@@ -1,7 +1,7 @@
 import Creatable from 'react-select/creatable';
 import { Card, Form, Button } from "react-bootstrap";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
-export const TableContent = ({ locationDesc }) => {
+export const TableContent = ({ locationDesc, tweet, spatialFootPrint }) => {
     const [category, setCategory] = useState(); 
     const category_options = [
         { value: 'C1', label: 'C1:House number addresses' },
@@ -24,19 +24,18 @@ export const TableContent = ({ locationDesc }) => {
     return (
         <>
             <div className="container">
-                <table class="table">
+                <table class="table" style={{"transition":"all .3s ease-in"}}>
                     <tbody>
                         <tr>
                             <th scope="row">Location Desc</th>
-                            <td>Category</td>
+                            <td>{tweet}</td>
                             <td key="3"><a class="btn btn-secondary" type="button" key="5" onClick={(e) =>{
                                 e.preventDefault();
-                                console.log("HELO")
                             }}>Edit..</a></td>
                         </tr>
                         <tr>
                             <th scope="row">Category</th>
-                            <td colspan="2">
+                            <td colSpan="2">
                             <Creatable options={category_options} onChange={handleCategory}
                                     onClick={(e) => {
                                         e.preventDefault();

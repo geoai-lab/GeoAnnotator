@@ -184,7 +184,7 @@ export const CreateProject = ({ children }) => {
                         </div>
                         <div className="col" style={{ "width": "50%", "position": "relative", "float": "right" }}>
                             {/* Below is map re renders after every switch of state or drawing */}
-                            {selectionState ? <Leafletmap key="1" id="create-map" geojson={jsondata} drawings={false} setMaplayersFunction={setMapLayers} editControl={false} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={false} drawings={false} setMaplayersFunction={setMapLayers} editControl={true} />}
+                            {selectionState ? <Leafletmap key="1" id="create-map" geojson={jsondata} drawings={false} setMaplayersFunction={setMapLayers} noRepeat={true} editControl={false} /> : <Leafletmap key="2" id="create-map" onChange={null} searchBar={false} drawings={false} setMaplayersFunction={setMapLayers} editControl={true} />}
                         </div>
                     </div>
                 </div>

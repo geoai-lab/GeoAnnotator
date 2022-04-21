@@ -152,7 +152,7 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
                                         text={registerForm.password} value={registerForm.password} required /> </div>
                                     <div class="form-field d-flex align-items-center"> <span class="fas fa-key"></span> <input onChange={handleChange} type="password" name="retypepassword" id="repwd" placeholder="Retype-Password"
                                         text={registerForm.retypepassword} value={registerForm.retypepassword} /> </div>
-                                    <button id="login-button" class="btn mt-3" onClick={(e) => {
+                                    <button id="login-button" class="btn btn-secondary" onClick={(e) => {
                                         HandleRegister(e);
                                         handleSubmit(false);
                                     }}>Register</button>

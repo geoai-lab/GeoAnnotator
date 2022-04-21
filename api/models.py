@@ -55,6 +55,7 @@ class Project(db.Model):
     __tablename__ = 'projects'
     project_id = db.Column(db.String(32), primary_key=True, unique=True, default=get_uuid)
     project_name = db.Column(db.String, nullable = False)
+    isDeleted = db.Column(db.Integer, nullable = False);
     geo_json = db.Column(db.String)
   
 class Submission(db.Model):

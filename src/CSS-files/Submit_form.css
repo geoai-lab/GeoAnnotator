@@ -29,11 +29,7 @@
     
       margin: auto;    
   }
-  .highlight:hover{
-    background-color: #422800;
-    cursor: pointer;
-  }
-
+  
 
   .avatar {
     width: 6%;
@@ -113,7 +109,6 @@
 }
 #tweetsection{
   position: relative;
-  cursor: text;
   bottom: 5px;
 }
 #refresh-button {
@@ -214,7 +209,6 @@
 #popup2 {
   position: relative;
   display: inline-block;
-  cursor: pointer;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;

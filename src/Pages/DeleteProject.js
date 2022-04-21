@@ -9,7 +9,7 @@ import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import * as util from "./Util.js";
 import { useNavigate } from "react-router-dom";
-export const DeleteProject = ({onSubmit, setProjectDeletion,CurProjectName  }) => {
+export const DeleteProject = ({ setProjectDeletion,CurProjectName  }) => {
     const [project, setProjects] = useState([])
     const [selectedProjects, setSelectedProjects] = useState()
     useEffect(() =>{
@@ -34,10 +34,25 @@ export const DeleteProject = ({onSubmit, setProjectDeletion,CurProjectName  }) =
                 projectList.push({ "label": project["project-name"], "value": project["project-name"] })
             }
             setProjects(projectList)
-
         }
         )
     }, [])
+    const onSubmit = () => {
+        axios({
+            method: "POST",
+            url: '/deleteproject',
+            withCredentials: true,
+                // gives me "2016-03-22 12:00:00 am EDT"
+            data: {
+               ['projects']: selectedProjects.map(data => data.label)
+
+            }
+        }).then( response => {
+            if(response.status === 200){
+                util.ToggleMessage("success","Project/s Deleted");
+            }
+        })
+    }
     return (
         <>
             <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">

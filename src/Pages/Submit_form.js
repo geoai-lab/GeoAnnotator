@@ -15,6 +15,7 @@ import Loading from "./Loading";
 import moment from "moment-timezone";
 import * as util from "./Util.js";
 import { TableContent } from "./TableContent";
+import { string } from "prop-types";
 export const Submit_form = ({ children }) => {
     const [tweet, setTweet] = useState('No Data... Please report to developer');
     const [isloading, setIsloading] = useState(true);
@@ -22,9 +23,10 @@ export const Submit_form = ({ children }) => {
     const [category, setCategory] = useState('')
     const [highlightSelection, setSelection] = useState([]);
     const [neuroHighlight, setNeuroHighlight] = useState({});
-  
+    const [LocationDescriptions, SetLocationDescriptions] = useState({})
     const [toggleSubmit, setToggleSubmit] = useState(1);
     const [MaplayersFunction, setMaplayersFunction] = useState();
+    const [currentLocationDescription, setCurrentLocationDescription] = useState(); 
     const [projectDescription, setProjectDescription] = useState(null);
     const [waitingForData, setWaitingForData] = useState(true);
     const [colorList, setColorList] = useState(["brown","orange","yellow","green","blue","indigo","violet","purple","pink","red"])
@@ -36,25 +38,55 @@ export const Submit_form = ({ children }) => {
         elementTagName: "mark",
         tagNames: ["mark"],
         onElementCreate: function (elem, classApplier){
+            elem.style.cursor = "pointer";
+            elem.style.transition = "all .3s ease-in"
             setColorList(colors => {
-                elem.style.backgroundColor = colors.pop();
+                var color = colors.pop();
+                elem.style.backgroundColor = color;
+                elem.setAttribute('key', color);
+                SetLocationDescriptions(data => {
+                    return(
+                        {
+                            ...data, 
+                            [color]: elem
+                        }
+                    )
+                });
                 return colors; 
             })
-            
-            
-            // need to delete if there is intersection
+
         },
         elementProperties: {
-            p: "#tweet"
+            p: "#tweet",
+            onclick: function() {
+                setCurrentLocationDescription(data => {
+                    return(
+                        {
+                            ...data,
+                            "tweet":this.childNodes[0].textContent,
+                            "color":this.style.backgroundColor
+                        }
+                    )});
+                
+                // util.ToggleMessage("warning","Do you want to delete this highlight?", function(){})
+                return false;
+            },
+            onmouseover: function() {
+                this.style.boxShadow = "5px 5px 5px";
+                this.style.border = ".30px solid"
+            },
+            onmouseout: function() {
+                this.style.boxShadow = "none"
+                this.style.border = "none"
+            }
         }
     })
     highlighter.addClassApplier(
         Applier
     );
-
+   
    
     useEffect(() => {
-        console.log("REPEARING HERE")
         setWaitingForData(true);
         setRefresh(data => data +1);
         setCategory(null);
@@ -64,7 +96,7 @@ export const Submit_form = ({ children }) => {
                 return response.json(); 
             }
             else {
-                alert("failed to grab data");
+                util.ToggleMessage("error","Server failed to respond");
             }
         }).then(data => {
             // if(data.id == tweet.id){
@@ -86,7 +118,6 @@ export const Submit_form = ({ children }) => {
         
     }, [toggleSubmit])
     useEffect(() => {
-       
         if(!neuroHighlight){
             return;
         }
@@ -175,10 +206,10 @@ export const Submit_form = ({ children }) => {
 
             }).catch((error) => {
                 if (error.response.status == 500) {
-                    alert("submission failed");
+                    util.ToggleMessage("error","Submission Failed");
                 }
                 else if(error.response === 409){
-                    alert("submission failed");
+                    util.ToggleMessage("error","Submission Failed");
                 }
 
             })
@@ -214,7 +245,10 @@ export const Submit_form = ({ children }) => {
                 {/*First Column*/}
                 <div className="row">
                     <div className="column1">
-                        {!isloading && projectDescription && <Leafletmap id="annotate-map" onChange={neuroHighlight} searchBar={true} drawings={true} editControl={true} setMaplayersFunction={setMaplayersFunction}
+                        {!isloading && projectDescription && <Leafletmap id="annotate-map" onChange={neuroHighlight} 
+                        searchBar={true} drawings={true} editControl={true} 
+                        setMaplayersFunction={setMaplayersFunction}
+                        setCurrentLocationDescription={setCurrentLocationDescription}
                             geojson={projectDescription.geo_json} />}
                     </div>
                     {/*Second column*/}
@@ -238,7 +272,7 @@ export const Submit_form = ({ children }) => {
                         <div className="row" style={{"padding-top":"20px"}}>
                             <div className="col" style={{"padding-right":"50px"}}>
                                 <label className="submit-section">
-                                    <TableContent />
+                                    {currentLocationDescription && <TableContent tweet={currentLocationDescription.tweet}/>}
                                 </label>
                             </div>
                             <div className="col" id="popup2">
