@@ -7,9 +7,9 @@ import Select from 'react-select'
 import { Button } from 'react-bootstrap';
 import $ from 'jquery';
 /**
-     * Component of the Login/Registration page
-     * This component handles a form where the user can either login, or register a new account 
-     * @param {setLogin} setFunction id used for the CSS styling of this component object 
+     * Component of the popup message
+     * This component handles the popup messages. (i.g. success on logging in, submission, or creating a new project) and vice versa for warnings, and errors 
+     * 
      */
 export const PopupMessage = () => {
     return (

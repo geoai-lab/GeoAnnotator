@@ -11,16 +11,19 @@ import Loading from './Pages/Loading';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { PopupMessage } from './Pages/PopupMessage';
-
+/**
+     * Main file component (Encompasses all children components)
+    */
 function App() {
 
-  const [loggedin, setIsLoggedin] = useState(false)
-  const [projects, setProjects] = useState([])
+  const [loggedin, setIsLoggedin] = useState(false) // state object if user is logged in or not
+  const [projects, setProjects] = useState([]) // state object that contains the project lists
   
-  const [projectName, setProjectName] = useState("")
-  const [_username, set_UserName] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [projectName, setProjectName] = useState("") // state object that contains the current project name
+  const [_username, set_UserName] = useState(""); // state that contains the current user that is logged in on the web application
+  const [isLoading, setIsLoading] = useState(true); // state object for when to show loading object or not
   useEffect(() => {
+    // Use effect on the server side to have session based authentication
     setIsLoading(true);
     axios({
       method: "GET",
@@ -45,6 +48,7 @@ function App() {
   }, [loggedin])
   
   if(isLoading){
+    // if use effect did not recieve any data .
     return(<Loading/>);
   }
   return (

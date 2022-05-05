@@ -6,13 +6,16 @@ import { Card } from 'react-bootstrap';
 import Select from 'react-select'
 import { Button } from 'react-bootstrap';
 /**
-     * Component of the Login/Registration page
-     * This component handles a form where the user can either login, or register a new account 
-     * @param {setLogin} setFunction id used for the CSS styling of this component object 
+     * Component of selecting new project 
+     * This component handles when a user wants to select a new project 
+     * @param {function} onSubmit function passed down from parent to call a submission of a new project that is selected 
+     * @param {function} setProjectName set state function to set the new project selected
+     * @param {string} id id used for the CSS styling of this component object 
      */
 export const SelectProject = ({id, addCreate, onSubmit, setProjectName, }) => {
     const [project, setProjects] = useState([])
     useEffect(() => {
+        // use effect for grabbing all of the current projects in the database 
         fetch('/project+descriptions').then(response => {
             if (response.ok) {
                 return response.json()

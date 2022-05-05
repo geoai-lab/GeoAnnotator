@@ -29,7 +29,10 @@ L.Icon.Default.mergeOptions({
     shadowUrl:
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png",
 });
-
+/**
+     * Component of the comparison page
+     * This component is shown at /compare page when there is a resolver and he/she is trying to resolve which two annotations are more correct. 
+     */
 export const Compare = () => {
     const [position, setPosition] = useState({ lat: 43.5128472, lng: -76.2510408 }); // { lat: 42.8864, lng: -78.8784 }
     const ZOOM_LEVEL = 12;

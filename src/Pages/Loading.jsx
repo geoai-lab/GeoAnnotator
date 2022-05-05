@@ -1,5 +1,10 @@
 import React from 'react'
 import "../CSS-files/Loading.css"
+/**
+     * Component of the loading 
+     * This component handles an html object when to show the user a loading screen 
+     * @param {string} id used for the CSS styling of this component object 
+     */
 export const Loading = ({id}) => {
   return (
     <>

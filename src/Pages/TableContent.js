@@ -6,8 +6,8 @@ import React, { useCallback, useEffect, useState, useMemo } from "react";
      * This component contains location descriptions of a certain highlight 
      */
 export const TableContent = ({ locationDesc, tweet, spatialFootPrint }) => {
-    const [category, setCategory] = useState(); 
-    const category_options = [
+    const [category, setCategory] = useState();  // Current category selected
+    const category_options = [ // Contains the initial categories of a location description 
         { value: 'C1', label: 'C1:House number addresses' },
         { value: 'C2', label: 'C2: Street names' },
         { value: 'C3', label: 'C3: Highways' },
@@ -20,9 +20,11 @@ export const TableContent = ({ locationDesc, tweet, spatialFootPrint }) => {
         { value: 'C10', label: "C10: Multiple-areas" }
     ]
     const handleCategory = (e) => {
+        // Event that updates the category state object 
         setCategory(e.label)
     }
     function truncate(str, n){
+        // function to truncate long strings and just change it to a smaller string with ... at the end 
         return (str.length > n) ? str.substr(0, n-1) + '...' : str;
       };
     return (
@@ -43,7 +45,6 @@ export const TableContent = ({ locationDesc, tweet, spatialFootPrint }) => {
                             <Creatable options={category_options} onChange={handleCategory}
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        console.log("HEIRE")
                                     }}
                                     id="creatable-submit"
                                     value={category ? { "label": category } : null}

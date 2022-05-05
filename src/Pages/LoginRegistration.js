@@ -29,6 +29,7 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
         username: ""
     })
     const HandleRegister = (event) => {
+        // event for when the is registering instead of logging in 
         event.preventDefault();
         setIsRegistering((data) => !data);
     }
@@ -104,6 +105,7 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
 
 
     function handleChange(event) {
+        // event that handles all input changes for logging in/registering. It updates all of the state objects associated with logging in or registering 
         const { value, name } = event.target
         if (!isRegistering) {
             setloginForm(prevNote => ({

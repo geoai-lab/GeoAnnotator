@@ -92,6 +92,7 @@ export const Submit_form = ({ children }) => {
    
    
     useEffect(() => {
+        // use effect for grabbing annotation data (i.g. new tweet to be annotated and the project geoJson )
         setWaitingForData(true);
         setRefresh(data => data +1);
         setCategory(null);
@@ -104,10 +105,6 @@ export const Submit_form = ({ children }) => {
                 util.ToggleMessage("error","Server failed to respond");
             }
         }).then(data => {
-            // if(data.id == tweet.id){
-            //     setToggleSubmit(data => data+1); // reload again
-            // }
-            console.log(data)
             setTweet(data)
             setWaitingForData(false);
             setIsloading(false)
@@ -117,17 +114,16 @@ export const Submit_form = ({ children }) => {
         )
  
 
-       
         setSelection([])
 
         
     }, [toggleSubmit])
     useEffect(() => {
+        // Use effect for adding the location highlights from the Rest API model onto the twitter card 
         if(!neuroHighlight){
             return;
         }
         var tweet_div = document.getElementById("tweet");
-        //const range = Rangy.createRange()
         if (!tweet_div) {
             return null;
         }
@@ -145,7 +141,7 @@ export const Submit_form = ({ children }) => {
         var range = Rangy.createRange(tweet_div)
         var keys = Object.keys(neuroHighlight)
         var new_index_side = 0
-
+        // for loop below to add the highlights using parent children html 
         for (var [nodeIndex, keyIndex] = [0, 0]; keyIndex < keys.length;) {
             var Node = tweet_div.childNodes[nodeIndex]
             if (!Node) {
@@ -172,6 +168,7 @@ export const Submit_form = ({ children }) => {
     }, [neuroHighlight])
 
     const handleClickRefresh = () => {
+        // event that refreshes components and updates new data within those components. 
         setRefresh(refresh + 1)
         setSelection([])
 
@@ -181,6 +178,7 @@ export const Submit_form = ({ children }) => {
     }
    
     const handleSubmit = async () => {
+        // evnet to handle a submission of a annotation 
         params.tweetid = 'any';
         if (!category) {
             util.ToggleMessage("error","You did not choose any category");
@@ -223,6 +221,7 @@ export const Submit_form = ({ children }) => {
     }
 
     const handleTextSelection = () => {
+        // event to handle when a user highlights a text from the twitter card, which is going to be a new location description 
         var tweetdiv = document.getElementById('tweet');
         const selection = Rangy.getSelection(tweetdiv);
         const ranges = selection.getAllRanges();

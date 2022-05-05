@@ -1,4 +1,7 @@
 import $ from "jquery"
+/*
+This is the utility file that contians configurations for the pop up message
+*/
 export function ToggleMessage(type,message, warningFunction, timer ) {
     if (type === "success") {
         $("#popupMessageSuccess").children("p").text(message);
