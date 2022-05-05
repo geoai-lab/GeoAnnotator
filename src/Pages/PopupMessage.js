@@ -6,6 +6,11 @@ import { Card } from 'react-bootstrap';
 import Select from 'react-select'
 import { Button } from 'react-bootstrap';
 import $ from 'jquery';
+/**
+     * Component of the Login/Registration page
+     * This component handles a form where the user can either login, or register a new account 
+     * @param {setLogin} setFunction id used for the CSS styling of this component object 
+     */
 export const PopupMessage = () => {
     return (
         <>

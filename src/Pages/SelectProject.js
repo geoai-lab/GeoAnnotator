@@ -5,6 +5,11 @@ import Popup from 'reactjs-popup';
 import { Card } from 'react-bootstrap';
 import Select from 'react-select'
 import { Button } from 'react-bootstrap';
+/**
+     * Component of the Login/Registration page
+     * This component handles a form where the user can either login, or register a new account 
+     * @param {setLogin} setFunction id used for the CSS styling of this component object 
+     */
 export const SelectProject = ({id, addCreate, onSubmit, setProjectName, }) => {
     const [project, setProjects] = useState([])
     useEffect(() => {

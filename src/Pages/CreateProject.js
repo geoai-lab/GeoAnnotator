@@ -15,6 +15,11 @@ import { useNavigate } from "react-router-dom";
 import $ from "jquery";
 import * as util from "./Util.js"
 import Loading from "./Loading";
+/**
+     * Component of the Login/Registration page
+     * This component handles a form where the user can either login, or register a new account 
+     * @param {setLogin} setFunction id used for the CSS styling of this component object 
+     */
 export const CreateProject = ({ children }) => {
     const [jsondata, setJsondata] = useState(null)
     const [location, setLocation] = useState([{

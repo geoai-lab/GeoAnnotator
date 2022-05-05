@@ -16,29 +16,34 @@ import moment from "moment-timezone";
 import * as util from "./Util.js";
 import { TableContent } from "./TableContent";
 import { string } from "prop-types";
+/**
+     * Component of the Submission Page of annotation
+     * This component handles when a user submits an annotation /api 
+     */
 export const Submit_form = ({ children }) => {
-    const [tweet, setTweet] = useState('No Data... Please report to developer');
-    const [isloading, setIsloading] = useState(true);
-    const [refresh, setRefresh] = useState(0);
-    const [category, setCategory] = useState('')
-    const [highlightSelection, setSelection] = useState([]);
-    const [neuroHighlight, setNeuroHighlight] = useState({});
-    const [LocationDescriptions, SetLocationDescriptions] = useState({})
-    const [toggleSubmit, setToggleSubmit] = useState(1);
-    const [MaplayersFunction, setMaplayersFunction] = useState();
-    const [currentLocationDescription, setCurrentLocationDescription] = useState(); 
-    const [projectDescription, setProjectDescription] = useState(null);
-    const [waitingForData, setWaitingForData] = useState(true);
-    const [colorList, setColorList] = useState(["brown","orange","yellow","green","blue","indigo","violet","purple","pink","red"])
-    var params = useParams();
-    Rangy.init();
+    const [tweet, setTweet] = useState('No Data... Please report to developer'); // state text that will be inside the TwitterCard component 
+    const [isloading, setIsloading] = useState(true); // state that opens the loading bar 
+    const [refresh, setRefresh] = useState(0); //  state that refreshes components
+    const [category, setCategory] = useState('') // state that contains a category. Currently, this will be removed since new version wants to have location descriptions instead
+    const [highlightSelection, setSelection] = useState([]); // contains the highlights that the user selected from the TwitterCard Component 
+    const [neuroHighlight, setNeuroHighlight] = useState({}); //  should contain Model Rest API highlights. E
+    const [LocationDescriptions, SetLocationDescriptions] = useState({}); //  Replacement of the highlightSelection state. Would contain objects 
+    const [toggleSubmit, setToggleSubmit] = useState(1); // state that changes when a user submits an annotation
+    const [MaplayersFunction, setMaplayersFunction] = useState(); // state that contains the map polygons from the LeafletMap Component 
+    const [currentLocationDescription, setCurrentLocationDescription] = useState();  // state that contains the current selected Location Description of the user 
+    const [projectDescription, setProjectDescription] = useState(null); // state that contains the project name and project geoJson
+    const [waitingForData, setWaitingForData] = useState(true); // state boolean that checks whether this component should wait for the data or not. It true, it will open the loading bar
+    const [colorList, setColorList] = useState(["brown","orange","yellow","green","blue","indigo","violet","purple","pink","red"]) // list of colors that will be choosen for the location descriptions 
+    var params = useParams(); // state that checks for the url parameters. Essentially if there is a specified tweet that wants to be annotated, the tweet id will be attached to the url link and this state will grab that
+    Rangy.init(); // Rangy Object initialization 
     const highlighter = Rangy.createHighlighter(); 
+    // Below is the highlighter object used to highlight location descriptions 
     const Applier = Rangy.createClassApplier("highlight", {
         ignoreWhiteSpace: true,
         elementTagName: "mark",
         tagNames: ["mark"],
-        onElementCreate: function (elem, classApplier){
-            elem.style.cursor = "pointer";
+        onElementCreate: function (elem, classApplier){ // when a location description is created 
+            elem.style.cursor = "pointer"; // edit elem CSS styles 
             elem.style.transition = "all .3s ease-in"
             setColorList(colors => {
                 var color = colors.pop();

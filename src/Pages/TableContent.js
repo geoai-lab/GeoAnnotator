@@ -1,6 +1,10 @@
 import Creatable from 'react-select/creatable';
 import { Card, Form, Button } from "react-bootstrap";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
+/**
+     * Component of the /api page table content 
+     * This component contains location descriptions of a certain highlight 
+     */
 export const TableContent = ({ locationDesc, tweet, spatialFootPrint }) => {
     const [category, setCategory] = useState(); 
     const category_options = [

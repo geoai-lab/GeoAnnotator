@@ -8,17 +8,21 @@ import { useNavigate } from "react-router-dom";
 import Popup from 'reactjs-popup';
 import { SelectProject } from './SelectProject';
 import * as util from './Util.js';
+/**
+     * Component of the Login/Registration page
+     * This component handles a form where the user can either login, or register a new account 
+     * @param {setLogin} setFunction id used for the CSS styling of this component object 
+     */
 export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
-    const [isRegistering, setIsRegistering] = useState(false);
-    const [currentProject, setCurrLoginProject] = useState();
-    const [changeOpening, setChangeOpening] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false); //To know if a user is presently logged in or registering, utilize this state object.
+    const [currentProject, setCurrLoginProject] = useState(); // This state object contains the name of the current project that the user selected (i.g. what the user selected from the list of project names in the project table)
     const [popupmessageOpen, setPopupmessageOpen] = useState(false);
-    const navigate = useNavigate();
-    const [loginForm, setloginForm] = useState({
+    const navigate = useNavigate(); // navigate object (i.g. navigate("/createproject") ==> redirects you to the /createproject website). Function is similar to <a href="{link}"/>
+    const [loginForm, setloginForm] = useState({ // when isRegistering==False this will contain the login data
         email: "",
         password: ""
     })
-    const [registerForm, setregisterForm] = useState({
+    const [registerForm, setregisterForm] = useState({ // when isRegistering==True this will contain the registration data
         email: "",
         password: "",
         retypepassword: "",
@@ -133,7 +137,6 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
                                         text={loginForm.password} value={loginForm.password} required /> </div>
                                     <button id="login-button" class="btn mt-3" data-target="#exampleModal" data-toggle="modal" onClick={(e) => {
                                         e.preventDefault();
-                                        setChangeOpening(true);
                                     }}>Login</button>
 
                                 </form>

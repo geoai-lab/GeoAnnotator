@@ -9,13 +9,18 @@ import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import * as util from "./Util.js";
 import { useNavigate } from "react-router-dom";
+/**
+     * Component is a popup function that opens if user wants to delete a project
+     * @param {string} CurProjectName String that contains the current project name. 
+     */
 export const DeleteProject = ({ setProjectDeletion,CurProjectName  }) => {
-    const [project, setProjects] = useState([])
-    const [selectedProjects, setSelectedProjects] = useState()
-    useEffect(() =>{
+    const [project, setProjects] = useState([]) // contains all of the project names
+    const [selectedProjects, setSelectedProjects] = useState() // selected projects that will be deleted
+    useEffect(() =>{ 
+        // useEffect that detects the selection of projects
         if(selectedProjects){
             var deletingCurProject =  selectedProjects.map(data => data.label).includes(CurProjectName)
-            if(deletingCurProject){
+            if(deletingCurProject){ // fires if the project you are deleting is the one the user is currently on 
                 util.ToggleMessage("warning","You are trying to delete project you are currently on", function(){});
             }
         
@@ -23,7 +28,7 @@ export const DeleteProject = ({ setProjectDeletion,CurProjectName  }) => {
        
     }, [CurProjectName, selectedProjects])
     useEffect(() => {
-        
+        // useEffect on render, will grab all of the project names from the database 
         fetch('/project+descriptions').then(response => {
             if (response.ok) {
                 return response.json()
