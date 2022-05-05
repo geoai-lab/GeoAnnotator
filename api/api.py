@@ -35,7 +35,7 @@ app.config['SESSION_USE_SIGNER'] = True
 #app.config['SESSION_COOKIE_DOMAIN]
 #app.config['SESSIO N_COOKies]
 #app.config['SESSION_COOKIE_SECURE'] = True # add this to make the cookies invisible or something 
-bcrypt = Bcrypt(app)
+bcrypt = Bcrypt(app) # this is encyrpt the app 
 
 
 CORS(app, supports_credentials=True)
@@ -47,6 +47,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 with app.app_context():
+    # before intialization of the app, commands under here are ran first 
     # Replace with the commented when running the command gunicorn3 -w 3 GeoAnnotator.api:app
     optionsData = jsonify(json.load(open('../../createProjectOptions.json'))) # 'GeoAnnotator/api/createProjectOptions.json'
     configurationsData = json.load(open('../../configuration_data.json')) #  'GeoAnnotator/api/configuration_data.json'
@@ -55,6 +56,10 @@ with app.app_context():
 
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    Loads current user data
+    ---
+    """
     return User.query.filter_by(id=user_id).first()
 
 @app.route('/')
@@ -182,6 +187,19 @@ def project_descriptions():
 @app.route("/createproject-submit", methods=["POST"])
 @login_required
 def createproject_submission():
+    """
+    Creation of a new project 
+    ---
+    POST:
+      description: adds a new project item onto the Projects table of the database 
+      responses:
+        200:
+            description:
+                new project added
+        409:
+            description:    
+               * if the project name given already exists within the database
+    """
     projectName = request.json["Project Name"]
     mapLayers = request.json["map-layers"]
     project_exists = Project.query.filter_by(project_name = projectName).first() is not None
