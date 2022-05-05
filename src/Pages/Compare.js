@@ -34,24 +34,24 @@ L.Icon.Default.mergeOptions({
      * This component is shown at /compare page when there is a resolver and he/she is trying to resolve which two annotations are more correct. 
      */
 export const Compare = () => {
-    const [position, setPosition] = useState({ lat: 43.5128472, lng: -76.2510408 }); // { lat: 42.8864, lng: -78.8784 }
-    const ZOOM_LEVEL = 12;
-    const mapRef1 = useRef();
-    const mapRef2 = useRef();
-    const [isloading, setIsloading] = useState(true)
-    const [annotators, setAnnotators] = useState("");
-    let { projectName } = useParams();
-    const navigate = useNavigate();
-    const [userData1, setUserData1] = useState();
-    const [userData2, setUserData2] = useState();
-    const [curTweetId, setCurTweetId] = useState("");
-    const [choosenUser, setChoosenUser] = useState(null);
-    const [userKey1, setUserKey1] = useState(1);
-    const [userKey2, setUserKey2] = useState(1);
-    const [waitingForData, setWaitingForData] = useState(true);
-    const [submissionEffect, setSubmissionEffect] = useState(true);
+    const [position, setPosition] = useState({ lat: 43.5128472, lng: -76.2510408 }); // state object of the position of the map in terms of latitude and longitude. Initial position is given 
+    const ZOOM_LEVEL = 12; // Zoom Level of initial render of the map
+    const mapRef1 = useRef(); // references for the left side map (currently not being used)
+    const mapRef2 = useRef();// references for the right side map (currently not being used)
+    const [annotators, setAnnotators] = useState(""); // state object that will contain the submissions of annotations. (i.g. this state will contain the submissions that the resovler is going to resolve)
+    let { projectName } = useParams(); // parameter of specific tweet (not implemented yet. but in the future this will be needed if a specific tweet wants to be resovled)
+    const navigate = useNavigate(); // navigation object to. Acts much like an <a href=""/>
+    const [userData1, setUserData1] = useState(); // current annotation data of the left side the compare page
+    const [userData2, setUserData2] = useState();// current annotation data of the right side the compare page
+    const [curTweetId, setCurTweetId] = useState(""); // current tweet id that is being resolved 
+    const [choosenUser, setChoosenUser] = useState(null); // the choosen correct annotation by the resolver 
+    const [userKey1, setUserKey1] = useState(1); // unique key for CSS userData1
+    const [userKey2, setUserKey2] = useState(1); // unique key for CSS userData2
+    const [waitingForData, setWaitingForData] = useState(true); // State object to show a loading screen 
+    const [submissionEffect, setSubmissionEffect] = useState(true); // state object to run a useEffect 
     //position ZOOM_LEVEL
     useEffect(() => {
+        // useEffect to grab data needed to comparisons (i.g. fetches data from the backend to grab submissions of annotators )
         axios({
             method: "GET",
             url: "/comparison",
@@ -91,16 +91,19 @@ export const Compare = () => {
     }
         , [submissionEffect])
     useEffect(() => {
+        // useEffect when the left side of the map is different. (i.g. when a resolver chooses a different annotation/annotator for user 1, run thorugh this effect and update the tweet that specific annotator highlighted)
         if (userData1) {
             pre_highlight("tweetcard1", userData1.highlight)
         }
     }, [userData1])
     useEffect(() => {
+           // useEffect when the right side of the map is different. (i.g. when a resolver chooses a different annotation/annotator for user 2, run thorugh this effect and update the tweet that specific annotator highlighted)
         if (userData2) {
             pre_highlight("tweetcard2", userData2.highlight)
         }
     }, [userData2])
     const MapSection = (e) => {
+        // function to return a map object with polygons of annotations 
         return (
             <MapContainer key={e.key} id='leaflet-compare' center={e.center} zoom={e.zoom}
                 attributionControl={false}
@@ -117,6 +120,7 @@ export const Compare = () => {
         )
     }
     const pre_highlight = (idname, highlight_array) => {
+        // function to pre highlight on the twitter card the location descriptions that was highlighted 
         const sortable = Object.values(highlight_array).sort((a, b) => a.start_idx - b.start_idx)
         var tweet_div = document.getElementById(idname);
         const range = Rangy.createRange()
@@ -151,10 +155,12 @@ export const Compare = () => {
         }
 
     }
-    const handleCreateAnnotation = () => {
+    const handleCreateAnnotation = () => { 
+        // function for when a resolver wants to create a new annotation with that specific tweet 
         navigate("/api/" + curTweetId);
     }
     const handleSubmit = () => {
+        // event handler to handle when a resolver finally submits which annotation he/she thinks is right. 
         setWaitingForData(true);
         setUserKey1(data => data + 1);
         setUserData2(data => data + 1);
