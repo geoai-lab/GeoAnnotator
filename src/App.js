@@ -23,7 +23,7 @@ function App() {
   useEffect(() => {
     setIsLoading(true);
     axios({
-      method: "POST",
+      method: "GET",
       url: "/@me",
       withCredentials: true
     })

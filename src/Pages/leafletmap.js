@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
-import L, { geoJSON } from "leaflet"
-import { MapContainer, TileLayer, useMap, FeatureGroup, Polygon, Rectangle, GeoJSON } from "react-leaflet";
+import L from "leaflet"
+import { MapContainer, TileLayer, useMap, FeatureGroup} from "react-leaflet";
 import osm from "./osm-providers";
 import 'leaflet/dist/leaflet.css';
 import { EditControl } from "react-leaflet-draw";
@@ -9,19 +9,12 @@ import { Card } from 'react-bootstrap';
 import 'leaflet-geosearch/dist/geosearch.css';
 import "leaflet-draw/dist/leaflet.draw.css";
 import "../CSS-files/leafletmap.css"
-import { MDBCol } from "mdbreact";
-import { useDebounce } from 'use-debounce';
 import AsyncSelect from 'react-select/async';
 import Popup from 'reactjs-popup';
 import Loading from "./Loading";
 import "../CSS-files/Login.css"
 import * as util from './Util.js';
 import $ from "jquery";
-import { ListGroup, Modal, Dropdown, DropdownButton, ButtonGroup, InputGroup } from "react-bootstrap";
-import { slide as Menu } from 'react-burger-menu'
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
-import { object } from "prop-types";
-// Once checked double check with saved on database theres a bounds and a x y 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl:
@@ -31,85 +24,68 @@ L.Icon.Default.mergeOptions({
     shadowUrl:
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png",
 });
-
+/**
+     * Component for the /api-grab, /compare, /createproject paths of the application. 
+     * This component is an updated version of a react-leaflet leaflet map. Handles all of a map's requirements from a web application.
+     * @param {string} id id used for the CSS styling of this component object 
+     * @param {json} onChange - This parameter contains the location description data required to zoom into a place and draw polygons on the map.
+     * @param {GeoJson} geojson - If this parameter exists, then this polygon should be included to the map. This option is currently only used in the new project part, where you may input geojson data from the states section.
+     * @param {boolean} searchBar - If this argument is true, a search bar will be added to the map. The nominatim data on the GeoAI lab servers is used by the search bar to return nominatim data.
+     * @param {boolean} drawings - If this argument is true, then allow the user to draw on the map. If not, it does not allow user to draw on the map
+     * @param {function} setMaplayersFunction - setFunction that is used to update the state of the current setterFunction. The polygons on the current leafletmap object are the values that are updated.
+     * @param {booolean} editControl - If this argument is true, then show an edit control feature on the map where user can draw, edit, create, and delete polygons. Else if argument is false, the initialization of this component will not contian any editControl object 
+     * @param {function} setCurrentLocationDescription - this implementation is not finished. Initially, this is planned to contain data of location descriptions to differentiate polygons by location descriptions/colors
+     * @param {boolean} noRepeat - if this function is true, then each time a new polygon appears on this component, the old ones get removes. Therefore, you will only see one instance of a drawing in this component if the argument is true.
+     */
 export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawings, setMaplayersFunction, editControl, setCurrentLocationDescription, noRepeat }) => {
-    const provider = new OpenStreetMapProvider({
-        params: {
-            email: 'jv11699@gmail.com', // auth for large number of requests
-            countrycodes: 'us',
-            polygon_geojson: "1"
-        }
-    }
-    );
-
-    // need to fix caching mechanism
-    //Results must be cached on your side. Clients sending repeatedly the same query may be classified as faulty and blocked.
-    const [position, setPosition] = useState({ lat: 39.7837304, lng: -100.445882 }); // { lat: 42.8864, lng: -78.8784 }
-    const [mapLayers, setMapLayers] = useState({}); // puts the data needed to get submitted 
-    const [isloading, setIsloading] = useState(true)
-    const [locations, setLocations] = useState({})
-    const [locationTitle, setLocationTitle] = useState('')
-    const [timeout, setTempTimeout] = useState(false)
-    const [navbarOpen, setNavbarOpen] = useState(false)
-    const [isinitial, setIsinitial] = useState(false)
-    const [SearchText, setSearchText] = useState("");
-    const [uniqueKey, setUniqueKey] = useState(0)
-    const [geojsonLayer, setGeojsonLayer] = useState(null)
-    const [rectangleBoundary, setRectangleBoundary] = useState()
-    const [map, setMap] = useState(null)
-    const [geojsonTag, setGeojsonTag] = useState(null);
-    const [selectGeojson, setSelectGeojson] = useState();
-    const [changeOpen, setChangeOpen] = useState(false);
-    const [editing, setEditing] = useState(false);
-    var drawingControls;
-    const ZOOM_LEVEL = 4;
-    var LeafletMap;
-    const [showGJOptions, setShowGJOptions] = useState(false);
-    const mapRef = useRef();
-    var typingTimer;
-    useEffect(() => {
-        if (searchBar && onChange) { // only fires during the /api
-            if (mapLayers) {
+    
+    const [position, setPosition] = useState({ lat: 39.7837304, lng: -100.445882 }); // initial position of the map when no data is given 
+    const [mapLayers, setMapLayers] = useState({}); //  would keep the existing mapLayers (i.g. polygons and drawings that the user input, and not the data it recieved)
+    const [isloading, setIsloading] = useState(true); // State object to determine whether to show a loading bar to the user. I.G. setIsLoading(true) when this component is waiting on data to be recieved
+    const [locationTitle, setLocationTitle] = useState(''); // State object that would contain the current location of the component is zoomed at i.g. setLocationTitle("Buffalo New York"), and locationTitle will be used for the title of this component
+    const [SearchText, setSearchText] = useState(""); // state object that will contain values in the search bar
+    const [geojsonLayer, setGeojsonLayer] = useState(null); // The red contour of the polygon will be stored in a state object. In essence, the data contained in this state would be shown as a red outline polygon on the map. Contains mostly project geojson and/or US states GeoJson
+    const [map, setMap] = useState(null); // State object for leaflet map object 
+    const [geojsonTag, setGeojsonTag] = useState(null); // State object that essentially should contian the polygons returned by the search bar 
+    const [selectGeojson, setSelectGeojson] = useState(); // If a user clicks on a polygon, this state object should that polygon object.
+    const [changeOpen, setChangeOpen] = useState(false); // Would open a modal for the user to ask if they want to edit the said polygon, or delete it. 
+    const [editing, setEditing] = useState(false); // If changeOpen == true, then this state object determines whether the user is currently editing the polygon or not. 
+    var drawingControls; // would contain the drawingControls on initialization of EditControl of the Leaflet MapObject 
+    const ZOOM_LEVEL = 4; // current zoom level of this object on initialization
+    const mapRef = useRef(); // Map Reference
+    useEffect(() => { // useEffect to update the leafletmap's data 
+        if (searchBar && onChange) { // when there is a search bar and there is tweet data 
+            if (mapLayers) { // if polygons exist inside the component, then delete the current polgons and their respective data
                 setMapLayers(layers => {
                     Object.keys(layers).map(key => map.removeLayer(layers[key]));
                     return null;
                 });
-                setUniqueKey(data => data + 1);
             }
             var location_total = ""
-            if (Object.keys(onChange).length !== 0) {
+            if (Object.keys(onChange).length !== 0) { // if the tweet data, contains prediction/location description, then add up all of the prediction data onto one string and use that in the search bar to search the right polygon and lat/long using the nominatim at the GEOAI servers.
                 for (var predicted of onChange) {
                     location_total = location_total + predicted.locationDesc + " "
                 }
             }
-            setSearchText(location_total)
-            var res_api = setTimeout(() => {
-                fetchData(location_total).then(data => {
-                    setLocations(data)
-                    setTempTimeout(true)
-                    setIsloading(false)
+            setSearchText(location_total); // the new location is inside the searchText (one that handles what goes inside the search bar)
+            var res_api = fetchData(location_total).then(data => { // using the GEOAI nominatim instance, search for the values of location_total(contains location description)
+                    setLocations(data);
+                    setIsloading(false);
                     if (data[0] && map) {
                         setGeojsonTag(data[0].geometry)
-                        setUniqueKey(data => data + 1)
                     }
                 })
-            }, 0)
-            setUniqueKey(data => data + 1)
 
             return () => clearTimeout(res_api)
 
         } else if (searchBar && !onChange) { // only occurs during when drawing on /createproject
             setIsloading(false)
-            setTempTimeout(true)
         }
         else { // only occurs when selecting states on /createproject 
-            setIsloading(false)
-            setTempTimeout(true)
-
+            setIsloading(false);
             if (geojson) {
                 setGeojsonLayer(L.geoJSON(geojson))
             }
-
         }
         setEditing(false);
 

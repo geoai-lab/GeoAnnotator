@@ -47,8 +47,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 with app.app_context():
-    optionsData = jsonify(json.load(open('../../createProjectOptions.json'))) # '../../createProjectOptions.json'
-    configurationsData = json.load(open('../../configuration_data.json'))
+    # Replace with the commented when running the command gunicorn3 -w 3 GeoAnnotator.api:app
+    optionsData = jsonify(json.load(open('../../createProjectOptions.json'))) # 'GeoAnnotator/api/createProjectOptions.json'
+    configurationsData = json.load(open('../../configuration_data.json')) #  'GeoAnnotator/api/configuration_data.json'
 
 
 
@@ -58,10 +59,28 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
+    """
+    Initialization of flask object 
+    ---
+    return:
+        returns an index.html object built by react's build file.
+    """
     return app.send_static_file("index.html")
 
-@app.route("/@me", methods = ["POST"]) # might need to change 
+@app.route("/@me", methods = ["GET"]) # might need to change 
 def get_current_user():
+    """
+    User session data is retrieved through this callback.
+    ---
+    GET:
+      description: Get session data
+      security:
+        - Session Token 
+      responses:
+        200:
+          content:
+            User/json
+    """
     if not session["project_name"]:
         return jsonify({"error": "did not select project"}), 401
    
@@ -78,6 +97,19 @@ def get_current_user():
 
 @app.route("/login", methods=["POST"])
 def login():
+    """
+    Function that handles login of user 
+    ---
+    POST:
+      description: Add new user in the session
+      responses:
+        200:
+            description:
+               Successfuly log in user onto the session.
+        401:
+            description:
+                User entered wrong username/password that does not match any data on the database.
+    """
     loginform = LoginForm()
     email = request.json["email"]
     password = request.json["password"]
@@ -101,16 +133,45 @@ def login():
 @app.route("/logout", methods=["POST"])
 @login_required
 def logout():
-    logout_user()
-    return redirect("/", code=200)
+    """
+    Function that handles logout of user 
+    ---
+    POST:
+      description: remove curent user in the session
+      responses:
+        200:
+            description:
+               Successfuly log out user from the session. 
+    """
+    logout_user() # flask logout library
+    return redirect("/", code=200) # successful log out will redirect to the homepage 
 
 @app.route("/createprojects", methods=["GET"])
 @login_required
 def create():
+    """
+    Function that returns state geojson at the create projects page. 
+    ---
+    GET:
+      data: optionsData =>
+      responses:
+        200:
+            description:
+               Successfuly log out user from the session. 
+    """
     return optionsData, 200
 
-@app.route("/project+descriptions", methods=["GET","POST"])
+@app.route("/project+descriptions", methods=["GET"])
 def project_descriptions():
+    """
+    Function that returns data from the project database that are not deleted by the user.
+    ---
+    GET:
+      responses:
+        200:
+            data:
+                {"project-name": <Project.project_name>, "geo_json":<Project.geo_json>} 
+    """
     projects = Project.query.filter_by(isDeleted = 0).all()
     print(projects)
     list_of_projects = []
@@ -135,7 +196,21 @@ def createproject_submission():
 
 @app.route("/register", methods=["POST"])
 def register_user():
-    email = request.json["email"]
+    """
+    By registering a new user in the database, you may add new user data to the database.
+    ---
+    POST:
+      description: Add new user in the database
+      responses:
+        200:
+            description:
+                new username and password are added onto the database.
+        409:
+            description:    
+               * if the username used to register already exists in the database
+               * if the password entered and the password retyped do not match
+    """
+    email = request.json["email"] 
     password = request.json["password"]
     retype = request.json["retypepassword"]
     username = request.json["username"]      
@@ -155,12 +230,33 @@ def register_user():
         "email": new_user.email
     }), 200
 
-@app.route('/comparison', methods =['GET','POST'])
+@app.route('/comparison', methods =['GET'])
 @login_required
 def compare_data():
+    """
+    Obtain information for the comparative page. 
+    When the user who is the resolver requests data to compare, 
+    this method must deliver data that the resolver has not resolved previously. 
+    That would be the value of the notYet_submitted variable.
+    ---
+    GET:
+      responses:
+        200:
+            data:
+                list of data that the resolver can compare and resolve 
+            format:
+                {
+                 text:<tweet_database.text>,
+                 submission_id:<Submission.submission_id>,
+                 annotation:<Submission.annotation>,
+                 username:<Submission.username>,
+                 projectGeojson:<Project.geo_json>,
+                 tweetid:<tweet_database.id>,
+                 userid:<Submission.userid>
+                 }
+                 where current_user=Submission.id values are not in current_user=CompareSubmission.id values
+    """
     project_name = session["project_name"]
-    user_data = User.query.with_entities(User.username)
-
     to_send_data = []    
     alreadySubmitted_ids = [idvid for subid in CompareSubmission.query.filter_by(userid = current_user.id).options(load_only(CompareSubmission.submissionid_1, CompareSubmission.submissionid_2)).all() for idvid in [subid.submissionid_1,subid.submissionid_2]]
                        # need to change the tweet id here later on 
@@ -173,17 +269,12 @@ def compare_data():
 
     df = pd.DataFrame(notYet_submitted, columns = ["SubmissionObject","text","submission_id","annotation","username","geo_json","id","userid"]).astype(str)
     to_iterate =None  # grab the first group of unique IDS
+    # an alternate to implementing the for loop below is by doing df.grouby('id',sort=False).first()
     for name, group in df.groupby('id',sort=False):
         to_iterate = group
         break 
-    # all_submissions = Submission.query.filter_by(project_name = project_name, tweetid = "901774898623692800")\
-    #                                 .join(tweet_database, Submission.tweetid == tweet_database.id) \
-    #                                     .join(Project, Submission.project_name == project_name) \
-    #                                         .filter_by(project_name = project_name) \
-    #                                               .add_columns(tweet_database.text, Submission.submission_id, Submission.annotation,Submission.username, Project.geo_json, tweet_database.id, Submission.userid) 
-               
-                   
-    for idx,filtered_submission in to_iterate.iterrows():  # each group is a tweet set
+  
+    for index,filtered_submission in to_iterate.iterrows():  # each group is a tweet set
         to_send_data.append({"text": filtered_submission.text,
         "submission_id": str(filtered_submission.submission_id),
         "annotation": json.loads(filtered_submission.annotation)["annotation"],
@@ -193,60 +284,94 @@ def compare_data():
         "userid":str(filtered_submission.userid)})
     return jsonify(to_send_data), 200
 
-@app.route('/handleProject/<type>', methods=["POST"])
-@login_required
-def handleProjectSelection(type):
-    print(type)
-    if type == "select":
-        print("hi")
-    else:
-        print("hi")
-    return jsonify({"success": "Project Complete"}), 200
-@app.route('/api-grab/<tweetid>', methods=['GET','POST'])
+
+@app.route('/api-grab/<tweetid>', methods=['GET'])
 @login_required
 def app_data(tweetid):
+    """
+    Obtain information for the Annotation page page. 
+    When the user who is the annotator requests data to annotate, 
+    this method must deliver data that the annotatoer has not annotated previously. 
+    ---
+    @param:
+        tweetid:  Grab the data in the database where Tweet_database.id == tweetid if this parameter exists.
+    ---
+    GET:
+      responses:
+        200:
+            data:
+                 data that the annotator can annotate
+            format:
+                {
+                 id:<tweet_database.id>,
+                 content:<tweet_data.text>,
+                 neuro_result: Model rest api data,
+                 project_description:{label:<Project.project_name>,geo_json:<Project.geo_json>}
+                 }
+        409:
+            description:
+                * If the data from the Model prediction link did not yield any results (i.g. response from the UB servers are not 200)
+                * If there is no project in session 
+
+    """
     submissions_exists = Submission.query.filter_by(userid = current_user.id) is not None 
-    if(submissions_exists):
+    if(submissions_exists): # if User already annotated data before, find data that the user has not annotated before and return that 
         tweet_ids = [ids.tweetid for ids in Submission.query.filter_by(userid = current_user.id, project_name = session["project_name"]).options(load_only(Submission.tweetid)).all()]
         tweets = tweet_database.query.filter_by(projectName = session["project_name"]).filter(tweet_database.id.notin_(tweet_ids)).first()
-    else:
-        tweets = tweet_database.query.filter_by(projectName = session["project_name"]).first() #"901774900481970176" #.order_by(func.random()).first() #func.random()
+    else: # It's the user's first time annotating, therefore pick the first tweet in the database
+        tweets = tweet_database.query.filter_by(projectName = session["project_name"]).first() 
     if(tweetid != 'any'):
         tweets = tweet_database.query.filter_by(id = str(tweetid)).first() 
     content = tweets.text
     project_name = session["project_name"]
-    if project_name:
+    if project_name: # if the session has a project, then query the project GeoJson
         project_json = Project.query.filter_by(project_name = project_name).first()
-    else:
+    else: # Since users must first register a project before signing in, this is extremely unlikely to occur.
         return jsonify({"error": "No Project on session"}), 409
-    urlEncoded = urllib.parse.quote(tweets.text)
-    toRequestModel = "{}={}".format(configurationsData['modelLink'],urlEncoded)
+    urlEncoded = urllib.parse.quote(tweets.text) #encode the text content of a tweet so that it may be converted into a url format
+    toRequestModel = "{}={}".format(configurationsData['modelLink'],urlEncoded) # Using the model url link from configuration.json, get a request using the URLencoded method.
     response = requests.get(toRequestModel)
     if response.status_code != 200:
+        # If the model url link does not return a response of 200, send a 409 since we do not have model prediction data.
+        # Cases of where the code fires here is when the servers at the University at Buffalo are down.
         return  jsonify({"error": "Rest Api Model unable to grab data"}), 409
 
-    neuro_results_json = response.json()['annotation']
+    neuro_results_json = response.json()['annotation'] # data from the response
     toSend = {'id': str(tweets.id), 
      'content': content,
      'neuro_result':neuro_results_json,
      'project_description': {"label":project_json.project_name, "geo_json": json.loads(project_json.geo_json)}}
-    return jsonify(toSend)
+    return jsonify(toSend), 200
 
-# sql injection might happen here since there is no login required 
 @app.route('/uploadfile', methods=['POST'])
 @login_required
 def uploading_textFile():
-    try:
-        projectName = request.form['projectName']
+    """
+   This method is related to the create project part, 
+   since if a user submits twitter data, it must first 
+   go via this method to be preprocessed and stored in the database.
+    ---
+    POST:
+      responses:
+        200:
+            description:
+                 The data from tweets has been successfully preprocessed and should now be available in the database.
+        401:
+            description:
+                * Preprocessing failed due to data format. 
+
+    """
+    try: 
+        projectName = request.form['projectName'] #The name of the project on which the user wishes to upload new tweets
         project_exists = Project.query.filter_by(project_name = projectName).first() is not None
-        if project_exists:
+        if project_exists: # if the project name already exists, then tell the user
             return jsonify({"error":"Project Name Already Exists"}), 401
         file = request.files['file']
         df = pd.read_json(file.stream.read().decode("UTF8"), lines=True, encoding="utf8")[['text','id','created_at']]
         df['projectName'] = projectName
         dtype={"text": String(),"id":String(), "created_at":DateTime(), "projectName":String()}
-        rowsAffected = df.to_sql(name = 'TwitterDataSet',con = db.engine, index = False, if_exists='append',dtype=dtype)
-    except Exception as e: 
+        rowsAffected = df.to_sql(name = 'TwitterDataSet',con = db.engine, index = False, if_exists='append',dtype=dtype) # upload onto the database 
+    except Exception as e: #If the entire procedure above fails, publish the line number where the error occurred.
         print(
         type(e).__name__,          # TypeError
         __file__,                  # /tmp/example.py
@@ -258,9 +383,20 @@ def uploading_textFile():
 @app.route('/deleteproject', methods=['POST'])
 @login_required
 def deleting_projects():
-    projects = request.json['projects']
+    """
+    This approach replaces the value on the isDeleted part of the Project column by one.
+    If we replace the column value with 1, we will not display the user this project since
+    they requested that it be removed.
+    ---
+    POST:
+      responses:
+        200:
+            description:
+                 Project data has successfuly been deleted/hidden fromn the user's view
+    """
+    projects = request.json['projects'] # contains a list of projects that the user desires to get deleted
     queried_projects = Project.query.filter(Project.project_name.in_(projects))
-    for query in queried_projects:
+    for query in queried_projects: # we replace the value with 1 
         query.isDeleted = 1 
     db.session.commit()
     return jsonify({"success": "Upload Complete"}), 200
@@ -268,6 +404,15 @@ def deleting_projects():
 @app.route('/api/submit', methods=['POST'])
 @login_required
 def submission():
+    """
+    This method handles the event when a user submits an annotation. 
+    ---
+    POST:
+      responses:
+        200:
+            description:
+                 adds a new row value in the Submission table on the HarveyTwitter.db
+    """
     json_object = request.json
     tweetid =json_object["tweetid"]
     project = session["project_name"]
@@ -291,8 +436,16 @@ def submission():
 @app.route('/compare/submit', methods=['POST'])
 @login_required
 def compare_submission():
+    """
+    When a resolver submits a resolution from the compare submissions page, this method handles the event.
+    ---
+    POST:
+      responses:
+        200:
+            description:
+                 adds a new row value in the compare-submission table on the HarveyTwitter.db
+    """
     json_object = request.json
-    
     userId1 = json_object['submission-userid-1']
     userId2 = json_object['submission-userid-2']
     submissionid1 = json_object['submissionid-1']
