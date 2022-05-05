@@ -10,6 +10,13 @@ import { SelectProject } from './SelectProject';
 import * as util from "./Util.js";
 import { useNavigate } from "react-router-dom";
 import { DeleteProject } from './DeleteProject';
+/**
+     * Component Navigation Bar 
+     * @param {boolean} isLogin determines if a user is logged in within the web application 
+     * @param {string} _username Username of the user that is currently logged in  
+     * @param {function} OnLogin function passed down that changes whether a user logs in or logs out
+     * @param {string} CurProjectName String that contains the current project name. 
+     */
 export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }) => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
@@ -17,6 +24,9 @@ export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }
     const [projectName, setProjectName] = useState(); 
     const [deleteProjects, setDeleteProjects] = useState(); 
     const handleLogout = () => {
+        /*
+        * event that handles when a user logs out 
+        */
         axios({
             method: "POST",
             url: "/logout",
@@ -33,6 +43,9 @@ export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }
 
     }
     const handleSubmitSelectProject = () => {
+        /*
+        * event that handles when tries to select a new project
+        */
         axios({
             method: "POST",
             url: "/handleProject/select",
@@ -41,6 +54,9 @@ export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }
         })
     }
     const handleDeleteProjects = () =>{
+        /*
+        * event that handles when tries to delete a project
+        */
         axios({
             method: "POST",
             url: "/handleProject/delete",
