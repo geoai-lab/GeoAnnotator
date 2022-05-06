@@ -4,11 +4,12 @@ import TweenLite from 'gsap'
 import "../CSS-files/Home.css"
 import homepageimg from "./homepagepictures.PNG"
 import sponsors from "./sponsors.PNG"
+/**
+     * Component for the / path of the application. 
+     * Contains simple description of the web application 
+     * @requires {user to be logged-in}
+     */
 function Home() {
-    window.onload = function () {
-        var title = document.getElementById("text");
-
-    }
     return (
 
         <>

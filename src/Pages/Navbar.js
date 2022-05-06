@@ -18,11 +18,9 @@ import { DeleteProject } from './DeleteProject';
      * @param {string} CurProjectName String that contains the current project name. 
      */
 export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }) => {
-    const [click, setClick] = useState(false);
-    const [button, setButton] = useState(true);
     const navigate = useNavigate();
     const [projectName, setProjectName] = useState(); 
-    const [deleteProjects, setDeleteProjects] = useState(); 
+ 
     const handleLogout = () => {
         /*
         * event that handles when a user logs out 
@@ -39,7 +37,6 @@ export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }
                     util.ToggleMessage("error", "Error in logout")
                 }
             })
-        setClick(false)
 
     }
     const handleSubmitSelectProject = () => {
@@ -66,7 +63,7 @@ export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }
     }   
     return (
         <>
-            <DeleteProject onSubmit={handleDeleteProjects} setProjectDeletion={setDeleteProjects} CurProjectName={CurProjectName}/>
+            <DeleteProject onSubmit={handleDeleteProjects} CurProjectName={CurProjectName}/>
             <SelectProject id="navbarSelection" onSubmit={handleSubmitSelectProject} setProjectName={setProjectName} addCreate={false}/>
             <div class="col-md-12" id="navigation-bar">
                 <nav className="navbar navbar-expand-lg navbar-light" style={{ "background-color": "#83aeb8" }}>

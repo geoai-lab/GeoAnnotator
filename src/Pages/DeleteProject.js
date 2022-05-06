@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
      * Component is a popup function that opens if user wants to delete a project
      * @param {string} CurProjectName String that contains the current project name. 
      */
-export const DeleteProject = ({ setProjectDeletion,CurProjectName  }) => {
+export const DeleteProject = ({CurProjectName  }) => {
     const [project, setProjects] = useState([]) // contains all of the project names
     const [selectedProjects, setSelectedProjects] = useState() // selected projects that will be deleted
     useEffect(() =>{ 
