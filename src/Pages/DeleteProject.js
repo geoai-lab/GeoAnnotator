@@ -43,6 +43,9 @@ export const DeleteProject = ({CurProjectName  }) => {
         )
     }, [])
     const onSubmit = () => {
+        /**
+         * Function that handles the event of when a user submits projects that needs to deleted 
+         */
         axios({
             method: "POST",
             url: '/deleteproject',

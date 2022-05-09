@@ -18,7 +18,7 @@ import { DeleteProject } from './DeleteProject';
      * @param {string} CurProjectName String that contains the current project name. 
      */
 export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }) => {
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // navigation object to direct user to pages
     const [projectName, setProjectName] = useState(); 
  
     const handleLogout = () => {
@@ -116,4 +116,3 @@ export const Navbar = ({ children, isLogin, OnLogin, _username, CurProjectName }
         </>
     )
 }
-

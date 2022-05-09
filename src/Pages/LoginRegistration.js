@@ -16,7 +16,6 @@ import * as util from './Util.js';
 export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
     const [isRegistering, setIsRegistering] = useState(false); //To know if a user is presently logged in or registering, utilize this state object.
     const [currentProject, setCurrLoginProject] = useState(); // This state object contains the name of the current project that the user selected (i.g. what the user selected from the list of project names in the project table)
-    const [popupmessageOpen, setPopupmessageOpen] = useState(false);
     const navigate = useNavigate(); // navigate object (i.g. navigate("/createproject") ==> redirects you to the /createproject website). Function is similar to <a href="{link}"/>
     const [loginForm, setloginForm] = useState({ // when isRegistering==False this will contain the login data
         email: "",
@@ -35,6 +34,7 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
     }
 
     function handleChange(event) {
+        //event for processing data form changes Essentially, either the state login form or the state register form should be updated.
         const { value, name } = event.target
         if (!isRegistering) {
             setloginForm(prevNote => ({
@@ -49,8 +49,11 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
         }
     }
     const handleSubmit = (isCreating) => {
-        console.log(currentProject);
-        if(!currentProject && !isRegistering){
+        /* handles login/register submission 
+        ----
+            @param {boolean} isCreating boolean that determines whether the user clicked create project button.
+        */
+        if(!currentProject && !isRegistering){ // when the user doesn't choose a project 
             util.ToggleMessage("error","Please Choose a project");
             return; 
         }
@@ -79,16 +82,16 @@ export const LoginRegistration = ({ onLogin, setLogin, setUsername }) => {
                     }
                     util.ToggleMessage("success","Log-In Successful");
                     setLogin(true);
-                    if (isCreating) {
+                    if (isCreating) { // when user logins and wants to create a project instead of annotating, then redirect user to the creaproject page 
                         navigate("/createproject");
                     }
-                    else {
+                    else { // else redirect user as an annotator 
                         navigate('/api')
                     }
                 }
 
             }).catch((error) => {
-                if (error.response.status == 401) {
+                if (error.response.status == 401) { 
                     util.ToggleMessage("error",error.response.data.error);
                 }
                 else if (error.response.status == 409) {

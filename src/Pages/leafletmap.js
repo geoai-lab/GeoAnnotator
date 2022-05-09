@@ -40,13 +40,13 @@ L.Icon.Default.mergeOptions({
 export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawings, setMaplayersFunction, editControl, setCurrentLocationDescription, noRepeat }) => {
     
     const [position, setPosition] = useState({ lat: 39.7837304, lng: -100.445882 }); // initial position of the map when no data is given 
-    const [mapLayers, setMapLayers] = useState({}); //  would keep the existing mapLayers (i.g. polygons and drawings that the user input, and not the data it recieved)
+    const [mapLayers, setMapLayers] = useState({}); //  would keep the existing mapLayers (i.g. polygons and drawings that the user input, and not the data it recieved) For now map layers only contain geoJson returned from the Edit Control
     const [isloading, setIsloading] = useState(true); // State object to determine whether to show a loading bar to the user. I.G. setIsLoading(true) when this component is waiting on data to be recieved
     const [locationTitle, setLocationTitle] = useState(''); // State object that would contain the current location of the component is zoomed at i.g. setLocationTitle("Buffalo New York"), and locationTitle will be used for the title of this component
     const [SearchText, setSearchText] = useState(""); // state object that will contain values in the search bar
     const [geojsonLayer, setGeojsonLayer] = useState(null); // The red contour of the polygon will be stored in a state object. In essence, the data contained in this state would be shown as a red outline polygon on the map. Contains mostly project geojson and/or US states GeoJson
     const [map, setMap] = useState(null); // State object for leaflet map object 
-    const [geojsonTag, setGeojsonTag] = useState(null); // State object that essentially should contian the polygons returned by the search bar 
+    const [geojsonSearchResult, setGeojsonSearchResult] = useState(null); // State object that essentially should contian the polygons returned by the search bar 
     const [selectGeojson, setSelectGeojson] = useState(); // If a user clicks on a polygon, this state object should that polygon object.
     const [changeOpen, setChangeOpen] = useState(false); // Would open a modal for the user to ask if they want to edit the said polygon, or delete it. 
     const [editing, setEditing] = useState(false); // If changeOpen == true, then this state object determines whether the user is currently editing the polygon or not. 
@@ -72,7 +72,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                     setLocations(data);
                     setIsloading(false);
                     if (data[0] && map) {
-                        setGeojsonTag(data[0].geometry)
+                        setGeojsonSearchResult(data[0].geometry)
                     }
                 })
 
@@ -92,17 +92,21 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
     }, [onChange])
     useEffect(() => {
+        // use effect for the passed geojson to add to the map changes 
         Addgeojson(map, geojson, true);
     }, [geojson])
     useEffect(() => {
-        Addgeojson(map, geojsonTag, false);
-    }, [geojsonTag])
+        // use effect for a search result returns a geoJson 
+        Addgeojson(map, geojsonSearchResult, false);
+    }, [geojsonSearchResult])
     useEffect(() => {
+        // use effect to update layers from parent level 
         if (setMaplayersFunction) {
             setMaplayersFunction(mapLayers)
         }
     }, [mapLayers]);
     useEffect(() => {
+        // add the geoJson to MapLayers
         if (setMaplayersFunction && selectGeojson) {
             setMapLayers(oldLayers => {
                 return ({
@@ -115,12 +119,16 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }, [selectGeojson])
 
 
-    const Addgeojson = (map, geojson_type, isBorder) => {
-        /* 
+    const Addgeojson = (map, GeoJsonObject, isBorder) => {
+        /**  
         Function only used when user is creating project and the addistion of geojsons are already here
+        ----
+        @param {leafletMap Object} map current leaflet map object 
+        @param {GeoJson} GeoJsonObject GeoJson object that is being passed on to be displayed onto the map
+        @param {boolean} isBorder boolean to determine whether the passed GeoJsonObject is a border created from the /createproject
         */
-        if (geojson_type && map) {
-            var layer = L.geoJSON(geojson_type, {
+        if (GeoJsonObject && map) {
+            var layer = L.geoJSON(GeoJsonObject, {
                 style: isBorder ? { "fillColor": "white", "opacity": "1", "color": "red", "fillOpacity": "0" } :
                     { "fillColor": "blue", "opacity": ".95", "color": "blue", "fillOpacity": ".2" },
                 onEachFeature: function (feature, layer) {
@@ -136,6 +144,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
             })
             layer.addTo(map)
             if(noRepeat){
+                // if we know only one polygon should only be shown and the old one should be removed
                 if(Object.keys(mapLayers).length > 0){
                     setMapLayers(data => {
                         map.removeLayer(data['-1']);
@@ -162,6 +171,12 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     }
 
     const handleloadOptions = (input) => {
+        /** 
+        event to handle the search bar loading options. When a user types on the search bar, this function handles that event and returns geoJson returned from the nominatim of University at Buffalo 
+        -----
+        @param {string} input location string
+        @return {GeoJson} 
+        */
         if (input) {
             const myPromise = new Promise((resolve, reject) => {
                 resolve(fetchData(input).then(data => {
@@ -199,6 +214,11 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
     }
     const fetchData = async (input_string) => {
+        /** 
+        function to fetch data from the nominatim at the GeoAI servers at the university at Buffalo 
+        @param {string} input_string location string 
+        @return {GeoJson} returns nominatim GeoJson Object 
+        */
         try {
             var response_string = "https://geoai.geog.buffalo.edu/nominatim/search?q=" + input_string + "&format=geojson&polygon_geojson=1";
             const data = await fetch(response_string).then(response => response.json()).then(data => data.features)
@@ -211,10 +231,17 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
 
 
     if (isloading) {
+        /*
+        when we are waiting for data, show a loading screen instead. 
+        */
         return (<Loading />);
     }
     const _onCreate = (e) => {
+        /** 
+        Function that handles the creation of polygon drawings on the Edit Control Object 
+        */
         if(!drawings){
+
             $("a.leaflet-draw-draw-polygon").hide();
         }
         setIsinitial(false)
@@ -228,7 +255,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                 return data;
             }); 
         }
-        console.log(layer);
+          // update the this components MapLayers
         setMapLayers((prevLayers) => ({
             ...prevLayers,
             [id]: layer
@@ -239,12 +266,17 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
     };
 
     const _onEdit = (e) => {
+         /** 
+        Function that handles the edit of polygon drawings on the Edit Control Object 
+        */
         setIsinitial(false)
         const { layerType, layer } = e;
         const layers = e.layers._layers
         if (Object.keys(layers).length == 0) {
+            // if there are no drawings then don't edit anything
             return
         }
+        // update the this components MapLayers
         for (const [key, value] of Object.entries(layers)) {
             setMapLayers((prevLayers) => ({
                 ...prevLayers,
@@ -253,6 +285,9 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         }
     }
     const _onDeleted = (e) => {
+         /** 
+        Function that handles the removal of polygon drawings on the Edit Control Object 
+        */
         setIsinitial(false);
         if(!drawings){
             setTimeout(() => {
@@ -266,6 +301,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         if (Object.keys(layers).length == 0) {
             return
         }
+          // update the this components MapLayers
         for (const [key, value] of Object.entries(layers)) {
             setMapLayers((prevLayers) => {
                 delete prevLayers[key];
@@ -275,7 +311,11 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         }
     }
     const handleDeleteGeojson = () => {
+        /** 
+        function to handle an event when user wants to delete a polygon returned by the search bar 
+        */
         if (selectGeojson) {
+            // if a user selected a polygon to delete 
             var deletemessage = document.getElementById("deletemessage")
             deletemessage.style.visibility = "hidden";
             map.removeLayer(selectGeojson);
@@ -289,7 +329,9 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         setChangeOpen(data => !data);
     }
     const handleEditGeoJson = () => {
-
+        /** 
+        function to handle an event when user wants to edit a polygon returned by the search bar 
+        */
         if (selectGeojson && !editing) {
             setEditing(true);
             selectGeojson.editing.enable();
@@ -300,7 +342,10 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
         setChangeOpen(data => !data);
     }
     const handleClickSearch = (json_value) => {
-        if (mapLayers && (Object.keys(mapLayers).length > 0)) {
+        /** 
+        function to handle an event when user clicks on one of the locations returned by the search bar 
+        */
+        if (mapLayers && (Object.keys(mapLayers).length > 0)) { // if there are still polygons on the screen
             util.ToggleMessage("warning","There are still polygons on the screen. This will delete everything. Do you want to continue?",
                 function(){
                     setMapLayers(layers => {
@@ -310,16 +355,16 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
                     setUniqueKey(data => data + 1);
                     setEditing(false);
                     setIsinitial(true);
-                    setGeojsonTag(json_value.geojson);
+                    setGeojsonSearchResult(json_value.geojson);
                     setLocationTitle(json_value.label);
                     $("#popupMessageWarning").hide("fade");
                 });
           
            
-        }else{
+        }else{ // if the screen is completely empty
             setEditing(false);
             setIsinitial(true);
-            setGeojsonTag(json_value.geojson);
+            setGeojsonSearchResult(json_value.geojson);
             setLocationTitle(json_value.label);
         }
 
@@ -334,7 +379,7 @@ export const Leafletmap = ({ children, id, onChange, geojson, searchBar, drawing
             <div class="container">
                 <div className="row" style={{ "z-index": -55, "height": "0%" }}>
                     <div className="col text-center">
-                    
+
                         <div className='form-group col-md-13'>
                             <div>
                                 <MapContainer id={id} center={position} zoom={ZOOM_LEVEL} ref={mapRef}
